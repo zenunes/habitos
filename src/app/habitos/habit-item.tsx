@@ -34,7 +34,7 @@ export function HabitItem({ habitId, title, frequency, active }: HabitItemProps)
       }`}
     >
       <div>
-        <p className="font-medium">{title}</p>
+        <p className="font-medium text-zinc-800">{title}</p>
         <p className="text-sm text-zinc-500">Frequência: {frequency}</p>
       </div>
       <div className="flex items-center gap-3">

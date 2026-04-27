@@ -26,7 +26,7 @@ export default async function DashboardPage() {
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-10">
       <header className="flex flex-col gap-2">
         <p className="text-sm uppercase tracking-wide text-zinc-500">Dashboard</p>
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-900">
           Ola, {user.email ?? "usuario"}
         </h1>
         <p className="text-zinc-600">
@@ -37,21 +37,21 @@ export default async function DashboardPage() {
       <section className="grid gap-4 sm:grid-cols-3">
         <article className="rounded-xl border border-zinc-200 bg-white p-4">
           <p className="text-sm text-zinc-500">XP total</p>
-          <p className="mt-2 text-2xl font-semibold">{progress.xpTotal}</p>
+          <p className="mt-2 text-2xl font-semibold text-zinc-800">{progress.xpTotal}</p>
         </article>
         <article className="rounded-xl border border-zinc-200 bg-white p-4">
           <p className="text-sm text-zinc-500">Nivel</p>
-          <p className="mt-2 text-2xl font-semibold">{progress.level}</p>
+          <p className="mt-2 text-2xl font-semibold text-zinc-800">{progress.level}</p>
         </article>
         <article className="rounded-xl border border-zinc-200 bg-white p-4">
           <p className="text-sm text-zinc-500">Streak atual</p>
-          <p className="mt-2 text-2xl font-semibold">{progress.currentStreak} dias</p>
+          <p className="mt-2 text-2xl font-semibold text-zinc-800">{progress.currentStreak} dias</p>
         </article>
       </section>
 
       {/* Secao de Check-in Rapido */}
       <section className="rounded-xl border border-zinc-200 bg-white p-5">
-        <h2 className="text-lg font-semibold mb-4">Habitos de Hoje</h2>
+        <h2 className="text-lg font-semibold text-zinc-800 mb-4">Habitos de Hoje</h2>
         {habits.length > 0 ? (
           <ul className="space-y-3">
             {habits.filter(h => h.active).map(habit => (
@@ -72,7 +72,7 @@ export default async function DashboardPage() {
       {mainQuest && (
         <section className="rounded-xl border border-zinc-200 bg-white p-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">{mainQuest.title}</h2>
+            <h2 className="text-lg font-semibold text-zinc-800">{mainQuest.title}</h2>
             {mainQuest.completed && (
               <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-800">Concluida</span>
             )}
@@ -83,7 +83,7 @@ export default async function DashboardPage() {
       )}
 
       <section className="rounded-xl border border-zinc-200 bg-white p-5">
-        <h2 className="text-lg font-semibold">Loja de recompensas</h2>
+        <h2 className="text-lg font-semibold text-zinc-800">Loja de recompensas</h2>
         {rewards.length > 0 ? (
           <ul className="mt-3 space-y-2 text-zinc-700">
             {rewards.map((reward) => (
