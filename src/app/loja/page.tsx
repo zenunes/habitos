@@ -1,15 +1,16 @@
 import Link from "next/link";
 import { requireUser } from "@/modules/auth/server/session";
-import { getUserRewards } from "@/modules/rewards/server/queries";
+import { getUserRewards, getUserRedeemedRewards } from "@/modules/rewards/server/queries";
 import { getUserProgress } from "@/modules/progression/server/queries";
 import { StoreManager } from "./store-manager";
-import { ArrowLeft, ShoppingCart } from "lucide-react";
+import { ArrowLeft, ShoppingCart, History } from "lucide-react";
 
 export default async function LojaPage() {
   await requireUser();
   
-  const [rewards, progress] = await Promise.all([
+  const [rewards, redeemedRewards, progress] = await Promise.all([
     getUserRewards(),
+    getUserRedeemedRewards(),
     getUserProgress(),
   ]);
 
@@ -41,6 +42,32 @@ export default async function LojaPage() {
       </header>
 
       <StoreManager initialRewards={rewards} availablePoints={progress.availablePoints} />
+
+      {/* HISTÓRICO DE INVENTÁRIO (COMPRAS RECENTES) */}
+      <section className="system-card p-6 border-slate-800 bg-slate-950/30">
+        <h2 className="text-xl font-heading font-bold text-white tracking-widest uppercase flex items-center gap-3 mb-6 border-b border-slate-800 pb-3">
+          <History size={24} className="text-slate-400" />
+          Inventário Recente
+        </h2>
+        
+        {redeemedRewards.length > 0 ? (
+          <ul className="space-y-3">
+            {redeemedRewards.slice(0, 5).map((item) => (
+              <li key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-900/50 p-4 rounded-lg border border-slate-800">
+                <div className="mb-2 sm:mb-0">
+                  <p className="font-heading font-bold text-slate-200">{item.title}</p>
+                  <p className="text-xs text-slate-500">Resgatado em {new Date(item.redeemedAt).toLocaleDateString('pt-BR')} às {new Date(item.redeemedAt).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</p>
+                </div>
+                <span className="text-[10px] text-purple-400 font-heading tracking-widest font-bold uppercase bg-purple-950/30 px-2 py-1 rounded border border-purple-500/30 self-start sm:self-auto">
+                  -{item.pointsCost} pts
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-slate-500 font-body text-center py-6">Você ainda não adquiriu nenhum item da Loja do Sistema.</p>
+        )}
+      </section>
     </main>
   );
 }

@@ -4,10 +4,16 @@ import { useState } from "react";
 import { HabitItem } from "./habit-item";
 import { CreateHabitForm } from "./create-habit-form";
 import { Habit } from "@/modules/habits/domain/habit";
-import { Plus, X, ListTodo } from "lucide-react";
+import { Plus, X, ListTodo, Filter } from "lucide-react";
 
 export function HabitsListManager({ initialHabits }: { initialHabits: Habit[] }) {
   const [isCreating, setIsCreating] = useState(false);
+  const [filter, setFilter] = useState<"all" | "daily" | "weekdays">("all");
+
+  const filteredHabits = initialHabits.filter(habit => {
+    if (filter === "all") return true;
+    return habit.frequency === filter;
+  });
 
   return (
     <div className="flex flex-col gap-6">
@@ -16,14 +22,38 @@ export function HabitsListManager({ initialHabits }: { initialHabits: Habit[] })
           <ListTodo size={24} className="text-sky-500" />
           Quests Ativas
         </h2>
-        {!isCreating && (
-          <button
-            onClick={() => setIsCreating(true)}
-            className="system-btn-primary py-2 px-4 text-xs shadow-[0_0_10px_var(--primary-glow)] flex items-center gap-2 w-full sm:w-auto"
-          >
-            <Plus size={16} /> Adicionar Nova Quest
-          </button>
-        )}
+        
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex bg-slate-900 border border-slate-700 rounded p-1">
+            <button 
+              onClick={() => setFilter("all")}
+              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded ${filter === "all" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
+            >
+              Todas
+            </button>
+            <button 
+              onClick={() => setFilter("daily")}
+              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded ${filter === "daily" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
+            >
+              Diárias
+            </button>
+            <button 
+              onClick={() => setFilter("weekdays")}
+              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded ${filter === "weekdays" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
+            >
+              Dias Úteis
+            </button>
+          </div>
+          
+          {!isCreating && (
+            <button
+              onClick={() => setIsCreating(true)}
+              className="system-btn-primary py-2 px-4 text-xs shadow-[0_0_10px_var(--primary-glow)] flex items-center gap-2"
+            >
+              <Plus size={16} /> <span className="hidden sm:inline">Adicionar Quest</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {isCreating && (
@@ -42,9 +72,9 @@ export function HabitsListManager({ initialHabits }: { initialHabits: Habit[] })
       )}
 
       <section className="system-card p-6">
-        {initialHabits.length > 0 ? (
+        {filteredHabits.length > 0 ? (
           <ul className="space-y-4">
-            {initialHabits.map((habit) => (
+            {filteredHabits.map((habit) => (
               <HabitItem
                 key={habit.id}
                 habitId={habit.id}
@@ -59,7 +89,7 @@ export function HabitsListManager({ initialHabits }: { initialHabits: Habit[] })
             <div className="mx-auto h-12 w-12 rounded-full bg-sky-900/30 flex items-center justify-center mb-4">
               <span className="h-4 w-1 bg-sky-500 rounded-full shadow-[0_0_8px_var(--primary-glow)]" />
             </div>
-            <p className="text-slate-400 font-body mb-2">Nenhuma quest cadastrada no sistema.</p>
+            <p className="text-slate-400 font-body mb-2">Nenhuma quest encontrada para este filtro.</p>
             <p className="text-xs text-sky-500/70 font-heading tracking-widest uppercase">O mundo aguarda seu despertar.</p>
           </div>
         )}

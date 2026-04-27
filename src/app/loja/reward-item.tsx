@@ -3,7 +3,9 @@
 import { useTransition } from "react";
 import { redeemRewardAction, deleteRewardAction } from "@/modules/rewards/actions";
 import { Reward } from "@/modules/rewards/domain/reward";
-import { Trash2, ShoppingBag } from "lucide-react";
+import { Trash2, ShoppingBag, Gift } from "lucide-react";
+import { toast } from "sonner";
+import confetti from "canvas-confetti";
 
 export function RewardItem({ reward, availablePoints }: { reward: Reward, availablePoints: number }) {
   const [isPending, startTransition] = useTransition();
@@ -14,7 +16,21 @@ export function RewardItem({ reward, availablePoints }: { reward: Reward, availa
       startTransition(async () => {
         const result = await redeemRewardAction(reward.id, reward.pointsCost);
         if (result.error) {
-          alert(result.error);
+          toast.error(result.error, {
+            style: { borderColor: "#ef4444", color: "#f87171" }
+          });
+        } else {
+          toast.success(`Resgatado: ${reward.title}`, {
+            icon: <Gift className="text-purple-400" />,
+            style: { borderColor: "#a855f7", color: "#d8b4fe", background: "rgba(168, 85, 247, 0.1)" }
+          });
+          
+          confetti({
+            particleCount: 50,
+            spread: 70,
+            origin: { y: 0.7 },
+            colors: ['#a855f7', '#c084fc', '#e879f9']
+          });
         }
       });
     }

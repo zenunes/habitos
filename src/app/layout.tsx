@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Rajdhani, Outfit } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const rajdhani = Rajdhani({
@@ -31,6 +32,21 @@ export default function RootLayout({
       <body
         className={`${rajdhani.variable} ${outfit.variable} font-body antialiased bg-[#030712] text-zinc-100 min-h-screen`}
       >
+        <Toaster 
+          theme="dark" 
+          position="bottom-center"
+          toastOptions={{
+            style: {
+              background: '#0f172a',
+              border: '1px solid #0ea5e9',
+              color: '#f8fafc',
+              fontFamily: 'var(--font-rajdhani)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              fontWeight: 'bold',
+            }
+          }}
+        />
         {children}
       </body>
     </html>

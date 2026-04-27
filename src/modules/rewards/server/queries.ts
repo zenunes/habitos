@@ -26,3 +26,40 @@ export async function getUserRewards(): Promise<Reward[]> {
     available: row.active,
   }));
 }
+
+export type RedeemedItem = {
+  id: string;
+  title: string;
+  pointsCost: number;
+  redeemedAt: string;
+};
+
+export async function getUserRedeemedRewards(): Promise<RedeemedItem[]> {
+  const user = await requireUser();
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("reward_redemptions")
+    .select(`
+      id,
+      points_cost,
+      created_at,
+      rewards (
+        title
+      )
+    `)
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    logger.error("Erro ao buscar historico de resgates", error, { userId: user.id });
+    return [];
+  }
+
+  return data.map((row: any) => ({
+    id: row.id,
+    title: row.rewards?.title || "Recompensa Excluída",
+    pointsCost: row.points_cost,
+    redeemedAt: row.created_at,
+  }));
+}

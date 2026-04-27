@@ -2,7 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { checkinHabitAction } from "@/modules/habits/actions-checkin";
-import { CheckCircle2, CircleDashed } from "lucide-react";
+import { CheckCircle2, CircleDashed, ShieldAlert } from "lucide-react";
+import { toast } from "sonner";
+import confetti from "canvas-confetti";
 
 type CheckinButtonProps = {
   habitId: string;
@@ -11,50 +13,78 @@ type CheckinButtonProps = {
 
 export function CheckinButton({ habitId, todayDateRef }: CheckinButtonProps) {
   const [isPending, startTransition] = useTransition();
-  const [statusMsg, setStatusMsg] = useState<string | null>(null);
 
   const handleCheckin = () => {
     startTransition(async () => {
       try {
         const result = await checkinHabitAction(habitId, todayDateRef);
-        setStatusMsg(result.message);
         
-        // Limpa a msg após alguns segundos
-        setTimeout(() => setStatusMsg(null), 3000);
+        if (result.message?.includes("Sucesso")) {
+          // Toast de sucesso padrao
+          toast.success("Quest Concluída! +10 XP", {
+            style: { borderColor: "#10b981", color: "#34d399", background: "rgba(16, 185, 129, 0.1)" }
+          });
+          
+          // Efeito de particulas
+          confetti({
+            particleCount: 40,
+            spread: 60,
+            origin: { y: 0.8 },
+            colors: ['#0ea5e9', '#38bdf8', '#7dd3fc']
+          });
+
+          // Checa se desbloqueou um título novo
+          if (result.message.includes("Título desbloqueado")) {
+            const title = result.message.split("Título desbloqueado: ")[1];
+            
+            // Dispara um toast epico para titulo
+            setTimeout(() => {
+              toast(`NOVO TÍTULO: ${title}`, {
+                icon: <ShieldAlert className="text-amber-500" />,
+                style: { 
+                  borderColor: "#f59e0b", 
+                  color: "#fbbf24", 
+                  background: "rgba(245, 158, 11, 0.15)",
+                  boxShadow: "0 0 20px rgba(245, 158, 11, 0.4)"
+                },
+                duration: 5000,
+              });
+              
+              // Explosao dourada
+              confetti({
+                particleCount: 100,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#f59e0b', '#fbbf24', '#fcd34d']
+              });
+            }, 800);
+          }
+        } else if (result.error) {
+          toast.error(result.error, {
+            style: { borderColor: "#ef4444", color: "#f87171" }
+          });
+        }
       } catch {
-        setStatusMsg("Erro ao realizar check-in");
+        toast.error("Erro ao realizar check-in", {
+          style: { borderColor: "#ef4444", color: "#f87171" }
+        });
       }
     });
   };
-
-  const isSuccess = statusMsg?.includes("Sucesso");
 
   return (
     <div className="flex flex-col items-end gap-1 mt-4 sm:mt-0 w-full sm:w-auto">
       <button
         onClick={handleCheckin}
-        disabled={isPending || isSuccess}
-        className={`system-btn-primary py-2 px-5 text-sm flex items-center justify-center gap-2 w-full sm:w-auto ${
-          isSuccess 
-            ? "!bg-emerald-600/20 !border-emerald-500/50 !text-emerald-400 !shadow-[0_0_15px_rgba(16,185,129,0.3)] cursor-not-allowed" 
-            : ""
-        }`}
+        disabled={isPending}
+        className="system-btn-primary py-2 px-5 text-sm flex items-center justify-center gap-2 w-full sm:w-auto"
       >
         {isPending ? (
           <>Sincronizando...</>
-        ) : isSuccess ? (
-          <><CheckCircle2 size={18} /> Quest Concluída</>
         ) : (
           <><CircleDashed size={18} className="text-sky-300" /> Completar Quest</>
         )}
       </button>
-      {statusMsg && (
-        <p className={`text-xs font-heading font-bold tracking-widest uppercase mt-2 text-right ${
-          statusMsg.includes("Erro") ? "text-red-400" : "text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]"
-        }`}>
-          {statusMsg}
-        </p>
-      )}
     </div>
   );
 }
