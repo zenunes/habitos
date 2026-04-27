@@ -8,7 +8,7 @@ import { logger } from "@/lib/logger";
 
 const habitSchema = z.object({
   title: z.string().min(2, "O titulo precisa ter pelo menos 2 caracteres.").max(50, "O titulo esta muito longo."),
-  description: z.string().max(200, "A descricao esta muito longa.").optional(),
+  description: z.string().max(200, "A descricao esta muito longa.").optional().or(z.literal("")),
   frequency: z.enum(["daily", "weekdays", "custom"]).default("daily"),
 });
 
@@ -40,7 +40,7 @@ export async function createHabitAction(
   const { error } = await supabase.from("habits").insert({
     user_id: user.id,
     title: parseResult.data.title,
-    description: parseResult.data.description,
+    description: parseResult.data.description || null,
     frequency: parseResult.data.frequency,
     active: true,
   });
@@ -52,6 +52,7 @@ export async function createHabitAction(
 
   logger.info("Habito criado com sucesso", { userId: user.id });
   revalidatePath("/habitos");
+  revalidatePath("/dashboard");
   return { message: "Habito criado com sucesso!" };
 }
 
