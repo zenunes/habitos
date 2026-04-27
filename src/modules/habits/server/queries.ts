@@ -26,3 +26,21 @@ export async function getActiveHabits(): Promise<Habit[]> {
     active: row.active,
   }));
 }
+
+export async function getTodayHabitLogs(dateRef: string): Promise<{habit_id: string}[]> {
+  const user = await requireUser();
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("habit_logs")
+    .select("habit_id")
+    .eq("user_id", user.id)
+    .eq("data_ref", dateRef);
+
+  if (error) {
+    logger.error("Erro ao buscar logs de habitos de hoje", error, { userId: user.id, dateRef });
+    return [];
+  }
+
+  return data || [];
+}

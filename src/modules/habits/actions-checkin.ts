@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUser } from "@/modules/auth/server/session";
 import { logger } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
+import { evaluateBadges } from "@/modules/progression/server/badges";
 
 const XP_PER_CHECKIN = 10;
 
@@ -72,8 +73,17 @@ export async function checkinHabitAction(habitId: string, dataRef: string) {
     logger.error("Erro ao atualizar progresso", progressError, { userId: user.id });
   }
 
-  logger.info("Check-in concluido com sucesso", { userId: user.id, habitId, newXp });
+  // 5. Avaliar Conquistas / Títulos Desbloqueados
+  const unlockedTitles = await evaluateBadges(user.id, newXp, newStreak);
+
+  logger.info("Check-in concluido com sucesso", { userId: user.id, habitId, newXp, unlockedTitles });
   revalidatePath("/habitos");
   revalidatePath("/dashboard");
+  revalidatePath("/conquistas");
+  
+  if (unlockedTitles.length > 0) {
+    return { message: `Sucesso: Quest concluída! +10 XP. Título desbloqueado: ${unlockedTitles.join(", ")}` };
+  }
+
   return { message: "Sucesso: Quest concluída! +10 XP" };
 }

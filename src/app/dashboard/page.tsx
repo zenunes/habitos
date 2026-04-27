@@ -2,23 +2,32 @@ import Link from "next/link";
 import { logoutAction } from "@/modules/auth/actions";
 import { requireUser } from "@/modules/auth/server/session";
 import { getUserProgress } from "@/modules/progression/server/queries";
+import { getUserProfile } from "@/modules/profile/server/queries";
 import { getActiveQuests } from "@/modules/quests/server/queries";
-import { getActiveHabits } from "@/modules/habits/server/queries";
+import { getActiveHabits, getTodayHabitLogs } from "@/modules/habits/server/queries";
 import { CheckinButton } from "./checkin-button";
-import { ShoppingCart, Trophy, Target, LogOut, Swords, Scroll, ShieldAlert, Zap } from "lucide-react";
+import { ShoppingCart, Trophy, Target, LogOut, Swords, Scroll, ShieldAlert, Zap, CheckCircle2, User as UserIcon } from "lucide-react";
 
 export default async function DashboardPage() {
   const user = await requireUser();
+  const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
   
-  const [progress, quests, habits] = await Promise.all([
+  const [progress, quests, allHabits, todayLogs, profile] = await Promise.all([
     getUserProgress(),
     getActiveQuests(),
-    getActiveHabits()
+    getActiveHabits(),
+    getTodayHabitLogs(todayStr),
+    getUserProfile()
   ]);
 
   const mainQuest = quests.length > 0 ? quests[0] : null;
-  const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-  const userName = user.email?.split("@")[0] || "Caçador";
+  const userName = profile?.name || user.email?.split("@")[0] || "Caçador";
+
+  // Identificar missões pendentes e concluídas
+  const completedHabitIds = new Set(todayLogs.map(log => log.habit_id));
+  const activeHabits = allHabits.filter(h => h.active);
+  const pendingHabits = activeHabits.filter(h => !completedHabitIds.has(h.id));
+  const completedHabits = activeHabits.filter(h => completedHabitIds.has(h.id));
 
   // Mock progress calculation for visual effect
   const xpForNextLevel = progress.level * 120;
@@ -50,6 +59,9 @@ export default async function DashboardPage() {
           </Link>
           <Link href="/habitos" className="system-btn-secondary !p-3 flex items-center justify-center hover:bg-slate-800" title="Gerenciar Quests">
             <Target size={20} />
+          </Link>
+          <Link href="/perfil" className="system-btn-secondary !p-3 flex items-center justify-center border-sky-500/30 text-sky-400 hover:border-sky-400 hover:text-sky-300 hover:bg-sky-500/10" title="Perfil do Caçador">
+            <UserIcon size={20} />
           </Link>
           <form action={logoutAction}>
             <button type="submit" className="system-btn-secondary !p-3 flex items-center justify-center border-red-900/50 text-red-400 hover:border-red-500 hover:text-red-300 hover:bg-red-900/20" title="Desconectar">
@@ -160,9 +172,20 @@ export default async function DashboardPage() {
             </Link>
           </div>
           
-          {habits.length > 0 ? (
+          {activeHabits.length === 0 ? (
+            <div className="text-center py-12 border border-dashed border-slate-700 rounded-xl bg-slate-900/30">
+              <div className="mx-auto h-16 w-16 rounded-full bg-sky-900/20 flex items-center justify-center mb-4 border border-sky-900/30">
+                <Scroll size={28} className="text-sky-500/50" />
+              </div>
+              <p className="text-lg text-slate-300 font-heading font-bold tracking-widest uppercase mb-2">Nenhuma Missão Atribuída</p>
+              <p className="text-sm text-slate-500 font-body mb-6">O sistema aguarda suas diretrizes para continuar a evolução.</p>
+              <Link href="/habitos" className="system-btn-primary inline-flex items-center gap-2 w-auto px-6 py-3">
+                <Target size={18} /> Aceitar Novas Missões
+              </Link>
+            </div>
+          ) : pendingHabits.length > 0 ? (
             <ul className="grid grid-cols-1 gap-4">
-              {habits.filter(h => h.active).map(habit => (
+              {pendingHabits.map(habit => (
                 <li key={habit.id} className="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-900/60 border border-slate-700 rounded-xl p-5 hover:border-sky-500/60 hover:bg-slate-800/80 transition-all shadow-sm hover:shadow-[0_0_20px_rgba(14,165,233,0.15)]">
                   <div className="flex items-start gap-4 mb-4 sm:mb-0">
                     <div className="mt-1 p-2 bg-slate-800 rounded-lg group-hover:bg-sky-900/40 group-hover:text-sky-400 text-slate-500 transition-colors border border-slate-700 group-hover:border-sky-500/30">
@@ -186,14 +209,33 @@ export default async function DashboardPage() {
             </ul>
           ) : (
             <div className="text-center py-12 border border-dashed border-slate-700 rounded-xl bg-slate-900/30">
-              <div className="mx-auto h-16 w-16 rounded-full bg-sky-900/20 flex items-center justify-center mb-4 border border-sky-900/30">
-                <Scroll size={28} className="text-sky-500/50" />
+              <div className="mx-auto h-16 w-16 rounded-full bg-emerald-900/20 flex items-center justify-center mb-4 border border-emerald-900/30">
+                <CheckCircle2 size={28} className="text-emerald-500/50" />
               </div>
-              <p className="text-lg text-slate-300 font-heading font-bold tracking-widest uppercase mb-2">Nenhuma Missão Atribuída</p>
-              <p className="text-sm text-slate-500 font-body mb-6">O sistema aguarda suas diretrizes para continuar a evolução.</p>
-              <Link href="/habitos" className="system-btn-primary inline-flex items-center gap-2 w-auto px-6 py-3">
-                <Target size={18} /> Aceitar Novas Missões
-              </Link>
+              <p className="text-lg text-emerald-400 font-heading font-bold tracking-widest uppercase mb-2 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]">Todas as Missões Concluídas!</p>
+              <p className="text-sm text-slate-500 font-body mb-6">O sistema reconhece o seu esforço hoje. Descanse para amanhã.</p>
+            </div>
+          )}
+          
+          {/* MISSÕES CONCLUÍDAS HOJE */}
+          {completedHabits.length > 0 && (
+            <div className="mt-8 pt-6 border-t border-slate-800">
+              <h3 className="text-sm font-heading font-bold tracking-widest text-slate-500 mb-4 uppercase flex items-center gap-2">
+                <CheckCircle2 size={16} /> Registros de Hoje
+              </h3>
+              <ul className="grid grid-cols-1 gap-3 opacity-60">
+                {completedHabits.map(habit => (
+                  <li key={habit.id} className="flex items-center justify-between bg-slate-900/40 border border-emerald-900/30 rounded-lg p-4">
+                    <div className="flex items-center gap-3">
+                      <CheckCircle2 size={16} className="text-emerald-500" />
+                      <p className="text-sm font-heading font-bold text-slate-300 line-through decoration-emerald-500/30">{habit.title}</p>
+                    </div>
+                    <span className="text-[10px] font-heading font-bold tracking-widest uppercase text-emerald-500 bg-emerald-950/30 px-2 py-1 rounded border border-emerald-900/50">
+                      Concluída
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </section>

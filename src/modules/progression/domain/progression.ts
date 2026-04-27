@@ -3,6 +3,7 @@ export type UserProgress = {
   level: number;
   currentStreak: number;
   bestStreak: number;
+  availablePoints: number;
 };
 
 const XP_PER_LEVEL = 120;
