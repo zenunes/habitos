@@ -10,9 +10,9 @@
 - [ ] Criar app Next.js com TypeScript.
 - [ ] Configurar Supabase (projeto, auth e banco).
 - [ ] Definir schema inicial e migracoes.
-- [ ] Ativar RLS e politicas por usuario.
-- [ ] Configurar padrao de logs e tratamento de erro.
-- [ ] Criar `.env.example` com todas as variaveis.
+- [x] Ativar RLS e politicas por usuario.
+- [x] Configurar padrao de logs e tratamento de erro.
+- [x] Criar `.env.example` com todas as variaveis.
 
 ## 3) Modulo de autenticacao
 - [x] Cadastro e login (base inicial com Supabase Auth).
