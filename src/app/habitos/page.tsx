@@ -2,6 +2,8 @@ import Link from "next/link";
 import { logoutAction } from "@/modules/auth/actions";
 import { requireUser } from "@/modules/auth/server/session";
 import { getActiveHabits } from "@/modules";
+import { CreateHabitForm } from "./create-habit-form";
+import { HabitItem } from "./habit-item";
 
 export default async function HabitosPage() {
   await requireUser();
@@ -22,34 +24,32 @@ export default async function HabitosPage() {
         </Link>
       </header>
 
-      <section className="rounded-xl border border-zinc-200 bg-white p-5">
-        {habits.length > 0 ? (
-          <ul className="space-y-3">
-            {habits.map((habit) => (
-              <li
-                key={habit.id}
-                className="flex items-center justify-between rounded-lg border border-zinc-200 p-3"
-              >
-                <div>
-                  <p className="font-medium">{habit.title}</p>
-                  <p className="text-sm text-zinc-500">Frequencia: {habit.frequency}</p>
-                </div>
-                <span
-                  className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                    habit.active
-                      ? "bg-emerald-100 text-emerald-700"
-                      : "bg-zinc-100 text-zinc-600"
-                  }`}
-                >
-                  {habit.active ? "Ativo" : "Pausado"}
-                </span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-zinc-500">Nenhum habito cadastrado.</p>
-        )}
+      <section className="space-y-6">
+        <CreateHabitForm onSuccess={async () => {
+          "use server";
+          // Esta action fake existe apenas para contornar a assinatura "use client" do form
+          // A revalidação real do Next.js já foi feita na action principal `createHabitAction`
+        }} />
+        
+        <div className="rounded-xl border border-zinc-200 bg-white p-5">
+          {habits.length > 0 ? (
+            <ul className="space-y-3">
+              {habits.map((habit) => (
+                <HabitItem
+                  key={habit.id}
+                  habitId={habit.id}
+                  title={habit.title}
+                  frequency={habit.frequency}
+                  active={habit.active}
+                />
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-zinc-500">Nenhum habito cadastrado.</p>
+          )}
+        </div>
       </section>
+
       <form action={logoutAction}>
         <button
           type="submit"
