@@ -21,7 +21,7 @@ export function CheckinButton({ habitId, habitTitle, todayDateRef }: CheckinButt
         
         // Limpa a msg após alguns segundos
         setTimeout(() => setStatusMsg(null), 3000);
-      } catch (error) {
+      } catch {
         setStatusMsg("Erro ao realizar check-in");
       }
     });
