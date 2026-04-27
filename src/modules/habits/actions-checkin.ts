@@ -5,6 +5,7 @@ import { requireUser } from "@/modules/auth/server/session";
 import { logger } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
 import { evaluateBadges } from "@/modules/progression/server/badges";
+import { calculateLevel } from "@/modules/progression/domain/progression";
 
 const XP_PER_CHECKIN = 10;
 
@@ -76,12 +77,20 @@ export async function checkinHabitAction(habitId: string, dataRef: string) {
   // 5. Avaliar Conquistas / Títulos Desbloqueados
   const unlockedTitles = await evaluateBadges(user.id, newXp, newStreak);
 
-  logger.info("Check-in concluido com sucesso", { userId: user.id, habitId, newXp, unlockedTitles });
+  const oldLevel = calculateLevel(currentXp);
+  const newLevel = calculateLevel(newXp);
+  const leveledUp = newLevel > oldLevel;
+
+  logger.info("Check-in concluido com sucesso", { userId: user.id, habitId, newXp, unlockedTitles, leveledUp });
   revalidatePath("/habitos");
   revalidatePath("/dashboard");
   revalidatePath("/conquistas");
   
-  if (unlockedTitles.length > 0) {
+  if (leveledUp && unlockedTitles.length > 0) {
+    return { message: `LEVEL UP! Você alcançou o Nível ${newLevel}. Título desbloqueado: ${unlockedTitles.join(", ")}` };
+  } else if (leveledUp) {
+    return { message: `LEVEL UP! Você alcançou o Nível ${newLevel}!` };
+  } else if (unlockedTitles.length > 0) {
     return { message: `Sucesso: Quest concluída! +10 XP. Título desbloqueado: ${unlockedTitles.join(", ")}` };
   }
 

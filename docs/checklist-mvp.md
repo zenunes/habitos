@@ -18,18 +18,18 @@
 - [x] Checklist interativo com botão de conclusão gamificado (Check-in).
 - [x] Lógica de Quests Diárias: Missões concluídas somem da lista de "pendentes" e vão para "Concluídas Hoje".
 - [ ] Implementar Quests Semanais/Mensais (Módulo de Desafios Fixos).
-- [ ] Adicionar filtro de dias úteis vs finais de semana para Quests Diárias.
+- [x] Adicionar filtro de dias úteis vs finais de semana para Quests Diárias.
 
 ## 4) Sistema de Conquistas e Recompensas
 - [x] Loja de Recompensas (`/loja`) para cadastrar itens e comprar com XP (descontando `availablePoints`).
 - [x] Sistema de Títulos e Conquistas (`/conquistas`) baseado no Nível e Ofensiva.
 - [x] Avaliação dinâmica de conquistas no momento do check-in da quest.
 - [ ] Animações de subida de nível ("Level Up!") e pop-ups de conquistas na tela.
-- [ ] Inventário de itens comprados na Loja.
+- [x] Inventário de itens comprados na Loja.
 
 ## 5) Qualidade e Polimento
 - [x] Corrigir bugs de cache e conflitos de pacotes (`lucide-react`, `next`, `react 19`).
 - [x] Aceitar campos vazios (descrição) ao criar missões.
 - [ ] Garantir responsividade perfeita em todas as telas de celular.
-- [ ] Adicionar Toast Notifications (notificações flutuantes) em vez de mensagens estáticas nos botões.
+- [x] Adicionar Toast Notifications (notificações flutuantes) em vez de mensagens estáticas nos botões.
 - [ ] Configurar recuperação de senha (fluxo de e-mail).

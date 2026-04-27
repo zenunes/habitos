@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { checkinHabitAction } from "@/modules/habits/actions-checkin";
-import { CheckCircle2, CircleDashed, ShieldAlert } from "lucide-react";
+import { CheckCircle2, CircleDashed, ShieldAlert, Zap } from "lucide-react";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
 
@@ -19,19 +19,45 @@ export function CheckinButton({ habitId, todayDateRef }: CheckinButtonProps) {
       try {
         const result = await checkinHabitAction(habitId, todayDateRef);
         
-        if (result.message?.includes("Sucesso")) {
-          // Toast de sucesso padrao
-          toast.success("Quest Concluída! +10 XP", {
-            style: { borderColor: "#10b981", color: "#34d399", background: "rgba(16, 185, 129, 0.1)" }
-          });
+        if (result.message?.includes("LEVEL UP") || result.message?.includes("Sucesso")) {
           
-          // Efeito de particulas
-          confetti({
-            particleCount: 40,
-            spread: 60,
-            origin: { y: 0.8 },
-            colors: ['#0ea5e9', '#38bdf8', '#7dd3fc']
-          });
+          if (result.message.includes("LEVEL UP")) {
+            const levelMatch = result.message.match(/Nível (\d+)/);
+            const level = levelMatch ? levelMatch[1] : "";
+            
+            toast.success(`LEVEL UP! Você atingiu o Nível ${level}`, {
+              icon: <Zap className="text-sky-400" />,
+              style: { 
+                borderColor: "#0ea5e9", 
+                color: "#38bdf8", 
+                background: "rgba(14, 165, 233, 0.15)",
+                boxShadow: "0 0 20px rgba(14, 165, 233, 0.4)"
+              },
+              duration: 6000,
+            });
+
+            // Efeito explosivo ciano de Level UP
+            confetti({
+              particleCount: 150,
+              spread: 120,
+              origin: { y: 0.6 },
+              colors: ['#0ea5e9', '#38bdf8', '#bae6fd'],
+              zIndex: 9999
+            });
+          } else {
+            // Toast de sucesso padrao
+            toast.success("Quest Concluída! +10 XP", {
+              style: { borderColor: "#10b981", color: "#34d399", background: "rgba(16, 185, 129, 0.1)" }
+            });
+            
+            // Efeito de particulas
+            confetti({
+              particleCount: 40,
+              spread: 60,
+              origin: { y: 0.8 },
+              colors: ['#0ea5e9', '#38bdf8', '#7dd3fc']
+            });
+          }
 
           // Checa se desbloqueou um título novo
           if (result.message.includes("Título desbloqueado")) {
@@ -55,7 +81,8 @@ export function CheckinButton({ habitId, todayDateRef }: CheckinButtonProps) {
                 particleCount: 100,
                 spread: 100,
                 origin: { y: 0.6 },
-                colors: ['#f59e0b', '#fbbf24', '#fcd34d']
+                colors: ['#f59e0b', '#fbbf24', '#fcd34d'],
+                zIndex: 10000
               });
             }, 800);
           }
