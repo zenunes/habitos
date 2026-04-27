@@ -1,3 +1,5 @@
+"use server";
+
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUser } from "@/modules/auth/server/session";
 import { logger } from "@/lib/logger";
