@@ -28,10 +28,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <body
         className={`${rajdhani.variable} ${outfit.variable} font-body antialiased bg-[#030712] text-zinc-100 min-h-screen`}
       >
+        {children}
         <Toaster 
           theme="dark" 
           position="bottom-center"
@@ -47,7 +48,6 @@ export default function RootLayout({
             }
           }}
         />
-        {children}
       </body>
     </html>
   );
