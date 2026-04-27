@@ -2,17 +2,16 @@ import Link from "next/link";
 import { logoutAction } from "@/modules/auth/actions";
 import { requireUser } from "@/modules/auth/server/session";
 import { getUserProgress } from "@/modules/progression/server/queries";
-import { getUserRewards } from "@/modules/rewards/server/queries";
 import { getActiveQuests } from "@/modules/quests/server/queries";
 import { getActiveHabits } from "@/modules/habits/server/queries";
 import { CheckinButton } from "./checkin-button";
+import { ShoppingCart, Trophy, Target, LogOut, Swords, Scroll, ShieldAlert, Zap } from "lucide-react";
 
 export default async function DashboardPage() {
   const user = await requireUser();
   
-  const [progress, rewards, quests, habits] = await Promise.all([
+  const [progress, quests, habits] = await Promise.all([
     getUserProgress(),
-    getUserRewards(),
     getActiveQuests(),
     getActiveHabits()
   ]);
@@ -33,22 +32,28 @@ export default async function DashboardPage() {
       <header className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-slate-800 pb-6">
         <div>
           <div className="inline-flex items-center gap-2 mb-2">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span>
             <p className="text-xs uppercase tracking-[0.2em] text-sky-400 font-heading font-bold">Status do Sistema</p>
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
+          <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] flex items-center gap-3">
             {userName}
           </h1>
           <p className="text-slate-400 mt-1">O sistema está registrando sua evolução diária.</p>
         </div>
 
         <div className="flex items-center gap-3">
-          <Link href="/habitos" className="system-btn-secondary">
-            Gerenciar Quests
+          <Link href="/loja" className="system-btn-secondary !p-3 flex items-center justify-center border-purple-500/30 text-purple-400 hover:border-purple-400 hover:text-purple-300 hover:bg-purple-500/10" title="Loja do Sistema">
+            <ShoppingCart size={20} />
+          </Link>
+          <Link href="/conquistas" className="system-btn-secondary !p-3 flex items-center justify-center border-amber-500/30 text-amber-400 hover:border-amber-400 hover:text-amber-300 hover:bg-amber-500/10" title="Títulos e Conquistas">
+            <Trophy size={20} />
+          </Link>
+          <Link href="/habitos" className="system-btn-secondary !p-3 flex items-center justify-center hover:bg-slate-800" title="Gerenciar Quests">
+            <Target size={20} />
           </Link>
           <form action={logoutAction}>
-            <button type="submit" className="system-btn-secondary border-red-900/50 text-red-400 hover:border-red-500 hover:text-red-300">
-              Desconectar
+            <button type="submit" className="system-btn-secondary !p-3 flex items-center justify-center border-red-900/50 text-red-400 hover:border-red-500 hover:text-red-300 hover:bg-red-900/20" title="Desconectar">
+              <LogOut size={20} />
             </button>
           </form>
         </div>
@@ -59,122 +64,139 @@ export default async function DashboardPage() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-sky-600/10 rounded-full blur-[80px] pointer-events-none" />
         
         <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
-          <div className="flex flex-col items-center justify-center min-w-[120px]">
+          <div className="flex flex-col items-center justify-center min-w-[120px] relative">
+            <div className="absolute inset-0 bg-sky-500/20 blur-2xl rounded-full"></div>
             <span className="text-sm font-heading font-bold uppercase tracking-widest text-sky-500 mb-1">Level</span>
-            <span className="text-6xl font-heading font-bold text-white drop-shadow-[0_0_15px_rgba(14,165,233,0.5)]">
+            <span className="text-7xl font-heading font-bold text-white drop-shadow-[0_0_20px_rgba(14,165,233,0.8)]">
               {progress.level}
             </span>
           </div>
 
           <div className="flex-1 w-full">
             <div className="flex justify-between text-sm mb-2 font-heading tracking-wider">
-              <span className="text-slate-400">EXPERIÊNCIA (XP)</span>
+              <span className="text-slate-400 flex items-center gap-2"><Zap size={14} className="text-sky-400"/> EXPERIÊNCIA (XP)</span>
               <span className="text-sky-400 font-bold">{currentLevelXp} / {xpForNextLevel}</span>
             </div>
             
             {/* Barra de Progresso */}
-            <div className="h-3 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 relative">
+            <div className="h-4 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 relative">
               <div 
-                className="h-full bg-sky-500 rounded-full relative shadow-[0_0_10px_var(--primary-glow)]"
+                className="h-full bg-sky-500 rounded-full relative shadow-[0_0_15px_var(--primary-glow)]"
                 style={{ width: `${progressPercent}%`, transition: 'width 1s ease-in-out' }}
               >
-                <div className="absolute top-0 right-0 bottom-0 w-10 bg-gradient-to-r from-transparent to-white/30" />
+                <div className="absolute top-0 right-0 bottom-0 w-10 bg-gradient-to-r from-transparent to-white/40" />
               </div>
             </div>
             
             <div className="grid grid-cols-2 gap-4 mt-6">
               <div className="bg-slate-900/50 rounded-lg border border-slate-800 p-4 relative overflow-hidden group hover:border-emerald-500/50 transition-colors">
                 <div className="absolute -right-4 -top-4 w-16 h-16 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-colors" />
-                <span className="text-xs text-slate-500 uppercase tracking-wider font-heading block mb-1">Ofensiva Atual</span>
-                <p className="text-2xl font-bold text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]">{progress.currentStreak} Dias</p>
+                <span className="text-xs text-slate-500 uppercase tracking-wider font-heading flex items-center gap-2 mb-1">
+                  <Swords size={12} className="text-emerald-500"/> Ofensiva Atual
+                </span>
+                <p className="text-3xl font-bold text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]">{progress.currentStreak} <span className="text-sm text-emerald-500/70">Dias</span></p>
               </div>
-              <div className="bg-slate-900/50 rounded-lg border border-slate-800 p-4 relative overflow-hidden group hover:border-sky-500/50 transition-colors">
-                <div className="absolute -right-4 -top-4 w-16 h-16 bg-sky-500/10 rounded-full blur-xl group-hover:bg-sky-500/20 transition-colors" />
-                <span className="text-xs text-slate-500 uppercase tracking-wider font-heading block mb-1">XP Total Acumulado</span>
-                <p className="text-2xl font-bold text-slate-200">{progress.xpTotal} pts</p>
+              <div className="bg-slate-900/50 rounded-lg border border-slate-800 p-4 relative overflow-hidden group hover:border-purple-500/50 transition-colors">
+                <div className="absolute -right-4 -top-4 w-16 h-16 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition-colors" />
+                <span className="text-xs text-slate-500 uppercase tracking-wider font-heading flex items-center gap-2 mb-1">
+                  <ShoppingCart size={12} className="text-purple-500"/> Pontos de Troca
+                </span>
+                <p className="text-3xl font-bold text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.4)]">{progress.xpTotal} <span className="text-sm text-purple-500/70">pts</span></p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="flex flex-col gap-8">
+        {/* MAIN QUEST */}
+        {mainQuest && (
+          <section className="system-card p-6 border-amber-500/40 bg-gradient-to-r from-[#0b0f19] via-amber-950/20 to-[#0b0f19] relative overflow-hidden">
+            <div className="absolute -right-10 -top-10 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 border-b border-amber-900/40 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-amber-500/10 rounded-lg border border-amber-500/30">
+                  <ShieldAlert size={24} className="text-amber-500" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-heading font-bold tracking-widest text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]">Missão Especial (Urgente)</h2>
+                  <p className="text-xs text-amber-500/70 font-heading tracking-widest uppercase">Recompensa Alta</p>
+                </div>
+              </div>
+              {mainQuest.completed && (
+                <span className="mt-3 sm:mt-0 rounded bg-amber-500/20 px-3 py-1.5 text-xs font-heading font-bold tracking-widest text-amber-400 uppercase border border-amber-500/50">
+                  Concluída
+                </span>
+              )}
+            </div>
+            
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-2">{mainQuest.title}</h3>
+                <p className="text-slate-300 font-body">{mainQuest.description}</p>
+              </div>
+              <div className="flex items-center gap-2 bg-amber-950/40 border border-amber-500/30 rounded-lg px-4 py-3 min-w-[140px] justify-center shadow-[0_0_15px_rgba(245,158,11,0.15)]">
+                <Trophy size={18} className="text-amber-500" />
+                <span className="font-bold text-xl text-amber-400">+{mainQuest.xpReward} XP</span>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* QUESTS DIÁRIAS (HÁBITOS) */}
-        <section className="system-card p-6">
-          <div className="flex items-center gap-3 mb-6 border-b border-slate-800 pb-3">
-            <div className="h-4 w-1 bg-sky-500 rounded-full shadow-[0_0_8px_var(--primary-glow)]" />
-            <h2 className="text-lg font-heading font-bold tracking-widest text-white">Missões Diárias</h2>
+        <section className="system-card p-6 border-sky-900/30">
+          <div className="flex items-center justify-between mb-6 border-b border-slate-800 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-sky-500/10 rounded-lg border border-sky-500/30">
+                <Scroll size={24} className="text-sky-400" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-heading font-bold tracking-widest text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">Missões Diárias</h2>
+                <p className="text-xs text-sky-500/70 font-heading tracking-widest uppercase">Renovação Diária</p>
+              </div>
+            </div>
+            <Link href="/habitos" className="text-xs font-heading font-bold tracking-widest uppercase text-sky-400 hover:text-sky-300 transition-colors bg-sky-950/30 px-3 py-1.5 rounded border border-sky-900/50 hover:bg-sky-900/50">
+              Gerenciar
+            </Link>
           </div>
           
           {habits.length > 0 ? (
-            <ul className="space-y-3">
+            <ul className="grid grid-cols-1 gap-4">
               {habits.filter(h => h.active).map(habit => (
-                <li key={habit.id} className="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-900/40 border border-slate-800 rounded-lg p-4 hover:border-sky-500/50 transition-colors">
-                  <div className="mb-3 sm:mb-0">
-                    <p className="font-heading font-bold text-slate-200 group-hover:text-white transition-colors">{habit.title}</p>
-                    <p className="text-xs text-slate-500 mt-1">{habit.frequency}</p>
+                <li key={habit.id} className="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-900/60 border border-slate-700 rounded-xl p-5 hover:border-sky-500/60 hover:bg-slate-800/80 transition-all shadow-sm hover:shadow-[0_0_20px_rgba(14,165,233,0.15)]">
+                  <div className="flex items-start gap-4 mb-4 sm:mb-0">
+                    <div className="mt-1 p-2 bg-slate-800 rounded-lg group-hover:bg-sky-900/40 group-hover:text-sky-400 text-slate-500 transition-colors border border-slate-700 group-hover:border-sky-500/30">
+                      <Target size={20} />
+                    </div>
+                    <div>
+                      <p className="text-lg font-heading font-bold text-slate-100 group-hover:text-white transition-colors">{habit.title}</p>
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <span className="text-[10px] font-heading tracking-widest uppercase bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">
+                          {habit.frequency === 'daily' ? 'Diária' : 'Dias Úteis'}
+                        </span>
+                        <span className="text-[10px] font-heading tracking-widest uppercase text-sky-500/70 flex items-center gap-1">
+                          <Zap size={10} /> +10 XP
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   <CheckinButton habitId={habit.id} todayDateRef={todayStr} />
                 </li>
               ))}
             </ul>
           ) : (
-            <div className="text-center py-8 border border-dashed border-slate-800 rounded-lg">
-              <p className="text-sm text-slate-500 font-body mb-3">Nenhuma missão atribuída.</p>
-              <Link href="/habitos" className="text-sky-400 hover:text-sky-300 text-sm font-heading tracking-wider uppercase font-bold underline">
-                Aceitar novas missões
+            <div className="text-center py-12 border border-dashed border-slate-700 rounded-xl bg-slate-900/30">
+              <div className="mx-auto h-16 w-16 rounded-full bg-sky-900/20 flex items-center justify-center mb-4 border border-sky-900/30">
+                <Scroll size={28} className="text-sky-500/50" />
+              </div>
+              <p className="text-lg text-slate-300 font-heading font-bold tracking-widest uppercase mb-2">Nenhuma Missão Atribuída</p>
+              <p className="text-sm text-slate-500 font-body mb-6">O sistema aguarda suas diretrizes para continuar a evolução.</p>
+              <Link href="/habitos" className="system-btn-primary inline-flex items-center gap-2 w-auto px-6 py-3">
+                <Target size={18} /> Aceitar Novas Missões
               </Link>
             </div>
           )}
         </section>
-
-        <div className="space-y-6">
-          {/* MAIN QUEST */}
-          {mainQuest && (
-            <section className="system-card p-6 border-amber-500/30 bg-gradient-to-br from-[#0b0f19] to-amber-950/20">
-              <div className="flex items-center justify-between mb-4 border-b border-amber-900/30 pb-3">
-                <div className="flex items-center gap-2">
-                  <div className="h-4 w-1 bg-amber-500 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
-                  <h2 className="text-lg font-heading font-bold tracking-widest text-amber-500">Missão Especial</h2>
-                </div>
-                {mainQuest.completed && (
-                  <span className="rounded bg-amber-500/20 px-2 py-1 text-[10px] font-heading font-bold tracking-widest text-amber-400 uppercase border border-amber-500/50">
-                    Concluída
-                  </span>
-                )}
-              </div>
-              <h3 className="font-bold text-white mb-2">{mainQuest.title}</h3>
-              <p className="text-sm text-slate-400 mb-4">{mainQuest.description}</p>
-              <div className="inline-block bg-amber-500/10 border border-amber-500/30 rounded px-3 py-1.5">
-                <span className="text-xs text-amber-500/70 uppercase tracking-wider mr-2 font-heading">Recompensa</span>
-                <span className="font-bold text-amber-400">+{mainQuest.xpReward} XP</span>
-              </div>
-            </section>
-          )}
-
-          {/* LOJA DO SISTEMA */}
-          <section className="system-card p-6">
-            <div className="flex items-center gap-3 mb-6 border-b border-slate-800 pb-3">
-              <div className="h-4 w-1 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.5)]" />
-              <h2 className="text-lg font-heading font-bold tracking-widest text-white">Loja do Sistema</h2>
-            </div>
-            
-            {rewards.length > 0 ? (
-              <ul className="space-y-3">
-                {rewards.map((reward) => (
-                  <li key={reward.id} className="flex justify-between items-center bg-slate-900/50 rounded p-3 border border-slate-800">
-                    <span className="text-sm text-slate-300 font-medium">{reward.title}</span>
-                    <span className="text-xs font-bold text-purple-400 bg-purple-500/10 px-2 py-1 rounded border border-purple-500/20">
-                      {reward.pointsCost} pts
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-slate-500 italic text-center py-4">A loja está indisponível no momento.</p>
-            )}
-          </section>
-        </div>
       </div>
     </main>
   );

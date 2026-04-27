@@ -4,20 +4,24 @@ import { useState } from "react";
 import { HabitItem } from "./habit-item";
 import { CreateHabitForm } from "./create-habit-form";
 import { Habit } from "@/modules/habits/domain/habit";
+import { Plus, X, ListTodo } from "lucide-react";
 
 export function HabitsListManager({ initialHabits }: { initialHabits: Habit[] }) {
   const [isCreating, setIsCreating] = useState(false);
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-xl font-heading font-bold text-white tracking-widest uppercase">Quests Ativas</h2>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 gap-4">
+        <h2 className="text-xl font-heading font-bold text-white tracking-widest uppercase flex items-center gap-3">
+          <ListTodo size={24} className="text-sky-500" />
+          Quests Ativas
+        </h2>
         {!isCreating && (
           <button
             onClick={() => setIsCreating(true)}
-            className="system-btn-primary py-2 px-4 text-xs shadow-[0_0_10px_var(--primary-glow)]"
+            className="system-btn-primary py-2 px-4 text-xs shadow-[0_0_10px_var(--primary-glow)] flex items-center gap-2 w-full sm:w-auto"
           >
-            + Adicionar Nova Quest
+            <Plus size={16} /> Adicionar Nova Quest
           </button>
         )}
       </div>
@@ -28,9 +32,9 @@ export function HabitsListManager({ initialHabits }: { initialHabits: Habit[] })
             <h3 className="font-heading text-lg font-bold text-sky-400 tracking-widest uppercase">Formular Missão</h3>
             <button 
               onClick={() => setIsCreating(false)}
-              className="text-slate-400 hover:text-white transition-colors"
+              className="text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-sm font-heading uppercase tracking-widest"
             >
-              Cancelar
+              <X size={16} /> Cancelar
             </button>
           </div>
           <CreateHabitForm onSuccess={() => setIsCreating(false)} />

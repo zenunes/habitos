@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/modules/auth/server/session";
 import { getActiveHabits } from "@/modules/habits/server/queries";
 import { HabitsListManager } from "./habits-list-manager";
+import { ArrowLeft, Target } from "lucide-react";
 
 export default async function HabitosPage() {
   await requireUser();
@@ -13,7 +14,9 @@ export default async function HabitosPage() {
         <div>
           <div className="inline-flex items-center gap-2 mb-2">
             <span className="h-2 w-2 rounded-full bg-sky-500 animate-pulse shadow-[0_0_8px_var(--primary-glow)]"></span>
-            <p className="text-xs uppercase tracking-[0.2em] text-sky-400 font-heading font-bold">Registro de Missões</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-sky-400 font-heading font-bold flex items-center gap-2">
+              <Target size={12} /> Registro de Missões
+            </p>
           </div>
           <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
             Painel de Quests Diárias
@@ -22,9 +25,9 @@ export default async function HabitosPage() {
         </div>
         <Link
           href="/dashboard"
-          className="system-btn-secondary"
+          className="system-btn-secondary flex items-center gap-2"
         >
-          Voltar ao Sistema
+          <ArrowLeft size={16} /> Voltar ao Sistema
         </Link>
       </header>
 

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { checkinHabitAction } from "@/modules/habits/actions-checkin";
+import { CheckCircle2, CircleDashed } from "lucide-react";
 
 type CheckinButtonProps = {
   habitId: string;
@@ -26,22 +27,30 @@ export function CheckinButton({ habitId, todayDateRef }: CheckinButtonProps) {
     });
   };
 
+  const isSuccess = statusMsg?.includes("Sucesso");
+
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className="flex flex-col items-end gap-1 mt-4 sm:mt-0 w-full sm:w-auto">
       <button
         onClick={handleCheckin}
-        disabled={isPending || statusMsg?.includes("Sucesso")}
-        className={`system-btn-primary py-2 px-4 text-xs ${
-          statusMsg?.includes("Sucesso") 
-            ? "!bg-emerald-600/20 !border-emerald-500/50 !text-emerald-400 !shadow-[0_0_10px_rgba(16,185,129,0.3)] cursor-not-allowed" 
+        disabled={isPending || isSuccess}
+        className={`system-btn-primary py-2 px-5 text-sm flex items-center justify-center gap-2 w-full sm:w-auto ${
+          isSuccess 
+            ? "!bg-emerald-600/20 !border-emerald-500/50 !text-emerald-400 !shadow-[0_0_15px_rgba(16,185,129,0.3)] cursor-not-allowed" 
             : ""
         }`}
       >
-        {isPending ? "Sincronizando..." : statusMsg?.includes("Sucesso") ? "Quest Concluída" : "Completar Quest"}
+        {isPending ? (
+          <>Sincronizando...</>
+        ) : isSuccess ? (
+          <><CheckCircle2 size={18} /> Quest Concluída</>
+        ) : (
+          <><CircleDashed size={18} className="text-sky-300" /> Completar Quest</>
+        )}
       </button>
       {statusMsg && (
-        <p className={`text-[10px] font-heading tracking-widest uppercase mt-1 ${
-          statusMsg.includes("Erro") ? "text-red-400" : "text-emerald-400"
+        <p className={`text-xs font-heading font-bold tracking-widest uppercase mt-2 text-right ${
+          statusMsg.includes("Erro") ? "text-red-400" : "text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]"
         }`}>
           {statusMsg}
         </p>
