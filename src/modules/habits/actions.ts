@@ -46,8 +46,8 @@ export async function createHabitAction(
   });
 
   if (error) {
-    logger.error("Falha ao criar habito", error, { userId: user.id });
-    return { error: "Nao foi possivel salvar o habito. Tente novamente." };
+    logger.error("Falha ao criar habito no banco", error, { userId: user.id });
+    return { error: `Nao foi possivel salvar o habito. Detalhe: ${error.message}` };
   }
 
   logger.info("Habito criado com sucesso", { userId: user.id });
