@@ -13,6 +13,10 @@ const authSchema = z.object({
     .trim(),
 });
 
+const signupSchema = authSchema.extend({
+  name: z.string().min(3, "O nome precisa ter no mínimo 3 caracteres.").trim(),
+});
+
 export type AuthActionState = {
   message?: string;
   error?: string;
@@ -50,9 +54,10 @@ export async function signupAction(
   _previousState: AuthActionState,
   formData: FormData,
 ): Promise<AuthActionState> {
-  const parseResult = authSchema.safeParse({
+  const parseResult = signupSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
+    name: formData.get("name"),
   });
 
   if (!parseResult.success) {
@@ -65,7 +70,15 @@ export async function signupAction(
   }
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.auth.signUp(parseResult.data);
+  const { error } = await supabase.auth.signUp({
+    email: parseResult.data.email,
+    password: parseResult.data.password,
+    options: {
+      data: {
+        name: parseResult.data.name,
+      },
+    },
+  });
 
   if (error) {
     logger.error("Falha ao cadastrar usuario", error, { email: parseResult.data.email });

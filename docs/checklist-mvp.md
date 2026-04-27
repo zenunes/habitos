@@ -1,4 +1,30 @@
-# Checklist de Execucao - Habitos Game
+# Checklist de Melhorias - Solo Leveling (System V1)
+
+## 1) Nova Arquitetura e Design System (RPG/Solo Leveling)
+- [x] Atualizar nome do projeto e meta tags para "Solo Leveling".
+- [x] Criar design system escuro e com neon azul em `globals.css` (Temática de "Sistema").
+- [x] Refatorar Layout Principal (Fontes Rajdhani/Outfit, background temático).
+- [x] Melhorar UI/UX da página de Login e Cadastro (Interface "System Initialization").
+
+## 2) Dashboard do Jogador (Status)
+- [x] Refatorar o Dashboard para exibir as estatísticas do jogador como um perfil de RPG.
+- [x] Adicionar barra de progresso de XP interativa e moderna.
+- [x] Exibir o nível, classe (ou título) e streak com visual gamificado.
+
+## 3) Painel de Quests Diárias (Hábitos)
+- [x] Refatorar CRUD de Hábitos com nomenclatura "Quests Diárias".
+- [x] Melhorar UX para adicionar novas "Quests" (Design mais intuitivo e rápido).
+- [x] Checklist interativo com botão de conclusão gamificado (Check-in).
+- [x] Listagem bonita e clara de Quests ativas e completas do dia.
+
+## 4) Qualidade e Correções
+- [ ] Garantir que o sistema funcione perfeitamente com Next.js 15 (Server Actions).
+- [ ] Testar fluxo completo de criar hábito e realizar check-in.
+- [ ] Garantir responsividade e visual consistente em mobile.
+
+---
+
+# Checklist de Execucao - Habitos Game (Antigo)
 
 ## 1) Descoberta e definicao
 - [ ] Validar proposta de valor e diferenciais.

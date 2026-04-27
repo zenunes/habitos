@@ -6,67 +6,59 @@ import { createHabitAction, type HabitActionState } from "@/modules/habits/actio
 const initialState: HabitActionState = {};
 
 export function CreateHabitForm({ onSuccess }: { onSuccess: () => void }) {
-  const [state, formAction, pending] = useActionState(async (prevState: HabitActionState, formData: FormData) => {
-    const result = await createHabitAction(prevState, formData);
-    if (!result.error) {
-      onSuccess();
-    }
-    return result;
-  }, initialState);
+  const [state, formAction, pending] = useActionState(createHabitAction, initialState);
+
+  // Fecha o form caso tenha sucesso, mas usando um "trick" simples via React 
+  // que escuta o estado da variavel de sucesso e fecha.
+  if (state.message) {
+    setTimeout(onSuccess, 500);
+  }
 
   return (
-    <form action={formAction} className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5">
-      <h2 className="text-lg font-semibold">Novo Hábito</h2>
-      
+    <form action={formAction} className="space-y-5 animate-in fade-in slide-in-from-top-4 duration-300">
       <label className="block">
-        <span className="mb-1 block text-sm font-medium text-zinc-700">Título</span>
+        <span className="mb-1.5 block text-xs font-heading font-semibold tracking-widest uppercase text-sky-400">Título da Quest</span>
         <input
-          className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+          className="system-input"
           name="title"
           type="text"
-          placeholder="Ex: Beber 2L de água"
+          placeholder="Ex: Treinamento de Força (100 Flexões)"
           required
         />
       </label>
       
       <label className="block">
-        <span className="mb-1 block text-sm font-medium text-zinc-700">Descrição (opcional)</span>
+        <span className="mb-1.5 block text-xs font-heading font-semibold tracking-widest uppercase text-slate-400">Descrição (Opcional)</span>
         <textarea
-          className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+          className="system-input min-h-[80px]"
           name="description"
           rows={2}
-          placeholder="Ex: Garrafa sempre na mesa"
+          placeholder="Ex: Completar antes do anoitecer"
         />
       </label>
       
       <label className="block">
-        <span className="mb-1 block text-sm font-medium text-zinc-700">Frequência</span>
+        <span className="mb-1.5 block text-xs font-heading font-semibold tracking-widest uppercase text-slate-400">Frequência da Quest</span>
         <select
-          className="w-full rounded-lg border border-zinc-300 px-3 py-2 bg-white"
+          className="system-input"
           name="frequency"
           defaultValue="daily"
         >
-          <option value="daily">Todos os dias</option>
-          <option value="weekdays">Dias de semana (Seg-Sex)</option>
+          <option value="daily" className="bg-slate-900 text-white">Missão Diária</option>
+          <option value="weekdays" className="bg-slate-900 text-white">Missão de Dias Úteis (Seg-Sex)</option>
         </select>
       </label>
 
-      {state.error && <p className="text-sm text-red-600">{state.error}</p>}
+      {state.error && <p className="text-xs text-red-400 font-heading tracking-widest uppercase bg-red-950/30 p-2 rounded border border-red-500/30">{state.error}</p>}
+      {state.message && <p className="text-xs text-emerald-400 font-heading tracking-widest uppercase bg-emerald-950/30 p-2 rounded border border-emerald-500/30">{state.message}</p>}
 
-      <div className="flex justify-end gap-2 pt-2">
-        <button
-          type="button"
-          onClick={onSuccess}
-          className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100"
-        >
-          Cancelar
-        </button>
+      <div className="flex justify-end gap-3 pt-4">
         <button
           type="submit"
-          disabled={pending}
-          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-60"
+          disabled={pending || !!state.message}
+          className="system-btn-primary w-full sm:w-auto"
         >
-          {pending ? "Salvando..." : "Salvar Hábito"}
+          {pending ? "Registrando no Sistema..." : "Aceitar Missão"}
         </button>
       </div>
     </form>

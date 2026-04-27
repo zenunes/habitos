@@ -2,14 +2,14 @@
 
 import { useState, useTransition } from "react";
 import { checkinHabitAction } from "@/modules/habits/actions-checkin";
+import { CheckCircle2, CircleDashed } from "lucide-react";
 
 type CheckinButtonProps = {
   habitId: string;
-  habitTitle: string;
   todayDateRef: string; // no formato YYYY-MM-DD
 };
 
-export function CheckinButton({ habitId, habitTitle, todayDateRef }: CheckinButtonProps) {
+export function CheckinButton({ habitId, todayDateRef }: CheckinButtonProps) {
   const [isPending, startTransition] = useTransition();
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
 
@@ -27,16 +27,34 @@ export function CheckinButton({ habitId, habitTitle, todayDateRef }: CheckinButt
     });
   };
 
+  const isSuccess = statusMsg?.includes("Sucesso");
+
   return (
-    <div className="flex flex-col items-start gap-1">
+    <div className="flex flex-col items-end gap-1 mt-4 sm:mt-0 w-full sm:w-auto">
       <button
         onClick={handleCheckin}
-        disabled={isPending}
-        className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-50"
+        disabled={isPending || isSuccess}
+        className={`system-btn-primary py-2 px-5 text-sm flex items-center justify-center gap-2 w-full sm:w-auto ${
+          isSuccess 
+            ? "!bg-emerald-600/20 !border-emerald-500/50 !text-emerald-400 !shadow-[0_0_15px_rgba(16,185,129,0.3)] cursor-not-allowed" 
+            : ""
+        }`}
       >
-        {isPending ? "Registrando..." : `Concluir ${habitTitle}`}
+        {isPending ? (
+          <>Sincronizando...</>
+        ) : isSuccess ? (
+          <><CheckCircle2 size={18} /> Quest Concluída</>
+        ) : (
+          <><CircleDashed size={18} className="text-sky-300" /> Completar Quest</>
+        )}
       </button>
-      {statusMsg && <p className="text-xs text-emerald-700">{statusMsg}</p>}
+      {statusMsg && (
+        <p className={`text-xs font-heading font-bold tracking-widest uppercase mt-2 text-right ${
+          statusMsg.includes("Erro") ? "text-red-400" : "text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]"
+        }`}>
+          {statusMsg}
+        </p>
+      )}
     </div>
   );
 }
