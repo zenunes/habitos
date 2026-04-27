@@ -15,10 +15,10 @@
 - [ ] Criar `.env.example` com todas as variaveis.
 
 ## 3) Modulo de autenticacao
-- [ ] Cadastro e login.
-- [ ] Sessao persistente e logout.
+- [x] Cadastro e login (base inicial com Supabase Auth).
+- [x] Sessao persistente e logout (base inicial).
 - [ ] Recuperacao de senha.
-- [ ] Guardas de rota para areas autenticadas.
+- [x] Guardas de rota para areas autenticadas (dashboard e habitos).
 
 ## 4) Modulo de habitos
 - [ ] CRUD de habitos.

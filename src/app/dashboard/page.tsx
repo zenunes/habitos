@@ -1,12 +1,14 @@
 import Link from "next/link";
+import { logoutAction } from "@/modules/auth/actions";
+import { requireUser } from "@/modules/auth/server/session";
 import {
   createProgressSnapshot,
-  sampleProfile,
   sampleRewards,
   weeklyQuest,
 } from "@/modules";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const user = await requireUser();
   const progress = createProgressSnapshot(340, 6);
 
   return (
@@ -14,7 +16,7 @@ export default function DashboardPage() {
       <header className="flex flex-col gap-2">
         <p className="text-sm uppercase tracking-wide text-zinc-500">Dashboard</p>
         <h1 className="text-3xl font-bold tracking-tight">
-          Ola, {sampleProfile.name}
+          Ola, {user.email ?? "usuario"}
         </h1>
         <p className="text-zinc-600">
           Aqui voce acompanha progresso, quests e recompensas.
@@ -53,12 +55,22 @@ export default function DashboardPage() {
         </ul>
       </section>
 
-      <Link
-        href="/habitos"
-        className="w-fit rounded-lg bg-zinc-900 px-4 py-2 font-medium text-white hover:bg-zinc-700"
-      >
-        Gerenciar habitos
-      </Link>
+      <div className="flex items-center gap-3">
+        <Link
+          href="/habitos"
+          className="w-fit rounded-lg bg-zinc-900 px-4 py-2 font-medium text-white hover:bg-zinc-700"
+        >
+          Gerenciar habitos
+        </Link>
+        <form action={logoutAction}>
+          <button
+            type="submit"
+            className="w-fit rounded-lg border border-zinc-300 px-4 py-2 font-medium text-zinc-700 hover:bg-zinc-100"
+          >
+            Sair
+          </button>
+        </form>
+      </div>
     </main>
   );
 }

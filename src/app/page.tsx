@@ -23,10 +23,10 @@ export default function Home() {
             Ir para Dashboard
           </Link>
           <Link
-            href="/habitos"
+            href="/login"
             className="rounded-xl border border-zinc-300 px-4 py-3 text-center font-medium text-zinc-800 transition hover:bg-zinc-100"
           >
-            Ir para Habitos
+            Entrar / Cadastrar
           </Link>
         </div>
       </main>
