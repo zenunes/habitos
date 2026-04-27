@@ -4,98 +4,91 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUser } from "@/modules/auth/server/session";
+import { logger } from "@/lib/logger";
 
-const createHabitSchema = z.object({
-  title: z.string().min(2, "Titulo muito curto.").max(80).trim(),
-  description: z.string().max(180).trim().optional().or(z.literal("")),
-  frequency: z.enum(["daily", "weekdays", "custom"]),
+const habitSchema = z.object({
+  title: z.string().min(2, "O titulo precisa ter pelo menos 2 caracteres.").max(50, "O titulo esta muito longo."),
+  description: z.string().max(200, "A descricao esta muito longa.").optional(),
+  frequency: z.enum(["daily", "weekdays", "custom"]).default("daily"),
 });
 
-const idSchema = z.object({
-  habitId: z.uuid("Identificador de habito invalido."),
-});
+export type HabitActionState = {
+  message?: string;
+  error?: string;
+};
 
-export async function createHabitAction(formData: FormData) {
-  const parsed = createHabitSchema.safeParse({
-    title: formData.get("title"),
-    description: formData.get("description"),
-    frequency: formData.get("frequency"),
+export async function createHabitAction(
+  _previousState: HabitActionState,
+  formData: FormData,
+): Promise<HabitActionState> {
+  const user = await requireUser();
+  
+  const parseResult = habitSchema.safeParse({
+    title: formData.get("title")?.toString().trim(),
+    description: formData.get("description")?.toString().trim(),
+    frequency: formData.get("frequency")?.toString(),
   });
 
-  if (!parsed.success) {
-    throw new Error(parsed.error.issues[0]?.message ?? "Dados invalidos.");
+  if (!parseResult.success) {
+    logger.warn("Tentativa de criar habito com dados invalidos", { issues: parseResult.error.issues, userId: user.id });
+    return {
+      error: parseResult.error.issues[0]?.message ?? "Dados invalidos.",
+    };
   }
 
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("habits").insert({
+    user_id: user.id,
+    title: parseResult.data.title,
+    description: parseResult.data.description,
+    frequency: parseResult.data.frequency,
+    active: true,
+  });
+
+  if (error) {
+    logger.error("Falha ao criar habito", error, { userId: user.id });
+    return { error: "Nao foi possivel salvar o habito. Tente novamente." };
+  }
+
+  logger.info("Habito criado com sucesso", { userId: user.id });
+  revalidatePath("/habitos");
+  return { message: "Habito criado com sucesso!" };
+}
+
+export async function toggleHabitStatusAction(habitId: string, currentStatus: boolean) {
   const user = await requireUser();
   const supabase = await createSupabaseServerClient();
 
-  const { error } = await supabase.from("habits").insert({
-    user_id: user.id,
-    title: parsed.data.title,
-    description: parsed.data.description || null,
-    frequency: parsed.data.frequency,
-  });
+  const { error } = await supabase
+    .from("habits")
+    .update({ active: !currentStatus })
+    .eq("id", habitId)
+    .eq("user_id", user.id);
 
   if (error) {
-    throw new Error("Nao foi possivel criar o habito.");
+    logger.error("Falha ao alterar status do habito", error, { userId: user.id, habitId });
+    throw new Error("Nao foi possivel alterar o status do habito.");
   }
 
+  logger.info("Status do habito alterado", { userId: user.id, habitId, newStatus: !currentStatus });
   revalidatePath("/habitos");
-  revalidatePath("/dashboard");
 }
 
-export async function toggleHabitAction(formData: FormData) {
-  const parsed = idSchema.safeParse({
-    habitId: formData.get("habitId"),
-  });
-
-  if (!parsed.success) {
-    throw new Error(parsed.error.issues[0]?.message ?? "Habito invalido.");
-  }
-
+export async function deleteHabitAction(habitId: string) {
+  const user = await requireUser();
   const supabase = await createSupabaseServerClient();
-
-  const { data, error: loadError } = await supabase
-    .from("habits")
-    .select("id, active")
-    .eq("id", parsed.data.habitId)
-    .single();
-
-  if (loadError || !data) {
-    throw new Error("Habito nao encontrado.");
-  }
 
   const { error } = await supabase
     .from("habits")
-    .update({ active: !data.active })
-    .eq("id", data.id);
+    .delete()
+    .eq("id", habitId)
+    .eq("user_id", user.id);
 
   if (error) {
-    throw new Error("Nao foi possivel atualizar o habito.");
+    logger.error("Falha ao excluir habito", error, { userId: user.id, habitId });
+    throw new Error("Nao foi possivel excluir o habito.");
   }
 
+  logger.info("Habito excluido", { userId: user.id, habitId });
   revalidatePath("/habitos");
-  revalidatePath("/dashboard");
-}
-
-export async function checkinHabitAction(formData: FormData) {
-  const parsed = idSchema.safeParse({
-    habitId: formData.get("habitId"),
-  });
-
-  if (!parsed.success) {
-    throw new Error(parsed.error.issues[0]?.message ?? "Habito invalido.");
-  }
-
-  const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.rpc("complete_habit_checkin", {
-    p_habit_id: parsed.data.habitId,
-  });
-
-  if (error) {
-    throw new Error("Nao foi possivel registrar o check-in.");
-  }
-
-  revalidatePath("/habitos");
-  revalidatePath("/dashboard");
 }
