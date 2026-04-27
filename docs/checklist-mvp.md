@@ -10,9 +10,9 @@
 - [ ] Criar app Next.js com TypeScript.
 - [ ] Configurar Supabase (projeto, auth e banco).
 - [ ] Definir schema inicial e migracoes.
-- [ ] Ativar RLS e politicas por usuario.
-- [ ] Configurar padrao de logs e tratamento de erro.
-- [ ] Criar `.env.example` com todas as variaveis.
+- [x] Ativar RLS e politicas por usuario.
+- [x] Configurar padrao de logs e tratamento de erro.
+- [x] Criar `.env.example` com todas as variaveis.
 
 ## 3) Modulo de autenticacao
 - [x] Cadastro e login (base inicial com Supabase Auth).
@@ -21,16 +21,16 @@
 - [x] Guardas de rota para areas autenticadas (dashboard e habitos).
 
 ## 4) Modulo de habitos
-- [ ] CRUD de habitos.
+- [x] CRUD basico de habitos (criar e alternar ativo/pausado).
 - [ ] Configurar recorrencia.
-- [ ] Pausar e reativar habito.
-- [ ] Listagem de habitos por dia.
+- [x] Pausar e reativar habito.
+- [x] Listagem de habitos por dia.
 
 ## 5) Check-in e progressao
-- [ ] Registrar conclusao diaria com idempotencia.
-- [ ] Gerar `xp_events` por check-in valido.
-- [ ] Recalcular nivel e streak.
-- [ ] Exibir progresso no dashboard principal.
+- [x] Registrar conclusao diaria com idempotencia.
+- [x] Gerar `xp_events` por check-in valido.
+- [x] Recalcular nivel e streak.
+- [x] Exibir progresso no dashboard principal.
 
 ## 6) Gamificacao extra (MVP estendido)
 - [ ] Quests semanais simples.

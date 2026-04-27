@@ -2,14 +2,21 @@ import Link from "next/link";
 import { logoutAction } from "@/modules/auth/actions";
 import { requireUser } from "@/modules/auth/server/session";
 import {
-  createProgressSnapshot,
-  sampleRewards,
-  weeklyQuest,
+  getUserProgress,
+  getUserRewards,
+  getActiveQuests,
 } from "@/modules";
 
 export default async function DashboardPage() {
   const user = await requireUser();
-  const progress = createProgressSnapshot(340, 6);
+
+  const [progress, rewards, quests] = await Promise.all([
+    getUserProgress(),
+    getUserRewards(),
+    getActiveQuests()
+  ]);
+
+  const mainQuest = quests.length > 0 ? quests[0] : null;
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-10">
@@ -38,21 +45,34 @@ export default async function DashboardPage() {
         </article>
       </section>
 
-      <section className="rounded-xl border border-zinc-200 bg-white p-5">
-        <h2 className="text-lg font-semibold">{weeklyQuest.title}</h2>
-        <p className="mt-2 text-zinc-600">{weeklyQuest.description}</p>
-        <p className="mt-2 text-sm text-zinc-500">Recompensa: {weeklyQuest.xpReward} XP</p>
-      </section>
+      {mainQuest && (
+        <section className="rounded-xl border border-zinc-200 bg-white p-5">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">{mainQuest.title}</h2>
+            {mainQuest.completed && (
+              <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-800">Concluida</span>
+            )}
+          </div>
+          <p className="mt-2 text-zinc-600">{mainQuest.description}</p>
+          <p className="mt-2 text-sm text-zinc-500">Recompensa: {mainQuest.xpReward} XP</p>
+        </section>
+      )}
 
       <section className="rounded-xl border border-zinc-200 bg-white p-5">
         <h2 className="text-lg font-semibold">Loja de recompensas</h2>
-        <ul className="mt-3 space-y-2 text-zinc-700">
-          {sampleRewards.map((reward) => (
-            <li key={reward.id}>
-              {reward.title} - {reward.pointsCost} pontos
-            </li>
-          ))}
-        </ul>
+        {rewards.length > 0 ? (
+          <ul className="mt-3 space-y-2 text-zinc-700">
+            {rewards.map((reward) => (
+              <li key={reward.id}>
+                {reward.title} - {reward.pointsCost} pontos
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-3 text-sm text-zinc-500">
+            Nenhuma recompensa disponivel no momento.
+          </p>
+        )}
       </section>
 
       <div className="flex items-center gap-3">
