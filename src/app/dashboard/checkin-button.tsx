@@ -100,16 +100,16 @@ export function CheckinButton({ habitId, todayDateRef }: CheckinButtonProps) {
   };
 
   return (
-    <div className="flex flex-col items-end gap-1 mt-4 sm:mt-0 w-full sm:w-auto">
+    <div className="flex flex-col mt-2 w-full">
       <button
         onClick={handleCheckin}
         disabled={isPending}
-        className="system-btn-primary py-2 px-5 text-sm flex items-center justify-center gap-2 w-full sm:w-auto"
+        className="system-btn-primary py-2.5 px-4 text-xs flex items-center justify-center gap-2 w-full shadow-[0_0_10px_rgba(14,165,233,0.15)]"
       >
         {isPending ? (
           <>Sincronizando...</>
         ) : (
-          <><CircleDashed size={18} className="text-sky-300" /> Completar Quest</>
+          <><CircleDashed size={16} className="text-sky-300" /> Completar Quest</>
         )}
       </button>
     </div>

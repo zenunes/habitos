@@ -184,16 +184,16 @@ export default async function DashboardPage() {
               </Link>
             </div>
           ) : pendingHabits.length > 0 ? (
-            <ul className="grid grid-cols-1 gap-4">
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {pendingHabits.map(habit => (
-                <li key={habit.id} className="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-900/60 border border-slate-700 rounded-xl p-5 hover:border-sky-500/60 hover:bg-slate-800/80 transition-all shadow-sm hover:shadow-[0_0_20px_rgba(14,165,233,0.15)]">
-                  <div className="flex items-start gap-4 mb-4 sm:mb-0">
-                    <div className="mt-1 p-2 bg-slate-800 rounded-lg group-hover:bg-sky-900/40 group-hover:text-sky-400 text-slate-500 transition-colors border border-slate-700 group-hover:border-sky-500/30">
-                      <Target size={20} />
+                <li key={habit.id} className="group relative flex flex-col justify-between bg-slate-900/60 border border-slate-700 rounded-xl p-4 hover:border-sky-500/60 hover:bg-slate-800/80 transition-all shadow-sm hover:shadow-[0_0_20px_rgba(14,165,233,0.15)]">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="p-2 bg-slate-800 rounded-lg group-hover:bg-sky-900/40 group-hover:text-sky-400 text-slate-500 transition-colors border border-slate-700 group-hover:border-sky-500/30">
+                      <Target size={18} />
                     </div>
                     <div>
-                      <p className="text-lg font-heading font-bold text-slate-100 group-hover:text-white transition-colors">{habit.title}</p>
-                      <div className="flex items-center gap-2 mt-1.5">
+                      <p className="text-base font-heading font-bold text-slate-100 group-hover:text-white transition-colors leading-tight">{habit.title}</p>
+                      <div className="flex flex-wrap items-center gap-2 mt-2">
                         <span className="text-[10px] font-heading tracking-widest uppercase bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">
                           {habit.frequency === 'daily' ? 'Diária' : 'Dias Úteis'}
                         </span>
