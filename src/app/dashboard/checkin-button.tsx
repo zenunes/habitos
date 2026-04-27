@@ -5,11 +5,10 @@ import { checkinHabitAction } from "@/modules/habits/actions-checkin";
 
 type CheckinButtonProps = {
   habitId: string;
-  habitTitle: string;
   todayDateRef: string; // no formato YYYY-MM-DD
 };
 
-export function CheckinButton({ habitId, habitTitle, todayDateRef }: CheckinButtonProps) {
+export function CheckinButton({ habitId, todayDateRef }: CheckinButtonProps) {
   const [isPending, startTransition] = useTransition();
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
 
@@ -28,15 +27,25 @@ export function CheckinButton({ habitId, habitTitle, todayDateRef }: CheckinButt
   };
 
   return (
-    <div className="flex flex-col items-start gap-1">
+    <div className="flex flex-col items-end gap-1">
       <button
         onClick={handleCheckin}
-        disabled={isPending}
-        className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-50"
+        disabled={isPending || statusMsg?.includes("Sucesso")}
+        className={`system-btn-primary py-2 px-4 text-xs ${
+          statusMsg?.includes("Sucesso") 
+            ? "!bg-emerald-600/20 !border-emerald-500/50 !text-emerald-400 !shadow-[0_0_10px_rgba(16,185,129,0.3)] cursor-not-allowed" 
+            : ""
+        }`}
       >
-        {isPending ? "Registrando..." : `Concluir ${habitTitle}`}
+        {isPending ? "Sincronizando..." : statusMsg?.includes("Sucesso") ? "Quest Concluída" : "Completar Quest"}
       </button>
-      {statusMsg && <p className="text-xs text-emerald-700">{statusMsg}</p>}
+      {statusMsg && (
+        <p className={`text-[10px] font-heading tracking-widest uppercase mt-1 ${
+          statusMsg.includes("Erro") ? "text-red-400" : "text-emerald-400"
+        }`}>
+          {statusMsg}
+        </p>
+      )}
     </div>
   );
 }

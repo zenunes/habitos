@@ -22,7 +22,7 @@ export async function checkinHabitAction(habitId: string, dataRef: string) {
   if (logError) {
     if (logError.code === "23505") { // Unique violation
       logger.info("Check-in ignorado (ja realizado para o dia)", { habitId, dataRef, userId: user.id });
-      return { message: "Habito ja concluido hoje." };
+      return { message: "Sucesso: Quest já concluída hoje." };
     }
     logger.error("Erro ao registrar habit_log", logError, { habitId, dataRef, userId: user.id });
     throw new Error("Falha ao registrar check-in.");
@@ -75,5 +75,5 @@ export async function checkinHabitAction(habitId: string, dataRef: string) {
   logger.info("Check-in concluido com sucesso", { userId: user.id, habitId, newXp });
   revalidatePath("/habitos");
   revalidatePath("/dashboard");
-  return { message: "Check-in realizado! +10 XP" };
+  return { message: "Sucesso: Quest concluída! +10 XP" };
 }

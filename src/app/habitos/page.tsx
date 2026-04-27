@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { logoutAction } from "@/modules/auth/actions";
 import { requireUser } from "@/modules/auth/server/session";
 import { getActiveHabits } from "@/modules/habits/server/queries";
 import { HabitsListManager } from "./habits-list-manager";
@@ -9,30 +8,27 @@ export default async function HabitosPage() {
   const habits = await getActiveHabits();
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-10">
-      <header className="flex items-end justify-between gap-4">
+    <main className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-10 relative z-10">
+      <header className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-slate-800 pb-6">
         <div>
-          <p className="text-sm uppercase tracking-wide text-zinc-500">Habitos</p>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Seus habitos ativos</h1>
+          <div className="inline-flex items-center gap-2 mb-2">
+            <span className="h-2 w-2 rounded-full bg-sky-500 animate-pulse shadow-[0_0_8px_var(--primary-glow)]"></span>
+            <p className="text-xs uppercase tracking-[0.2em] text-sky-400 font-heading font-bold">Registro de Missões</p>
+          </div>
+          <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
+            Painel de Quests Diárias
+          </h1>
+          <p className="text-slate-400 mt-1">Gerencie as missões que guiarão sua evolução.</p>
         </div>
         <Link
           href="/dashboard"
-          className="rounded-lg border border-zinc-300 px-4 py-2 font-medium text-zinc-800 hover:bg-zinc-100 bg-white"
+          className="system-btn-secondary"
         >
-          Voltar ao dashboard
+          Voltar ao Sistema
         </Link>
       </header>
 
       <HabitsListManager initialHabits={habits} />
-
-      <form action={logoutAction}>
-        <button
-          type="submit"
-          className="w-fit rounded-lg border border-zinc-300 px-4 py-2 font-medium text-zinc-700 hover:bg-zinc-100 bg-white"
-        >
-          Sair
-        </button>
-      </form>
     </main>
   );
 }
