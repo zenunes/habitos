@@ -1,15 +1,12 @@
 import Link from "next/link";
 import { logoutAction } from "@/modules/auth/actions";
 import { requireUser } from "@/modules/auth/server/session";
-import {
-  createProgressSnapshot,
-  sampleRewards,
-  weeklyQuest,
-} from "@/modules";
+import { getDashboardSummary } from "@/modules/progression/server/queries";
+import { sampleRewards, weeklyQuest } from "@/modules";
 
 export default async function DashboardPage() {
   const user = await requireUser();
-  const progress = createProgressSnapshot(340, 6);
+  const summary = await getDashboardSummary();
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-10">
@@ -26,15 +23,26 @@ export default async function DashboardPage() {
       <section className="grid gap-4 sm:grid-cols-3">
         <article className="rounded-xl border border-zinc-200 bg-white p-4">
           <p className="text-sm text-zinc-500">XP total</p>
-          <p className="mt-2 text-2xl font-semibold">{progress.xpTotal}</p>
+          <p className="mt-2 text-2xl font-semibold">{summary.xpTotal}</p>
         </article>
         <article className="rounded-xl border border-zinc-200 bg-white p-4">
           <p className="text-sm text-zinc-500">Nivel</p>
-          <p className="mt-2 text-2xl font-semibold">{progress.level}</p>
+          <p className="mt-2 text-2xl font-semibold">{summary.level}</p>
         </article>
         <article className="rounded-xl border border-zinc-200 bg-white p-4">
           <p className="text-sm text-zinc-500">Streak atual</p>
-          <p className="mt-2 text-2xl font-semibold">{progress.currentStreak} dias</p>
+          <p className="mt-2 text-2xl font-semibold">{summary.currentStreak} dias</p>
+        </article>
+      </section>
+
+      <section className="grid gap-4 sm:grid-cols-2">
+        <article className="rounded-xl border border-zinc-200 bg-white p-4">
+          <p className="text-sm text-zinc-500">Habitos ativos</p>
+          <p className="mt-2 text-2xl font-semibold">{summary.activeHabits}</p>
+        </article>
+        <article className="rounded-xl border border-zinc-200 bg-white p-4">
+          <p className="text-sm text-zinc-500">Check-ins hoje</p>
+          <p className="mt-2 text-2xl font-semibold">{summary.doneToday}</p>
         </article>
       </section>
 
