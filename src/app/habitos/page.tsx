@@ -1,7 +1,11 @@
 import Link from "next/link";
+import { logoutAction } from "@/modules/auth/actions";
+import { requireUser } from "@/modules/auth/server/session";
 import { sampleHabits } from "@/modules";
 
-export default function HabitosPage() {
+export default async function HabitosPage() {
+  await requireUser();
+
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-10">
       <header className="flex items-end justify-between gap-4">
@@ -41,6 +45,14 @@ export default function HabitosPage() {
           ))}
         </ul>
       </section>
+      <form action={logoutAction}>
+        <button
+          type="submit"
+          className="w-fit rounded-lg border border-zinc-300 px-4 py-2 font-medium text-zinc-700 hover:bg-zinc-100"
+        >
+          Sair
+        </button>
+      </form>
     </main>
   );
 }
