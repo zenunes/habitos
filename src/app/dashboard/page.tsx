@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { logoutAction } from "@/modules/auth/actions";
 import { requireUser } from "@/modules/auth/server/session";
-import {
-  getUserProgress,
-  getUserRewards,
-  getActiveQuests,
-  getActiveHabits
-} from "@/modules";
+import { getUserProgress } from "@/modules/progression/server/queries";
+import { getUserRewards } from "@/modules/rewards/server/queries";
+import { getActiveQuests } from "@/modules/quests/server/queries";
+import { getActiveHabits } from "@/modules/habits/server/queries";
 import { CheckinButton } from "./checkin-button";
 
 export default async function DashboardPage() {

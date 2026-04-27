@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { logoutAction } from "@/modules/auth/actions";
 import { requireUser } from "@/modules/auth/server/session";
-import { getActiveHabits } from "@/modules";
+import { getActiveHabits } from "@/modules/habits/server/queries";
 import { HabitsListManager } from "./habits-list-manager";
 
 export default async function HabitosPage() {
