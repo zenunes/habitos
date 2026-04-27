@@ -42,11 +42,12 @@ npm run dev
 ## Banco e RLS
 
 - Migracao inicial: `supabase/migrations/0001_initial_schema.sql`
+- Fluxo de check-in e progresso: `supabase/migrations/0002_checkin_and_progress.sql`
 - Inclui tabelas de habitos, progresso, quests, badges e recompensas
 - Inclui policies de RLS por `auth.uid()` para isolamento por usuario
 
 ## Proximos passos tecnicos
 
-- Implementar check-in diario com idempotencia
-- Persistir XP, nivel e streak
+- Evoluir recorrencia custom de habitos
+- Exibir historico semanal e analytics basicos
 - Integrar quests/badges/recompensas no fluxo real

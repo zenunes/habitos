@@ -21,16 +21,16 @@
 - [x] Guardas de rota para areas autenticadas (dashboard e habitos).
 
 ## 4) Modulo de habitos
-- [ ] CRUD de habitos.
+- [x] CRUD basico de habitos (criar e alternar ativo/pausado).
 - [ ] Configurar recorrencia.
-- [ ] Pausar e reativar habito.
-- [ ] Listagem de habitos por dia.
+- [x] Pausar e reativar habito.
+- [x] Listagem de habitos por dia.
 
 ## 5) Check-in e progressao
-- [ ] Registrar conclusao diaria com idempotencia.
-- [ ] Gerar `xp_events` por check-in valido.
-- [ ] Recalcular nivel e streak.
-- [ ] Exibir progresso no dashboard principal.
+- [x] Registrar conclusao diaria com idempotencia.
+- [x] Gerar `xp_events` por check-in valido.
+- [x] Recalcular nivel e streak.
+- [x] Exibir progresso no dashboard principal.
 
 ## 6) Gamificacao extra (MVP estendido)
 - [ ] Quests semanais simples.
