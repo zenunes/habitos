@@ -8,7 +8,7 @@ import { Plus, X, ListTodo, Filter } from "lucide-react";
 
 export function HabitsListManager({ initialHabits }: { initialHabits: Habit[] }) {
   const [isCreating, setIsCreating] = useState(false);
-  const [filter, setFilter] = useState<"all" | "daily" | "weekdays">("all");
+  const [filter, setFilter] = useState<"all" | "daily" | "weekdays" | "once" | "negative">("all");
 
   const filteredHabits = initialHabits.filter(habit => {
     if (filter === "all") return true;
@@ -24,24 +24,36 @@ export function HabitsListManager({ initialHabits }: { initialHabits: Habit[] })
         </h2>
         
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="flex bg-slate-900 border border-slate-700 rounded p-1">
+          <div className="flex bg-slate-900 border border-slate-700 rounded p-1 overflow-x-auto max-w-[calc(100vw-3rem)] custom-scrollbar">
             <button 
               onClick={() => setFilter("all")}
-              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded ${filter === "all" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
+              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap ${filter === "all" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
             >
               Todas
             </button>
             <button 
               onClick={() => setFilter("daily")}
-              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded ${filter === "daily" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
+              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap ${filter === "daily" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
             >
               Diárias
             </button>
             <button 
               onClick={() => setFilter("weekdays")}
-              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded ${filter === "weekdays" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
+              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap ${filter === "weekdays" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
             >
               Dias Úteis
+            </button>
+            <button 
+              onClick={() => setFilter("once")}
+              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap ${filter === "once" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
+            >
+              Únicas
+            </button>
+            <button 
+              onClick={() => setFilter("negative")}
+              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap ${filter === "negative" ? "bg-red-900/50 text-red-400" : "text-slate-400 hover:text-slate-200"}`}
+            >
+              Inimigos
             </button>
           </div>
           

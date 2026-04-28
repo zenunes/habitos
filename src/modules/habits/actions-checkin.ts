@@ -13,36 +13,39 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
   const user = await requireUser();
   const supabase = await createSupabaseServerClient();
 
+  // 0. Buscar detalhes do Hábito para saber o tipo
+  const { data: habitData, error: habitError } = await supabase
+    .from("habits")
+    .select("frequency")
+    .eq("id", habitId)
+    .single();
+
+  if (habitError || !habitData) {
+    logger.error("Erro ao buscar hábito no check-in", habitError, { habitId });
+    throw new Error("Hábito não encontrado.");
+  }
+
+  const isNegative = habitData.frequency === "negative";
+  const isOnce = habitData.frequency === "once";
+
   // 1. Inserir o log com tratamento de erro (idempotencia via constraint unique)
   const { error: logError } = await supabase.from("habit_logs").insert({
     user_id: user.id,
     habit_id: habitId,
     data_ref: dataRef,
-    status: "done",
+    status: isNegative ? "failed" : "done",
   });
 
   if (logError) {
     if (logError.code === "23505") { // Unique violation
       logger.info("Check-in ignorado (ja realizado para o dia)", { habitId, dataRef, userId: user.id });
-      return { message: "Sucesso: Quest já concluída hoje." };
+      return { message: "Esta ação já foi registrada hoje." };
     }
     logger.error("Erro ao registrar habit_log", logError, { habitId, dataRef, userId: user.id });
     throw new Error("Falha ao registrar check-in.");
   }
 
-  // 2. Registrar evento de XP
-  const { error: xpError } = await supabase.from("xp_events").insert({
-    user_id: user.id,
-    source: `checkin_${habitId}`,
-    points: XP_PER_CHECKIN,
-    metadata: { habit_id: habitId, data_ref: dataRef },
-  });
-
-  if (xpError) {
-    logger.error("Erro ao registrar XP", xpError, { userId: user.id });
-  }
-
-  // 3. Buscar progresso atual
+  // 2. Buscar progresso atual
   const { data: progress } = await supabase
     .from("user_progress")
     .select("*")
@@ -52,32 +55,53 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
   const currentXp = progress?.xp_total || 0;
   const currentStreak = progress?.current_streak || 0;
   const bestStreak = progress?.best_streak || 0;
+  const currentHp = progress?.hp_current ?? 100;
   const lastCheckinDate = progress?.last_checkin_date || null;
 
-  const newXp = currentXp + XP_PER_CHECKIN;
+  let newXp = currentXp;
   let newStreak = currentStreak;
+  let newHp = currentHp;
 
-  if (!lastCheckinDate) {
-    // Primeiro check-in do usuário
-    newStreak = 1;
-  } else {
-    // dataRef e lastCheckinDate estão no formato 'YYYY-MM-DD'
-    const todayDate = new Date(dataRef);
-    const lastDate = new Date(lastCheckinDate);
+  if (isNegative) {
+    // Hábito negativo dá Dano ao invés de XP
+    newHp = Math.max(0, currentHp - 10);
     
-    // Convertendo para UTC para evitar problemas de timezone/horário de verão
-    const utcToday = Date.UTC(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
-    const utcLast = Date.UTC(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate());
-    
-    // Calcula a diferença em dias inteiros
-    const diffDays = Math.floor((utcToday - utcLast) / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 1) {
-      newStreak += 1; // Dia consecutivo, aumenta a ofensiva
-    } else if (diffDays > 1) {
-      newStreak = 1; // Perdeu a ofensiva (pulou um dia ou mais)
+    // Se HP zerar, reseta ofensiva
+    if (newHp === 0 && currentHp > 0) {
+      newStreak = 0;
     }
-    // Se diffDays === 0 (mesmo dia), a ofensiva não muda
+  } else {
+    // Hábito normal dá XP
+    newXp = currentXp + XP_PER_CHECKIN;
+
+    // Registrar evento de XP
+    const { error: xpError } = await supabase.from("xp_events").insert({
+      user_id: user.id,
+      source: `checkin_${habitId}`,
+      points: XP_PER_CHECKIN,
+      metadata: { habit_id: habitId, data_ref: dataRef },
+    });
+
+    if (xpError) {
+      logger.error("Erro ao registrar XP", xpError, { userId: user.id });
+    }
+
+    // Lógica de Ofensiva (Streak)
+    if (!lastCheckinDate) {
+      newStreak = 1;
+    } else {
+      const todayDate = new Date(dataRef);
+      const lastDate = new Date(lastCheckinDate);
+      const utcToday = Date.UTC(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
+      const utcLast = Date.UTC(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate());
+      const diffDays = Math.floor((utcToday - utcLast) / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 1) {
+        newStreak += 1;
+      } else if (diffDays > 1) {
+        newStreak = 1;
+      }
+    }
   }
 
   const progressPayload = {
@@ -85,10 +109,11 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
     xp_total: newXp,
     current_streak: newStreak,
     best_streak: Math.max(newStreak, bestStreak),
-    last_checkin_date: dataRef,
+    hp_current: newHp,
+    last_checkin_date: isNegative ? lastCheckinDate : dataRef, // Não atualiza last_checkin se for negativo
   };
 
-  // 4. Atualizar progresso do usuario (Upsert)
+  // 4. Atualizar progresso do usuario
   const { error: progressError } = await supabase
     .from("user_progress")
     .upsert(progressPayload, { onConflict: "user_id" });
@@ -97,7 +122,12 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
     logger.error("Erro ao atualizar progresso", progressError, { userId: user.id });
   }
 
-  // 5. Avaliar Conquistas / Títulos Desbloqueados
+  // 5. Se for "once" (Tarefa Única), desativa ou deleta
+  if (isOnce) {
+    await supabase.from("habits").update({ active: false }).eq("id", habitId);
+  }
+
+  // 6. Avaliar Conquistas / Títulos Desbloqueados
   const unlockedTitles = await evaluateBadges(user.id, newXp, newStreak);
 
   const oldLevel = calculateLevel(currentXp);
@@ -108,12 +138,18 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
   const newClass = getHunterClass(newLevel);
   const classChanged = newClass !== oldClass;
 
-  logger.info("Check-in concluido com sucesso", { userId: user.id, habitId, newXp, unlockedTitles, leveledUp, classChanged });
   revalidatePath("/habitos");
   revalidatePath("/dashboard");
   revalidatePath("/conquistas");
   
-  let returnMessage = "Sucesso: Quest concluída! +10 XP";
+  if (isNegative) {
+    if (newHp === 0 && currentHp > 0) {
+      return { message: "Você cedeu ao inimigo. -10 HP. SEU HP ZEROU! Ofensiva reiniciada." };
+    }
+    return { message: "Você cedeu ao inimigo. -10 HP." };
+  }
+
+  let returnMessage = isOnce ? "Tarefa única concluída! +10 XP" : "Sucesso: Quest concluída! +10 XP";
 
   if (classChanged) {
     returnMessage = `CLASS UP! Você despertou como: ${newClass}!`;
@@ -125,7 +161,7 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
     if (leveledUp || classChanged) {
       returnMessage += ` Título: ${unlockedTitles.join(", ")}`;
     } else {
-      returnMessage = `Sucesso: Quest concluída! +10 XP. Título desbloqueado: ${unlockedTitles.join(", ")}`;
+      returnMessage = `Quest concluída! +10 XP. Título desbloqueado: ${unlockedTitles.join(", ")}`;
     }
   }
 

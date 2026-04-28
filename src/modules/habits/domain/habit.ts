@@ -1,4 +1,4 @@
-export type HabitFrequency = "daily" | "weekdays" | "custom" | string;
+export type HabitFrequency = "daily" | "weekdays" | "custom" | "once" | "negative";
 
 export type Habit = {
   id: string;

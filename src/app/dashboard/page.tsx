@@ -169,7 +169,7 @@ export default async function DashboardPage() {
           </section>
         )}
 
-        {/* QUESTS DIÁRIAS (HÁBITOS) */}
+        {/* QUESTS DIÁRIAS (HÁBITOS) E INIMIGOS */}
         <section className="system-card p-6 border-sky-900/30">
           <div className="flex items-center justify-between mb-6 border-b border-slate-800 pb-4">
             <div className="flex items-center gap-3">
@@ -177,7 +177,7 @@ export default async function DashboardPage() {
                 <Scroll size={24} className="text-sky-400" />
               </div>
               <div>
-                <h2 className="text-2xl font-heading font-bold tracking-widest text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">Missões Diárias</h2>
+                <h2 className="text-2xl font-heading font-bold tracking-widest text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">Painel de Missões</h2>
                 <p className="text-xs text-sky-500/70 font-heading tracking-widest uppercase">Renovação Diária</p>
               </div>
             </div>
@@ -199,36 +199,60 @@ export default async function DashboardPage() {
             </div>
           ) : pendingHabits.length > 0 ? (
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {pendingHabits.map(habit => (
-                <li key={habit.id} className="group relative flex flex-col justify-between bg-slate-900/60 border border-slate-700 rounded-xl p-4 hover:border-sky-500/60 hover:bg-slate-800/80 transition-all shadow-sm hover:shadow-[0_0_20px_rgba(14,165,233,0.15)]">
-                  <div className="flex items-start gap-3 mb-4">
-                    <div className="p-2 bg-slate-800 rounded-lg group-hover:bg-sky-900/40 group-hover:text-sky-400 text-slate-500 transition-colors border border-slate-700 group-hover:border-sky-500/30">
-                      <Target size={18} />
-                    </div>
-                    <div>
-                      <div className="flex items-start gap-2 justify-between w-full">
-                        <p className="text-base font-heading font-bold text-slate-100 group-hover:text-white transition-colors leading-tight">{habit.title}</p>
+              {pendingHabits.map(habit => {
+                const isEnemy = habit.frequency === 'negative';
+                const isOnce = habit.frequency === 'once';
+                
+                return (
+                  <li key={habit.id} className={`group relative flex flex-col justify-between bg-slate-900/60 border rounded-xl p-4 transition-all shadow-sm ${
+                    isEnemy ? "border-red-900/50 hover:border-red-500/60 hover:bg-red-950/20 hover:shadow-[0_0_20px_rgba(220,38,38,0.15)]" :
+                    isOnce ? "border-amber-900/50 hover:border-amber-500/60 hover:bg-amber-950/20 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)]" :
+                    "border-slate-700 hover:border-sky-500/60 hover:bg-slate-800/80 hover:shadow-[0_0_20px_rgba(14,165,233,0.15)]"
+                  }`}>
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className={`p-2 rounded-lg border transition-colors ${
+                        isEnemy ? "bg-red-950/50 text-red-500 border-red-900/50 group-hover:bg-red-900/40 group-hover:border-red-500/30" :
+                        isOnce ? "bg-amber-950/50 text-amber-500 border-amber-900/50 group-hover:bg-amber-900/40 group-hover:border-amber-500/30" :
+                        "bg-slate-800 text-slate-500 border-slate-700 group-hover:bg-sky-900/40 group-hover:text-sky-400 group-hover:border-sky-500/30"
+                      }`}>
+                        {isEnemy ? <ShieldAlert size={18} /> : <Target size={18} />}
                       </div>
-                      
-                      {habit.description && (
-                        <p className="text-xs text-slate-400 mt-2 line-clamp-2 font-body group-hover:text-slate-300 transition-colors">
-                          {habit.description}
-                        </p>
-                      )}
+                      <div>
+                        <div className="flex items-start gap-2 justify-between w-full">
+                          <p className={`text-base font-heading font-bold transition-colors leading-tight ${
+                            isEnemy ? "text-red-100 group-hover:text-red-400" :
+                            isOnce ? "text-amber-100 group-hover:text-amber-400" :
+                            "text-slate-100 group-hover:text-white"
+                          }`}>{habit.title}</p>
+                        </div>
+                        
+                        {habit.description && (
+                          <p className="text-xs text-slate-400 mt-2 line-clamp-2 font-body group-hover:text-slate-300 transition-colors">
+                            {habit.description}
+                          </p>
+                        )}
 
-                      <div className="flex flex-wrap items-center gap-2 mt-3">
-                        <span className="text-[10px] font-heading tracking-widest uppercase bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">
-                          {habit.frequency === 'daily' ? 'Diária' : 'Dias Úteis'}
-                        </span>
-                        <span className="text-[10px] font-heading tracking-widest uppercase text-sky-500/70 flex items-center gap-1">
-                          <Zap size={10} /> +10 XP
-                        </span>
+                        <div className="flex flex-wrap items-center gap-2 mt-3">
+                          <span className={`text-[10px] font-heading tracking-widest uppercase px-2 py-0.5 rounded border ${
+                            isEnemy ? "bg-red-950 text-red-500 border-red-900" :
+                            isOnce ? "bg-amber-950 text-amber-500 border-amber-900" :
+                            "bg-slate-800 text-slate-400 border-slate-700"
+                          }`}>
+                            {isEnemy ? 'Inimigo (Evite)' : isOnce ? 'Missão Única' : habit.frequency === 'daily' ? 'Diária' : 'Dias Úteis'}
+                          </span>
+                          
+                          <span className={`text-[10px] font-heading tracking-widest uppercase flex items-center gap-1 ${
+                            isEnemy ? "text-red-500/70" : "text-sky-500/70"
+                          }`}>
+                            {isEnemy ? <><Heart size={10} /> -10 HP</> : <><Zap size={10} /> +10 XP</>}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <CheckinButton habitId={habit.id} todayDateRef={todayStr} />
-                </li>
-              ))}
+                    <CheckinButton habitId={habit.id} todayDateRef={todayStr} isEnemy={isEnemy} />
+                  </li>
+                );
+              })}
             </ul>
           ) : (
             <div className="text-center py-12 border border-dashed border-slate-700 rounded-xl bg-slate-900/30">
