@@ -12,7 +12,7 @@ export function RewardItem({ reward, availablePoints, isSystemItem = false }: { 
   const canAfford = availablePoints >= reward.pointsCost;
 
   const handleRedeem = () => {
-    if (window.confirm(`Deseja resgatar "${reward.title}" por ${reward.pointsCost} pontos?`)) {
+    if (window.confirm(`Deseja comprar "${reward.title}" por ${reward.pointsCost} moedas?`)) {
       startTransition(async () => {
         const result = await redeemRewardAction(reward.id, reward.pointsCost);
         if (result.error) {
@@ -33,16 +33,16 @@ export function RewardItem({ reward, availablePoints, isSystemItem = false }: { 
               colors: ['#f43f5e', '#fb7185', '#fda4af']
             });
           } else {
-            toast.success(`Resgatado: ${reward.title}`, {
-              icon: <Gift className="text-purple-400" />,
-              style: { borderColor: "#a855f7", color: "#d8b4fe", background: "rgba(168, 85, 247, 0.1)" }
+            toast.success(`Comprado: ${reward.title}`, {
+              icon: <Gift className="text-amber-400" />,
+              style: { borderColor: "#f59e0b", color: "#fcd34d", background: "rgba(245, 158, 11, 0.1)" }
             });
             
             confetti({
               particleCount: 50,
               spread: 70,
               origin: { y: 0.7 },
-              colors: ['#a855f7', '#c084fc', '#e879f9']
+              colors: ['#f59e0b', '#fbbf24', '#fcd34d']
             });
           }
         }
@@ -59,14 +59,14 @@ export function RewardItem({ reward, availablePoints, isSystemItem = false }: { 
   };
 
   return (
-    <li className={`group relative flex flex-col sm:flex-row sm:items-center justify-between ${isSystemItem ? 'bg-rose-950/20 border-rose-900/50 hover:border-rose-500/60' : 'bg-slate-900/60 border-slate-700 hover:border-purple-500/60'} border rounded-xl p-4 hover:bg-slate-800/80 transition-all shadow-sm ${isSystemItem ? 'hover:shadow-[0_0_20px_rgba(244,63,94,0.15)]' : 'hover:shadow-[0_0_20px_rgba(168,85,247,0.15)]'} ${isPending ? "opacity-50" : "opacity-100"}`}>
+    <li className={`group relative flex flex-col sm:flex-row sm:items-center justify-between ${isSystemItem ? 'bg-rose-950/20 border-rose-900/50 hover:border-rose-500/60' : 'bg-slate-900/60 border-slate-700 hover:border-amber-500/60'} border rounded-xl p-4 hover:bg-slate-800/80 transition-all shadow-sm ${isSystemItem ? 'hover:shadow-[0_0_20px_rgba(244,63,94,0.15)]' : 'hover:shadow-[0_0_20px_rgba(245,158,11,0.15)]'} ${isPending ? "opacity-50" : "opacity-100"}`}>
       <div className="flex items-start gap-4 mb-4 sm:mb-0">
-        <div className={`mt-1 p-2 rounded-lg transition-colors border ${isSystemItem ? 'bg-rose-900/20 text-rose-500 border-rose-900/40 group-hover:bg-rose-900/40 group-hover:border-rose-500/40' : 'bg-slate-800 group-hover:bg-purple-900/40 group-hover:text-purple-400 text-slate-500 border-slate-700 group-hover:border-purple-500/30'}`}>
+        <div className={`mt-1 p-2 rounded-lg transition-colors border ${isSystemItem ? 'bg-rose-900/20 text-rose-500 border-rose-900/40 group-hover:bg-rose-900/40 group-hover:border-rose-500/40' : 'bg-slate-800 group-hover:bg-amber-900/40 group-hover:text-amber-400 text-slate-500 border-slate-700 group-hover:border-amber-500/30'}`}>
           {isSystemItem ? <Heart size={20} /> : <ShoppingBag size={20} />}
         </div>
         <div>
           <p className={`text-lg font-heading font-bold transition-colors ${isSystemItem ? 'text-rose-200 group-hover:text-rose-100' : 'text-slate-100 group-hover:text-white'}`}>{reward.title}</p>
-          <p className={`text-[10px] mt-1 font-heading tracking-widest font-bold uppercase inline-block px-2 py-0.5 rounded border ${isSystemItem ? 'text-rose-400 bg-rose-950/40 border-rose-500/30' : 'text-purple-400 bg-purple-950/30 border-purple-500/30'}`}>Custo: {reward.pointsCost} pts</p>
+          <p className={`text-[10px] mt-1 font-heading tracking-widest font-bold uppercase inline-block px-2 py-0.5 rounded border ${isSystemItem ? 'text-rose-400 bg-rose-950/40 border-rose-500/30' : 'text-amber-400 bg-amber-950/30 border-amber-500/30'}`}>Custo: {reward.pointsCost} 🪙</p>
         </div>
       </div>
       <div className="flex items-center gap-2 mt-4 sm:mt-0">
@@ -77,11 +77,11 @@ export function RewardItem({ reward, availablePoints, isSystemItem = false }: { 
             canAfford
               ? isSystemItem
                 ? "bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500/20 hover:shadow-[0_0_10px_rgba(244,63,94,0.3)]"
-                : "bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20 hover:shadow-[0_0_10px_rgba(168,85,247,0.3)]"
+                : "bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 hover:shadow-[0_0_10px_rgba(245,158,11,0.3)]"
               : "bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed"
           }`}
         >
-          {isPending ? "Processando..." : canAfford ? "Comprar" : "Pontos Insuf."}
+          {isPending ? "Processando..." : canAfford ? "Comprar" : "Ouro Insuf."}
         </button>
         
         {!isSystemItem && (

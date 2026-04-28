@@ -57,8 +57,8 @@ export async function redeemRewardAction(
   const supabase = await createSupabaseServerClient();
 
   const progress = await getUserProgress();
-  if (progress.availablePoints < pointsCost) {
-    return { error: "Pontos insuficientes para resgatar esta recompensa." };
+  if (progress.coins < pointsCost) {
+    return { error: "Moedas insuficientes para comprar esta recompensa." };
   }
 
   // Verifica se é a Poção de Cura pelo ID especial "potion"
@@ -68,30 +68,31 @@ export async function redeemRewardAction(
     }
 
     const newHp = Math.min(100, progress.hpCurrent + 30); // Poção cura 30 HP
+    const newCoins = progress.coins - pointsCost;
 
-    // 1. Atualiza HP do usuário
+    // 1. Atualiza HP e Moedas do usuário
     const { error: hpError } = await supabase
       .from("user_progress")
-      .update({ hp_current: newHp })
+      .update({ hp_current: newHp, coins: newCoins })
       .eq("user_id", user.id);
 
-    if (hpError) return { error: "Erro ao consumir poção." };
-
-    // 2. Registra no histórico como um resgate já consumido
-    // Para isso a poção precisa existir na tabela de rewards ou criamos um registro falso no histórico sem FK.
-    // Mas o banco exige FK. Para contornar, registramos apenas o gasto de pontos e atualizamos a tela
-    // Vamos registrar um "xp_events" negativo para subtrair os pontos diretamente, já que não temos um reward_id válido.
-    
-    await supabase.from("xp_events").insert({
-      user_id: user.id,
-      source: "potion_buy",
-      points: -pointsCost, // evento negativo para descontar pontos
-    });
+    if (hpError) return { error: "Erro ao comprar poção." };
 
     revalidatePath("/dashboard");
     revalidatePath("/loja");
     return { message: "Poção consumida! +30 HP restaurado.", isPotion: true };
   }
+
+  // Comprando item normal da loja
+  const newCoins = progress.coins - pointsCost;
+  
+  // Atualiza moedas do usuário
+  const { error: coinsError } = await supabase
+    .from("user_progress")
+    .update({ coins: newCoins })
+    .eq("user_id", user.id);
+
+  if (coinsError) return { error: "Erro ao descontar moedas." };
 
   const { error } = await supabase.from("reward_redemptions").insert({
     user_id: user.id,

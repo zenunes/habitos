@@ -40,8 +40,8 @@ export function InventoryItem({ item }: { item: RedeemedItem }) {
       </div>
       
       <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4">
-        <span className="text-[10px] text-purple-400 font-heading tracking-widest font-bold uppercase bg-purple-950/30 px-2 py-1 rounded border border-purple-500/30">
-          -{item.pointsCost} pts
+        <span className="text-[10px] text-amber-400 font-heading tracking-widest font-bold uppercase bg-amber-950/30 px-2 py-1 rounded border border-amber-500/30">
+          -{item.pointsCost} 🪙
         </span>
         
         {isConsumed ? (

@@ -4,6 +4,7 @@ export type UserProgress = {
   currentStreak: number;
   bestStreak: number;
   availablePoints: number;
+  coins: number;
   lastCheckinDate?: string | null;
   hpCurrent: number;
   lastHpCalcDate?: string | null;

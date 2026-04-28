@@ -30,15 +30,15 @@ export default async function LojaPage() {
           <p className="text-slate-400 mt-1">Utilize seus pontos de evolução para adquirir recompensas.</p>
         </div>
         <div className="flex flex-col items-end gap-4">
-          <div className="bg-purple-900/20 border border-purple-500/30 px-4 py-2 rounded-lg">
-            <span className="text-xs text-purple-400 font-heading uppercase tracking-widest block mb-1">Pontos Disponíveis</span>
-            <span className="text-2xl font-bold text-white drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]">{progress.availablePoints} pts</span>
+          <div className="bg-amber-900/20 border border-amber-500/30 px-4 py-2 rounded-lg flex flex-col items-end">
+            <span className="text-xs text-amber-400 font-heading uppercase tracking-widest block mb-1">Ouro (Gold)</span>
+            <span className="text-2xl font-bold text-white drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">{progress.coins} 🪙</span>
           </div>
           <TopNav />
         </div>
       </header>
 
-      <StoreManager initialRewards={rewards} availablePoints={progress.availablePoints} />
+      <StoreManager initialRewards={rewards} availablePoints={progress.coins} />
 
       {/* HISTÓRICO DE INVENTÁRIO (COMPRAS RECENTES) */}
       <section className="system-card p-6 border-slate-800 bg-slate-950/30">

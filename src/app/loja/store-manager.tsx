@@ -13,13 +13,13 @@ export function StoreManager({ initialRewards, availablePoints }: { initialRewar
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 gap-4">
         <h2 className="text-xl font-heading font-bold text-white tracking-widest uppercase flex items-center gap-3">
-          <ShoppingCart size={24} className="text-purple-500" />
+          <ShoppingCart size={24} className="text-amber-500" />
           Itens Disponíveis
         </h2>
         {!isCreating && (
           <button
             onClick={() => setIsCreating(true)}
-            className="system-btn-primary !bg-purple-600 hover:!bg-purple-500 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] py-2 px-4 text-xs shadow-[0_0_10px_rgba(168,85,247,0.2)] flex items-center gap-2 w-full sm:w-auto"
+            className="system-btn-primary !bg-amber-600 hover:!bg-amber-500 hover:shadow-[0_0_15px_rgba(245,158,11,0.4)] py-2 px-4 text-xs shadow-[0_0_10px_rgba(245,158,11,0.2)] flex items-center gap-2 w-full sm:w-auto text-amber-950 font-bold"
           >
             <Plus size={16} /> Adicionar Nova Recompensa
           </button>
@@ -27,9 +27,9 @@ export function StoreManager({ initialRewards, availablePoints }: { initialRewar
       </div>
 
       {isCreating && (
-        <div className="system-card p-6 border-purple-500/50 bg-purple-950/10">
+        <div className="system-card p-6 border-amber-500/50 bg-amber-950/10">
           <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
-            <h3 className="font-heading text-lg font-bold text-purple-400 tracking-widest uppercase">Criar Item na Loja</h3>
+            <h3 className="font-heading text-lg font-bold text-amber-400 tracking-widest uppercase">Criar Item na Loja</h3>
             <button 
               onClick={() => setIsCreating(false)}
               className="text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-sm font-heading uppercase tracking-widest"
@@ -41,7 +41,7 @@ export function StoreManager({ initialRewards, availablePoints }: { initialRewar
         </div>
       )}
 
-      <section className="system-card p-6 border-purple-900/30">
+      <section className="system-card p-6 border-amber-900/30">
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
           
           {/* ITEM FIXO DO SISTEMA: POÇÃO DE CURA */}
@@ -50,7 +50,7 @@ export function StoreManager({ initialRewards, availablePoints }: { initialRewar
             reward={{
               id: "potion",
               title: "Poção de Cura (Restaura 30 HP)",
-              pointsCost: 50,
+              pointsCost: 50, // 50 Gold
               active: true,
             }}
             availablePoints={availablePoints}

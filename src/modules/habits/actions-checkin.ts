@@ -8,6 +8,7 @@ import { evaluateBadges } from "@/modules/progression/server/badges";
 import { calculateLevel, getHunterClass } from "@/modules/progression/domain/progression";
 
 const XP_PER_CHECKIN = 10;
+const COINS_PER_CHECKIN = 5;
 
 export async function checkinHabitAction(habitId: string, dataRef: string): Promise<{ message?: string, error?: string }> {
   const user = await requireUser();
@@ -53,12 +54,14 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
     .maybeSingle();
 
   const currentXp = progress?.xp_total || 0;
+  const currentCoins = progress?.coins || 0;
   const currentStreak = progress?.current_streak || 0;
   const bestStreak = progress?.best_streak || 0;
   const currentHp = progress?.hp_current ?? 100;
   const lastCheckinDate = progress?.last_checkin_date || null;
 
   let newXp = currentXp;
+  let newCoins = currentCoins;
   let newStreak = currentStreak;
   let newHp = currentHp;
 
@@ -71,8 +74,9 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
       newStreak = 0;
     }
   } else {
-    // Hábito normal dá XP
+    // Hábito normal dá XP e Coins
     newXp = currentXp + XP_PER_CHECKIN;
+    newCoins = currentCoins + COINS_PER_CHECKIN;
 
     // Registrar evento de XP
     const { error: xpError } = await supabase.from("xp_events").insert({
@@ -107,6 +111,7 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
   const progressPayload = {
     user_id: user.id,
     xp_total: newXp,
+    coins: newCoins,
     current_streak: newStreak,
     best_streak: Math.max(newStreak, bestStreak),
     hp_current: newHp,
@@ -149,7 +154,7 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
     return { message: "Você cedeu ao inimigo. -10 HP." };
   }
 
-  let returnMessage = isOnce ? "Tarefa única concluída! +10 XP" : "Sucesso: Quest concluída! +10 XP";
+  let returnMessage = isOnce ? "Tarefa única concluída! +10 XP | +5 Gold" : "Sucesso: Quest concluída! +10 XP | +5 Gold";
 
   if (classChanged) {
     returnMessage = `CLASS UP! Você despertou como: ${newClass}!`;
@@ -161,7 +166,7 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
     if (leveledUp || classChanged) {
       returnMessage += ` Título: ${unlockedTitles.join(", ")}`;
     } else {
-      returnMessage = `Quest concluída! +10 XP. Título desbloqueado: ${unlockedTitles.join(", ")}`;
+      returnMessage = `Quest concluída! +10 XP | +5 Gold. Título desbloqueado: ${unlockedTitles.join(", ")}`;
     }
   }
 

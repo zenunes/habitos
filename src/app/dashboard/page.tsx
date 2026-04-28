@@ -122,12 +122,12 @@ export default async function DashboardPage() {
                 </span>
                 <p className="text-3xl font-bold text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]">{progress.currentStreak} <span className="text-sm text-emerald-500/70">Dias</span></p>
               </div>
-              <div className="bg-slate-900/50 rounded-lg border border-slate-800 p-4 relative overflow-hidden group hover:border-purple-500/50 transition-colors">
-                <div className="absolute -right-4 -top-4 w-16 h-16 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition-colors" />
+              <div className="bg-slate-900/50 rounded-lg border border-slate-800 p-4 relative overflow-hidden group hover:border-amber-500/50 transition-colors">
+                <div className="absolute -right-4 -top-4 w-16 h-16 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-colors" />
                 <span className="text-xs text-slate-500 uppercase tracking-wider font-heading flex items-center gap-2 mb-1">
-                  <ShoppingCart size={12} className="text-purple-500"/> Pontos de Troca
+                  <ShoppingCart size={12} className="text-amber-500"/> Ouro Acumulado
                 </span>
-                <p className="text-3xl font-bold text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.4)]">{progress.xpTotal} <span className="text-sm text-purple-500/70">pts</span></p>
+                <p className="text-3xl font-bold text-amber-400 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]">{progress.coins} <span className="text-sm text-amber-500/70">🪙</span></p>
               </div>
             </div>
           </div>
@@ -244,7 +244,7 @@ export default async function DashboardPage() {
                           <span className={`text-[10px] font-heading tracking-widest uppercase flex items-center gap-1 ${
                             isEnemy ? "text-red-500/70" : "text-theme-light/70"
                           }`}>
-                            {isEnemy ? <><Heart size={10} /> -10 HP</> : <><Zap size={10} /> +10 XP</>}
+                            {isEnemy ? <><Heart size={10} /> -10 HP</> : <><Zap size={10} /> +10 XP | +5 🪙</>}
                           </span>
                         </div>
                       </div>
