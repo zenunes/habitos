@@ -1,21 +1,23 @@
-# Sistema de Progressão e Classes (Job Change) - Solo Leveling
+# Sistema de Progressão e Classes - "O Caminho do Despertar"
 
-Para trazer a verdadeira essência do anime *Solo Leveling* para o nosso sistema de hábitos, a progressão de nível deixará de ser apenas um número. Conforme o jogador acumula XP, a curva de dificuldade aumenta (Ciclo de XP) e ele passa por **Mudanças de Classe** (Job Change), alterando seu título principal no Dashboard.
+Para manter a interface gamificada e imersiva sem copiar diretamente os animes, criei uma **Árvore de Progressão Original** focada no conceito de "Despertar" e domínio sobre a própria vida (hábitos). 
 
-## 1. Escala de Classes (Ranks e Jobs)
-Baseado na jornada de Sung Jin-Woo, o sistema de classes será dividido pelos marcos de nível:
+O jogador não é apenas um caçador de monstros; ele é um indivíduo comum que descobre um sistema que o permite reescrever sua própria realidade. Conforme ele prova sua consistência e domina seus hábitos, ele transcende a biologia normal.
+
+## 1. Escala de Classes (Ranks Originais)
+O sistema avalia a sincronia do usuário com seus hábitos. Cada mudança de classe representa uma quebra de limitação humana:
 
 | Nível | Classe / Rank | Descrição (Lore) |
 | :--- | :--- | :--- |
-| **Lv 1 ao 9** | Caçador Rank-E | O Mais Fraco da Humanidade. Foco em sobrevivência. |
-| **Lv 10 ao 19** | Caçador Rank-D | Sobrevivente. Começando a se adaptar ao sistema. |
-| **Lv 20 ao 29** | Caçador Rank-C | Caçador Experiente. |
-| **Lv 30 ao 39** | Caçador Rank-B | Elite Inicial. |
-| **Lv 40 ao 49** | Necromante | O Despertar. A primeira mudança de classe oficial. |
-| **Lv 50 ao 69** | Caçador Rank-A | Caçador de Alto Nível. |
-| **Lv 70 ao 89** | Monarca das Sombras | O domínio sobre as sombras começa. |
-| **Lv 90 ao 99** | Caçador Rank-S | Nível Nacional. Uma força da natureza. |
-| **Lv 100+** | Monarca Absoluto | O ápice do Sistema. |
+| **Lv 1 ao 9** | O Adormecido | A fase inicial. O sistema ainda é instável e o usuário é refém da procrastinação. |
+| **Lv 10 ao 19** | O Desperto | O primeiro vislumbre de controle. Hábitos começam a se formar, mas a mente ainda hesita. |
+| **Lv 20 ao 29** | Forjador de Rotinas | O usuário entende que motivação é falha e disciplina é a chave. A rotina se torna uma armadura. |
+| **Lv 30 ao 39** | Arquitetos do Tempo | O tempo não é mais um inimigo. O usuário molda suas horas como um recurso tangível. |
+| **Lv 40 ao 49** | Especialista (Job Change) | A primeira Grande Provação. O usuário se especializa na execução impecável de tarefas diárias. |
+| **Lv 50 ao 69** | Mestre do Controle | Impulsos e distrações não têm mais poder. A execução de missões torna-se quase automática. |
+| **Lv 70 ao 89** | O Transcendente | Limites físicos e mentais são superados diariamente. A fadiga é apenas um conceito. |
+| **Lv 90 ao 99** | Arquiteto da Realidade | O usuário tem poder absoluto sobre o que faz, construindo o próprio destino sem falhas. |
+| **Lv 100+** | A Anomalia (Apex) | Um erro no sistema. A perfeição e consistência encarnadas. |
 
 ## 2. Ciclo de XP (Curva de Progressão)
 Atualmente, o nível é calculado de forma linear (Ex: Nível * 120 XP). Para o novo sistema, implementaremos uma curva de XP exponencial ou baseada em multiplicadores, onde os primeiros níveis são fáceis de passar, mas os níveis de "Mudança de Classe" exigem um esforço contínuo e diário muito maior.
