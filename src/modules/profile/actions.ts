@@ -32,8 +32,7 @@ export async function updateProfileAction(
 
   const { error } = await supabase
     .from("profiles")
-    .update({ name: parseResult.data.name })
-    .eq("id", user.id);
+    .upsert({ id: user.id, name: parseResult.data.name }, { onConflict: "id" });
 
   if (error) {
     logger.error("Erro ao atualizar perfil", error, { userId: user.id });
