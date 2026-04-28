@@ -23,35 +23,35 @@ export function HabitsListManager({ initialHabits }: { initialHabits: Habit[] })
           Quests Ativas
         </h2>
         
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="flex bg-slate-900 border border-slate-700 rounded p-1 overflow-x-auto max-w-[calc(100vw-3rem)] custom-scrollbar">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          <div className="flex flex-wrap bg-slate-900 border border-slate-700 rounded p-1 w-full sm:w-auto justify-center sm:justify-start">
             <button 
               onClick={() => setFilter("all")}
-              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap ${filter === "all" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
+              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap flex-1 sm:flex-none ${filter === "all" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
             >
               Todas
             </button>
             <button 
               onClick={() => setFilter("daily")}
-              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap ${filter === "daily" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
+              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap flex-1 sm:flex-none ${filter === "daily" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
             >
               Diárias
             </button>
             <button 
               onClick={() => setFilter("weekdays")}
-              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap ${filter === "weekdays" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
+              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap flex-1 sm:flex-none ${filter === "weekdays" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
             >
               Dias Úteis
             </button>
             <button 
               onClick={() => setFilter("once")}
-              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap ${filter === "once" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
+              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap flex-1 sm:flex-none ${filter === "once" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
             >
               Únicas
             </button>
             <button 
               onClick={() => setFilter("negative")}
-              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap ${filter === "negative" ? "bg-red-900/50 text-red-400" : "text-slate-400 hover:text-slate-200"}`}
+              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap flex-1 sm:flex-none ${filter === "negative" ? "bg-red-900/50 text-red-400" : "text-slate-400 hover:text-slate-200"}`}
             >
               Inimigos
             </button>
@@ -60,9 +60,9 @@ export function HabitsListManager({ initialHabits }: { initialHabits: Habit[] })
           {!isCreating && (
             <button
               onClick={() => setIsCreating(true)}
-              className="system-btn-primary py-2 px-4 text-xs shadow-[0_0_10px_var(--primary-glow)] flex items-center gap-2"
+              className="system-btn-primary py-2 px-4 text-xs shadow-[0_0_10px_var(--primary-glow)] flex items-center justify-center gap-2 w-full sm:w-auto"
             >
-              <Plus size={16} /> <span className="hidden sm:inline">Adicionar Quest</span>
+              <Plus size={16} /> <span>Adicionar Quest</span>
             </button>
           )}
         </div>
