@@ -27,14 +27,14 @@ Fórmula proposta: `XP Necessário = (Nível Atual ^ 1.5) * 100`
 ## 3. Checklist de Implementação
 
 ### Lógica (Backend)
-- [ ] **Mapeamento de Classes:** Criar a função `getHunterClass(level: number)` no domínio de progressão (`progression.ts`).
-- [ ] **Refatoração do XP:** Atualizar a função `calculateLevel(xpTotal)` para usar a nova curva de experiência (Ciclo de XP).
-- [ ] **Detector de Job Change:** Adicionar lógica no `actions-checkin.ts` para detectar não apenas o *Level Up*, mas também o *Class Up* (Mudança de Classe), retornando um sinal especial para a interface.
+- [x] **Mapeamento de Classes:** Criar a função `getHunterClass(level: number)` no domínio de progressão (`progression.ts`).
+- [x] **Refatoração do XP:** Atualizar a função `calculateLevel(xpTotal)` para usar a nova curva de experiência (Ciclo de XP).
+- [x] **Detector de Job Change:** Adicionar lógica no `actions-checkin.ts` para detectar não apenas o *Level Up*, mas também o *Class Up* (Mudança de Classe), retornando um sinal especial para a interface.
 
 ### Interface (Frontend)
-- [ ] **UI do Dashboard:** Adicionar a exibição da Classe atual (ex: "Necromante") abaixo ou ao lado do nome do Caçador no painel principal.
-- [ ] **Animação de Job Change:** Criar um alerta épico (diferente do Level Up comum) quando o jogador mudar de classe, imitando a tela de sistema do anime ("Você cumpriu os requisitos da Quest de Mudança de Classe").
-- [ ] **Página de Perfil:** Mostrar o emblema da classe atual e uma barra de progresso específica para a próxima mudança de classe.
+- [x] **UI do Dashboard:** Adicionar a exibição da Classe atual (ex: "Necromante") abaixo ou ao lado do nome do Caçador no painel principal.
+- [x] **Animação de Job Change:** Criar um alerta épico (diferente do Level Up comum) quando o jogador mudar de classe, imitando a tela de sistema do anime ("Você cumpriu os requisitos da Quest de Mudança de Classe").
+- [x] **Página de Perfil:** Mostrar o emblema da classe atual e uma barra de progresso específica para a próxima mudança de classe.
 
 ---
 *Arise.*
