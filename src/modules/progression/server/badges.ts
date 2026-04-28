@@ -1,6 +1,55 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { logger } from "@/lib/logger";
 import { calculateLevel } from "../domain/progression";
+import { requireUser } from "@/modules/auth/server/session";
+
+export type BadgeInfo = {
+  id: string;
+  code: string;
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+  unlocked: boolean;
+  grantedAt?: string;
+};
+
+export async function getUserBadges(): Promise<BadgeInfo[]> {
+  const user = await requireUser();
+  const supabase = await createSupabaseServerClient();
+
+  const { data: allBadges, error: badgesError } = await supabase.from("badges").select("*");
+  if (badgesError || !allBadges) {
+    logger.error("Erro ao buscar badges globais", badgesError);
+    return [];
+  }
+
+  const { data: userBadges, error: userBadgesError } = await supabase
+    .from("user_badges")
+    .select("badge_id, granted_at")
+    .eq("user_id", user.id);
+  
+  if (userBadgesError) {
+    logger.error("Erro ao buscar badges do usuario", userBadgesError);
+    return [];
+  }
+
+  const userBadgeMap = new Map(userBadges?.map(ub => [ub.badge_id, ub.granted_at]) || []);
+
+  return allBadges.map((badge) => {
+    const criteria = badge.criteria as any;
+    return {
+      id: badge.id,
+      code: badge.code,
+      title: badge.title,
+      description: criteria.description || "",
+      icon: criteria.icon || "medal",
+      color: criteria.color || "text-slate-400",
+      unlocked: userBadgeMap.has(badge.id),
+      grantedAt: userBadgeMap.get(badge.id),
+    };
+  });
+}
 
 export async function evaluateBadges(userId: string, newXpTotal: number, currentStreak: number): Promise<string[]> {
   const supabase = await createSupabaseServerClient();
@@ -37,6 +86,8 @@ export async function evaluateBadges(userId: string, newXpTotal: number, current
     if (criteria.type === "level" && currentLevel >= criteria.target) {
       qualifies = true;
     } else if (criteria.type === "streak" && currentStreak >= criteria.target) {
+      qualifies = true;
+    } else if (criteria.type === "checkin" && newXpTotal > 0) {
       qualifies = true;
     }
 

@@ -3,15 +3,25 @@ import { requireUser } from "@/modules/auth/server/session";
 import { getUserProfile } from "@/modules/profile/server/queries";
 import { getUserProgress } from "@/modules/progression/server/queries";
 import { getLevelProgress } from "@/modules/progression/domain/progression";
+import { getHabitLogsSummary } from "@/modules/habits/server/queries";
+import { getUserBadges } from "@/modules/progression/server/badges";
 import { ProfileForm } from "./profile-form";
 import { TopNav } from "@/components/layout/top-nav";
-import { UserIcon, Shield, Star, Zap, Activity } from "lucide-react";
+import { UserIcon, Shield, Star, Zap, Activity, CalendarDays, Medal } from "lucide-react";
+import { Heatmap } from "./heatmap";
+import { BadgesList } from "./badges-list";
 
 export default async function PerfilPage() {
   const user = await requireUser();
   const profile = await getUserProfile();
   const progress = await getUserProgress();
   const levelData = getLevelProgress(progress.xpTotal, progress.level);
+  
+  // Buscar histórico de até 140 dias (20 semanas de 7 dias)
+  const logsSummary = await getHabitLogsSummary(140);
+  
+  // Buscar conquistas (badges) do usuário
+  const badges = await getUserBadges();
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-10 relative z-10 pb-24 md:pb-10">
@@ -73,7 +83,24 @@ export default async function PerfilPage() {
         </div>
       </section>
 
+      {/* MAPA DE CALOR (CONTRIBUIÇÕES) */}
+      <section className="system-card p-6 border-sky-900/30">
+        <h2 className="text-xl font-heading font-bold tracking-widest text-white mb-6 flex items-center gap-3">
+          <CalendarDays size={24} className="text-sky-500" /> Histórico de Quests
+        </h2>
+        <Heatmap data={logsSummary} days={140} />
+      </section>
+
+      {/* CONQUISTAS / BADGES */}
+      <section className="system-card p-6 border-sky-900/30">
+        <h2 className="text-xl font-heading font-bold tracking-widest text-white mb-6 flex items-center gap-3">
+          <Medal size={24} className="text-amber-500" /> Conquistas Desbloqueadas
+        </h2>
+        <BadgesList badges={badges} />
+      </section>
+
       {/* BARRA DE PROGRESSO DE XP */}
+
       <section className="system-card p-6 border-sky-900/30">
         <div className="flex justify-between items-end mb-4">
           <div>
