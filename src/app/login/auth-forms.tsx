@@ -1,114 +1,101 @@
 "use client";
 
-import { useActionState, useState } from "react";
-import { loginAction, signupAction, type AuthActionState } from "@/modules/auth/actions";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { useActionState } from "react";
+import {
+  loginAction,
+  signupAction,
+  type AuthActionState,
+} from "@/modules/auth/actions";
 
 const initialState: AuthActionState = {};
 
 function AuthMessage({ state }: { state: AuthActionState }) {
   if (state.error) {
-    return <p className="mt-4 rounded bg-red-950/50 border border-red-500/50 p-3 text-sm text-red-400 font-body shadow-[0_0_10px_rgba(239,68,68,0.2)]">{state.error}</p>;
+    return <p className="text-sm text-red-600">{state.error}</p>;
   }
+
   if (state.message) {
-    return <p className="mt-4 rounded bg-emerald-950/50 border border-emerald-500/50 p-3 text-sm text-emerald-400 font-body shadow-[0_0_10px_rgba(16,185,129,0.2)]">{state.message}</p>;
+    return <p className="text-sm text-emerald-700">{state.message}</p>;
   }
+
   return null;
 }
 
-export function AuthForms() {
-  const searchParams = useSearchParams();
-  const defaultIsLogin = searchParams.get("mode") !== "signup";
-  const [isLogin, setIsLogin] = useState(defaultIsLogin);
-
-  const [loginState, loginFormAction, isLoginPending] = useActionState(loginAction, initialState);
-  const [signupState, signupFormAction, isSignupPending] = useActionState(signupAction, initialState);
-
-  const activeState = isLogin ? loginState : signupState;
-  const isPending = isLogin ? isLoginPending : isSignupPending;
-  const action = isLogin ? loginFormAction : signupFormAction;
+export function LoginForm() {
+  const [state, formAction, pending] = useActionState(loginAction, initialState);
 
   return (
-    <div className="system-card p-8">
-      <div className="mb-6 flex rounded-lg bg-slate-900 p-1 border border-slate-800">
-        <button
-          type="button"
-          className={`flex-1 rounded-md py-2 text-sm font-heading tracking-widest font-bold uppercase transition-all ${
-            isLogin ? "bg-sky-600 text-white shadow-[0_0_10px_var(--primary-glow)]" : "text-slate-400 hover:text-white"
-          }`}
-          onClick={() => setIsLogin(true)}
-        >
-          Acessar Sistema
-        </button>
-        <button
-          type="button"
-          className={`flex-1 rounded-md py-2 text-sm font-heading tracking-widest font-bold uppercase transition-all ${
-            !isLogin ? "bg-sky-600 text-white shadow-[0_0_10px_var(--primary-glow)]" : "text-slate-400 hover:text-white"
-          }`}
-          onClick={() => setIsLogin(false)}
-        >
-          Despertar (Criar)
-        </button>
-      </div>
+    <form action={formAction} className="space-y-3">
+      <label className="block">
+        <span className="mb-1 block text-sm font-medium text-zinc-700">E-mail</span>
+        <input
+          className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+        />
+      </label>
+      <label className="block">
+        <div className="mb-1 flex items-center justify-between text-sm font-medium text-zinc-700">
+          <span>Senha</span>
+          <a href="/recuperar-senha" className="text-xs text-blue-600 hover:underline">
+            Esqueceu a senha?
+          </a>
+        </div>
+        <input
+          className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          required
+        />
+      </label>
+      <button
+        type="submit"
+        disabled={pending}
+        className="w-full rounded-lg bg-zinc-900 px-4 py-2 font-medium text-white hover:bg-zinc-700 disabled:opacity-60"
+      >
+        {pending ? "Entrando..." : "Entrar"}
+      </button>
+      <AuthMessage state={state} />
+    </form>
+  );
+}
 
-      <form action={action} className="space-y-5">
-        {!isLogin && (
-          <label className="block animate-in fade-in slide-in-from-top-2 duration-300">
-            <span className="mb-1.5 block text-xs font-heading font-semibold tracking-widest uppercase text-sky-400">Nome de Caçador (Codinome)</span>
-            <input
-              className="system-input"
-              name="name"
-              type="text"
-              autoComplete="name"
-              placeholder="Sung Jin-Woo"
-              required={!isLogin}
-            />
-          </label>
-        )}
+export function SignupForm() {
+  const [state, formAction, pending] = useActionState(signupAction, initialState);
 
-        <label className="block">
-          <span className="mb-1.5 block text-xs font-heading font-semibold tracking-widest uppercase text-sky-400">Identificação (E-mail)</span>
-          <input
-            className="system-input"
-            name="email"
-            type="email"
-            autoComplete="email"
-            placeholder="caçador@sistema.com"
-            required
-          />
-        </label>
-
-        <label className="block">
-          <div className="mb-1.5 flex items-center justify-between">
-            <span className="block text-xs font-heading font-semibold tracking-widest uppercase text-sky-400">Código de Acesso (Senha)</span>
-            {isLogin && (
-              <Link href="/recuperar-senha" className="text-xs font-body text-slate-400 hover:text-sky-400 transition-colors">
-                Esqueceu a senha?
-              </Link>
-            )}
-          </div>
-          <input
-            className="system-input"
-            name="password"
-            type="password"
-            autoComplete={isLogin ? "current-password" : "new-password"}
-            placeholder="••••••••"
-            required
-            minLength={8}
-          />
-        </label>
-
-        <button
-          type="submit"
-          disabled={isPending}
-          className="system-btn-primary mt-2"
-        >
-          {isPending ? "Processando..." : isLogin ? "Entrar" : "Criar Conta"}
-        </button>
-
-        <AuthMessage state={activeState} />
-      </form>
-    </div>
+  return (
+    <form action={formAction} className="space-y-3">
+      <label className="block">
+        <span className="mb-1 block text-sm font-medium text-zinc-700">E-mail</span>
+        <input
+          className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+        />
+      </label>
+      <label className="block">
+        <span className="mb-1 block text-sm font-medium text-zinc-700">Senha</span>
+        <input
+          className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          required
+        />
+      </label>
+      <button
+        type="submit"
+        disabled={pending}
+        className="w-full rounded-lg border border-zinc-300 px-4 py-2 font-medium text-zinc-800 hover:bg-zinc-100 disabled:opacity-60"
+      >
+        {pending ? "Criando conta..." : "Criar conta"}
+      </button>
+      <AuthMessage state={state} />
+    </form>
   );
 }
