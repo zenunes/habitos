@@ -56,7 +56,7 @@ export default async function DashboardPage() {
         <div>
           <div className="inline-flex items-center gap-2 mb-2">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span>
-            <p className="text-xs uppercase tracking-[0.2em] text-sky-400 font-heading font-bold">Status do Sistema</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-theme-base font-heading font-bold">Status do Sistema</p>
           </div>
           <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] flex items-center gap-3">
             {userName}
@@ -69,30 +69,30 @@ export default async function DashboardPage() {
 
       {/* PAINEL DE STATUS */}
       <section className="system-card p-6 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-sky-600/10 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-theme-base opacity-10 rounded-full blur-[80px] pointer-events-none" />
         
         <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
           <div className="flex flex-col items-center justify-center min-w-[120px] relative">
-            <div className="absolute inset-0 bg-sky-500/20 blur-2xl rounded-full"></div>
-            <span className="text-sm font-heading font-bold uppercase tracking-widest text-sky-500 mb-1">Level</span>
-            <span className="text-7xl font-heading font-bold text-white drop-shadow-[0_0_20px_rgba(14,165,233,0.8)]">
+            <div className="absolute inset-0 bg-theme-base opacity-20 blur-2xl rounded-full"></div>
+            <span className="text-sm font-heading font-bold uppercase tracking-widest text-theme-light mb-1">Level</span>
+            <span className="text-7xl font-heading font-bold text-white drop-shadow-[0_0_20px_var(--theme-glow)]">
               {progress.level}
             </span>
-            <span className="mt-2 text-xs font-heading font-bold tracking-widest uppercase text-sky-400 bg-sky-950/50 px-3 py-1 rounded-full border border-sky-500/30 whitespace-nowrap text-center">
+            <span className="mt-2 text-xs font-heading font-bold tracking-widest uppercase text-theme-light bg-slate-900/50 px-3 py-1 rounded-full border border-theme-base/30 whitespace-nowrap text-center">
               {progress.className}
             </span>
           </div>
 
           <div className="flex-1 w-full">
             <div className="flex justify-between text-sm mb-2 font-heading tracking-wider">
-              <span className="text-slate-400 flex items-center gap-2"><Zap size={14} className="text-sky-400"/> EXPERIÊNCIA (XP)</span>
-              <span className="text-sky-400 font-bold">{levelStats.xpIntoCurrentLevel} / {levelStats.xpNeededForNextLevel}</span>
+              <span className="text-slate-400 flex items-center gap-2"><Zap size={14} className="text-theme-light"/> EXPERIÊNCIA (XP)</span>
+              <span className="text-theme-light font-bold">{levelStats.xpIntoCurrentLevel} / {levelStats.xpNeededForNextLevel}</span>
             </div>
             
             {/* Barra de Progresso XP */}
             <div className="h-4 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 relative mb-4">
               <div 
-                className="h-full bg-sky-500 rounded-full relative shadow-[0_0_15px_var(--primary-glow)]"
+                className="h-full bg-theme-base rounded-full relative shadow-[0_0_15px_var(--theme-glow)]"
                 style={{ width: `${levelStats.progressPercent}%`, transition: 'width 1s ease-in-out' }}
               >
                 <div className="absolute top-0 right-0 bottom-0 w-10 bg-gradient-to-r from-transparent to-white/40" />
@@ -170,26 +170,26 @@ export default async function DashboardPage() {
         )}
 
         {/* QUESTS DIÁRIAS (HÁBITOS) E INIMIGOS */}
-        <section className="system-card p-6 border-sky-900/30">
+        <section className="system-card p-6 border-theme-base/30">
           <div className="flex items-center justify-between mb-6 border-b border-slate-800 pb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-sky-500/10 rounded-lg border border-sky-500/30">
-                <Scroll size={24} className="text-sky-400" />
+              <div className="p-2 bg-theme-base/10 rounded-lg border border-theme-base/30">
+                <Scroll size={24} className="text-theme-light" />
               </div>
               <div>
                 <h2 className="text-2xl font-heading font-bold tracking-widest text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">Painel de Missões</h2>
-                <p className="text-xs text-sky-500/70 font-heading tracking-widest uppercase">Renovação Diária</p>
+                <p className="text-xs text-theme-base/70 font-heading tracking-widest uppercase">Renovação Diária</p>
               </div>
             </div>
-            <Link href="/habitos" className="text-xs font-heading font-bold tracking-widest uppercase text-sky-400 hover:text-sky-300 transition-colors bg-sky-950/30 px-3 py-1.5 rounded border border-sky-900/50 hover:bg-sky-900/50">
+            <Link href="/habitos" className="text-xs font-heading font-bold tracking-widest uppercase text-theme-light hover:text-white transition-colors bg-slate-900/30 px-3 py-1.5 rounded border border-theme-base/50 hover:bg-theme-base/20">
               Gerenciar
             </Link>
           </div>
           
           {activeHabits.length === 0 ? (
             <div className="text-center py-12 border border-dashed border-slate-700 rounded-xl bg-slate-900/30">
-              <div className="mx-auto h-16 w-16 rounded-full bg-sky-900/20 flex items-center justify-center mb-4 border border-sky-900/30">
-                <Scroll size={28} className="text-sky-500/50" />
+              <div className="mx-auto h-16 w-16 rounded-full bg-theme-base/20 flex items-center justify-center mb-4 border border-theme-base/30">
+                <Scroll size={28} className="text-theme-base/50" />
               </div>
               <p className="text-lg text-slate-300 font-heading font-bold tracking-widest uppercase mb-2">Nenhuma Missão Atribuída</p>
               <p className="text-sm text-slate-500 font-body mb-6">O sistema aguarda suas diretrizes para continuar a evolução.</p>
@@ -207,13 +207,13 @@ export default async function DashboardPage() {
                   <li key={habit.id} className={`group relative flex flex-col justify-between bg-slate-900/60 border rounded-xl p-4 transition-all shadow-sm ${
                     isEnemy ? "border-red-900/50 hover:border-red-500/60 hover:bg-red-950/20 hover:shadow-[0_0_20px_rgba(220,38,38,0.15)]" :
                     isOnce ? "border-amber-900/50 hover:border-amber-500/60 hover:bg-amber-950/20 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)]" :
-                    "border-slate-700 hover:border-sky-500/60 hover:bg-slate-800/80 hover:shadow-[0_0_20px_rgba(14,165,233,0.15)]"
+                    "border-slate-700 hover:border-theme-base/60 hover:bg-slate-800/80 hover:shadow-[0_0_20px_var(--theme-glow)]"
                   }`}>
                     <div className="flex items-start gap-3 mb-4">
                       <div className={`p-2 rounded-lg border transition-colors ${
                         isEnemy ? "bg-red-950/50 text-red-500 border-red-900/50 group-hover:bg-red-900/40 group-hover:border-red-500/30" :
                         isOnce ? "bg-amber-950/50 text-amber-500 border-amber-900/50 group-hover:bg-amber-900/40 group-hover:border-amber-500/30" :
-                        "bg-slate-800 text-slate-500 border-slate-700 group-hover:bg-sky-900/40 group-hover:text-sky-400 group-hover:border-sky-500/30"
+                        "bg-slate-800 text-slate-500 border-slate-700 group-hover:bg-theme-base/20 group-hover:text-theme-light group-hover:border-theme-base/30"
                       }`}>
                         {isEnemy ? <ShieldAlert size={18} /> : <Target size={18} />}
                       </div>
@@ -242,7 +242,7 @@ export default async function DashboardPage() {
                           </span>
                           
                           <span className={`text-[10px] font-heading tracking-widest uppercase flex items-center gap-1 ${
-                            isEnemy ? "text-red-500/70" : "text-sky-500/70"
+                            isEnemy ? "text-red-500/70" : "text-theme-light/70"
                           }`}>
                             {isEnemy ? <><Heart size={10} /> -10 HP</> : <><Zap size={10} /> +10 XP</>}
                           </span>

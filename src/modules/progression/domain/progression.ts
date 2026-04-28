@@ -70,3 +70,19 @@ export function getHunterClass(level: number): string {
   if (level < 100) return "Arquiteto da Realidade";
   return "A Anomalia"; // Apex
 }
+
+/**
+ * Retorna a classe de cor/tema do CSS (data-theme) baseado no nível do jogador.
+ * Os temas são injetados no html globalmente.
+ */
+export function getThemeByLevel(level: number): string {
+  if (level < 10) return "theme-slate";     // O Adormecido: Cinza neutro
+  if (level < 20) return "theme-sky";       // O Desperto: Azul céu (padrão)
+  if (level < 30) return "theme-emerald";   // Forjador de Rotinas: Verde
+  if (level < 40) return "theme-amber";     // Arquiteto do Tempo: Dourado/Amarelo
+  if (level < 50) return "theme-rose";      // Especialista: Vermelho rose
+  if (level < 70) return "theme-purple";    // Mestre do Controle: Roxo
+  if (level < 90) return "theme-fuchsia";   // O Transcendente: Fuchsia/Rosa
+  if (level < 100) return "theme-indigo";   // Arquiteto da Realidade: Indigo
+  return "theme-crimson";                   // A Anomalia: Vermelho Sangue
+}

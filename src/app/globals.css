@@ -3,6 +3,10 @@
 @theme {
   --font-heading: var(--font-rajdhani);
   --font-body: var(--font-outfit);
+  --color-theme-base: var(--theme-base);
+  --color-theme-light: var(--theme-light);
+  --color-theme-dark: var(--theme-dark);
+  --color-theme-glow: var(--theme-glow);
 }
 
 @layer base {
@@ -12,21 +16,96 @@
     --card: #0b0f19;
     --card-foreground: #f8fafc;
     --border: #1e293b;
-    --primary: #0ea5e9;
-    --primary-glow: rgba(14, 165, 233, 0.4);
-    --secondary: #334155;
-    --accent: #3b82f6;
     --success: #10b981;
     --danger: #ef4444;
+
+    /* Theme: Default / Sky (O Desperto) */
+    --theme-base: #0ea5e9;
+    --theme-light: #38bdf8;
+    --theme-dark: #0369a1;
+    --theme-glow: rgba(14, 165, 233, 0.4);
+  }
+
+  /* O Adormecido (Lv 1-9) */
+  :root[data-theme="theme-slate"] {
+    --theme-base: #64748b;
+    --theme-light: #94a3b8;
+    --theme-dark: #334155;
+    --theme-glow: rgba(100, 116, 139, 0.4);
+  }
+
+  /* O Desperto (Lv 10-19) */
+  :root[data-theme="theme-sky"] {
+    --theme-base: #0ea5e9;
+    --theme-light: #38bdf8;
+    --theme-dark: #0369a1;
+    --theme-glow: rgba(14, 165, 233, 0.4);
+  }
+
+  /* Forjador de Rotinas (Lv 20-29) */
+  :root[data-theme="theme-emerald"] {
+    --theme-base: #10b981;
+    --theme-light: #34d399;
+    --theme-dark: #047857;
+    --theme-glow: rgba(16, 185, 129, 0.4);
+  }
+
+  /* Arquiteto do Tempo (Lv 30-39) */
+  :root[data-theme="theme-amber"] {
+    --theme-base: #f59e0b;
+    --theme-light: #fbbf24;
+    --theme-dark: #b45309;
+    --theme-glow: rgba(245, 158, 11, 0.4);
+  }
+
+  /* Especialista (Lv 40-49) */
+  :root[data-theme="theme-rose"] {
+    --theme-base: #e11d48;
+    --theme-light: #fb7185;
+    --theme-dark: #9f1239;
+    --theme-glow: rgba(225, 29, 72, 0.4);
+  }
+
+  /* Mestre do Controle (Lv 50-69) */
+  :root[data-theme="theme-purple"] {
+    --theme-base: #a855f7;
+    --theme-light: #c084fc;
+    --theme-dark: #7e22ce;
+    --theme-glow: rgba(168, 85, 247, 0.4);
+  }
+
+  /* O Transcendente (Lv 70-89) */
+  :root[data-theme="theme-fuchsia"] {
+    --theme-base: #d946ef;
+    --theme-light: #e879f9;
+    --theme-dark: #a21caf;
+    --theme-glow: rgba(217, 70, 239, 0.4);
+  }
+
+  /* Arquiteto da Realidade (Lv 90-99) */
+  :root[data-theme="theme-indigo"] {
+    --theme-base: #6366f1;
+    --theme-light: #818cf8;
+    --theme-dark: #4338ca;
+    --theme-glow: rgba(99, 102, 241, 0.4);
+  }
+
+  /* A Anomalia (Lv 100+) */
+  :root[data-theme="theme-crimson"] {
+    --theme-base: #991b1b;
+    --theme-light: #dc2626;
+    --theme-dark: #7f1d1d;
+    --theme-glow: rgba(153, 27, 27, 0.6);
   }
 
   body {
     background-color: var(--background);
     color: var(--foreground);
     font-family: var(--font-body);
-    background-image: radial-gradient(circle at 50% 0%, #111827 0%, transparent 70%);
+    background-image: radial-gradient(circle at 50% 0%, var(--theme-dark) 0%, transparent 70%);
     background-repeat: no-repeat;
     background-attachment: fixed;
+    transition: background-image 1s ease-in-out;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -43,11 +122,11 @@
   }
   
   .system-input {
-    @apply w-full rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all;
+    @apply w-full rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:border-theme-base focus:outline-none focus:ring-1 focus:ring-theme-base transition-all;
   }
 
   .system-btn-primary {
-    @apply w-full rounded-lg bg-sky-600 px-4 py-3 font-heading font-bold uppercase tracking-wider text-white transition-all hover:bg-sky-500 hover:shadow-[0_0_15px_var(--primary-glow)] disabled:opacity-50 disabled:hover:shadow-none;
+    @apply w-full rounded-lg bg-theme-base px-4 py-3 font-heading font-bold uppercase tracking-wider text-white transition-all hover:bg-theme-light hover:shadow-[0_0_15px_var(--theme-glow)] disabled:opacity-50 disabled:hover:shadow-none;
   }
 
   .system-btn-secondary {
@@ -62,14 +141,15 @@
 /* Custom Scrollbar for the System */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: #030712;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: var(--theme-dark);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: var(--theme-base);
 }
