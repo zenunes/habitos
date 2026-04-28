@@ -3,7 +3,7 @@
 Após uma análise completa do projeto, identifiquei diversas oportunidades de melhoria em Lógica, Interface (UI/UX) e Arquitetura do Código. Abaixo estão os itens documentados para a próxima fase do sistema:
 
 ## 1) Lógica do Sistema (Regras de Negócio)
-- [ ] **Lógica de Ofensiva (Streak) Real:** 
+- [x] **Lógica de Ofensiva (Streak) Real:** 
   - *Problema atual:* O sistema adiciona `+1` na ofensiva para *cada* missão completada, inflacionando o número. Além disso, não reseta quando o jogador perde um dia.
   - *Solução:* Adicionar a coluna `last_checkin_date` em `user_progress`. Se o último check-in for de hoje, a ofensiva não muda. Se for de ontem, soma `+1`. Se for mais antigo, a ofensiva reseta para `1`.
 - [ ] **Filtro de Dias Úteis no Servidor:**

@@ -4,6 +4,7 @@ export type UserProgress = {
   currentStreak: number;
   bestStreak: number;
   availablePoints: number;
+  lastCheckinDate?: string | null;
 };
 
 const XP_PER_LEVEL = 120;

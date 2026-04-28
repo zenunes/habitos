@@ -32,6 +32,7 @@ export async function getUserProgress(): Promise<UserProgress> {
       currentStreak: 0,
       bestStreak: 0,
       availablePoints: 0,
+      lastCheckinDate: null,
     };
   }
 
@@ -42,5 +43,6 @@ export async function getUserProgress(): Promise<UserProgress> {
     currentStreak: progressData.current_streak,
     bestStreak: progressData.best_streak,
     availablePoints: Math.max(0, xpTotal - spentPoints),
+    lastCheckinDate: progressData.last_checkin_date,
   };
 }

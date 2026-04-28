@@ -52,17 +52,40 @@ export async function checkinHabitAction(habitId: string, dataRef: string) {
   const currentXp = progress?.xp_total || 0;
   const currentStreak = progress?.current_streak || 0;
   const bestStreak = progress?.best_streak || 0;
+  const lastCheckinDate = progress?.last_checkin_date || null;
 
   const newXp = currentXp + XP_PER_CHECKIN;
-  // Apenas simulando um acrescimo de streak se for o primeiro do dia
-  // Em um sistema real e robusto, isso precisa considerar as datas do ultimo check-in e fuso horario
-  const newStreak = currentStreak + 1; 
+  let newStreak = currentStreak;
+
+  if (!lastCheckinDate) {
+    // Primeiro check-in do usuário
+    newStreak = 1;
+  } else {
+    // dataRef e lastCheckinDate estão no formato 'YYYY-MM-DD'
+    const todayDate = new Date(dataRef);
+    const lastDate = new Date(lastCheckinDate);
+    
+    // Convertendo para UTC para evitar problemas de timezone/horário de verão
+    const utcToday = Date.UTC(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
+    const utcLast = Date.UTC(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate());
+    
+    // Calcula a diferença em dias inteiros
+    const diffDays = Math.floor((utcToday - utcLast) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 1) {
+      newStreak += 1; // Dia consecutivo, aumenta a ofensiva
+    } else if (diffDays > 1) {
+      newStreak = 1; // Perdeu a ofensiva (pulou um dia ou mais)
+    }
+    // Se diffDays === 0 (mesmo dia), a ofensiva não muda
+  }
 
   const progressPayload = {
     user_id: user.id,
     xp_total: newXp,
     current_streak: newStreak,
     best_streak: Math.max(newStreak, bestStreak),
+    last_checkin_date: dataRef,
   };
 
   // 4. Atualizar progresso do usuario (Upsert)
