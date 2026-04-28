@@ -7,7 +7,7 @@ export async function getUserProgress(): Promise<UserProgress> {
   const user = await requireUser();
   const supabase = await createSupabaseServerClient();
 
-  const [{ data: progressData, error: progressError }, { data: redemptionsData }] = await Promise.all([
+  const [{ data: progressData, error: progressError }, { data: redemptionsData }, { data: potionBuysData }] = await Promise.all([
     supabase
       .from("user_progress")
       .select("*")
@@ -16,10 +16,16 @@ export async function getUserProgress(): Promise<UserProgress> {
     supabase
       .from("reward_redemptions")
       .select("points_cost")
+      .eq("user_id", user.id),
+    supabase
+      .from("xp_events")
+      .select("points")
       .eq("user_id", user.id)
+      .eq("source", "potion_buy")
   ]);
 
   const spentPoints = redemptionsData?.reduce((acc, row) => acc + row.points_cost, 0) || 0;
+  const potionSpentPoints = potionBuysData?.reduce((acc, row) => acc + Math.abs(row.points), 0) || 0;
 
   if (progressError) {
     logger.error("Erro ao buscar progresso do usuario", progressError, { userId: user.id });
@@ -45,7 +51,7 @@ export async function getUserProgress(): Promise<UserProgress> {
     level: progressData.level || calculateLevel(xpTotal),
     currentStreak: progressData.current_streak,
     bestStreak: progressData.best_streak,
-    availablePoints: Math.max(0, xpTotal - spentPoints),
+    availablePoints: Math.max(0, xpTotal - spentPoints - potionSpentPoints),
     lastCheckinDate: progressData.last_checkin_date,
     hpCurrent: progressData.hp_current ?? 100,
     lastHpCalcDate: progressData.last_hp_calc_date,

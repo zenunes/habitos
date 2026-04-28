@@ -4,7 +4,7 @@ import { useState } from "react";
 import { CreateRewardForm } from "./create-reward-form";
 import { RewardItem } from "./reward-item";
 import { Reward } from "@/modules/rewards/domain/reward";
-import { Plus, X, ShoppingCart } from "lucide-react";
+import { Plus, X, ShoppingCart, Heart } from "lucide-react";
 
 export function StoreManager({ initialRewards, availablePoints }: { initialRewards: Reward[], availablePoints: number }) {
   const [isCreating, setIsCreating] = useState(false);
@@ -42,23 +42,37 @@ export function StoreManager({ initialRewards, availablePoints }: { initialRewar
       )}
 
       <section className="system-card p-6 border-purple-900/30">
-        {initialRewards.length > 0 ? (
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {initialRewards.map((reward) => (
-              <RewardItem
-                key={reward.id}
-                reward={reward}
-                availablePoints={availablePoints}
-              />
-            ))}
-          </ul>
-        ) : (
-          <div className="text-center py-10 border border-dashed border-slate-800 rounded-xl bg-slate-900/30">
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          {/* ITEM FIXO DO SISTEMA: POÇÃO DE CURA */}
+          <RewardItem
+            key="potion"
+            reward={{
+              id: "potion",
+              title: "Poção de Cura (Restaura 30 HP)",
+              pointsCost: 50,
+              active: true,
+            }}
+            availablePoints={availablePoints}
+            isSystemItem={true}
+          />
+
+          {initialRewards.map((reward) => (
+            <RewardItem
+              key={reward.id}
+              reward={reward}
+              availablePoints={availablePoints}
+            />
+          ))}
+        </ul>
+
+        {initialRewards.length === 0 && (
+          <div className="text-center py-10 mt-6 border border-dashed border-slate-800 rounded-xl bg-slate-900/30">
             <div className="mx-auto h-16 w-16 rounded-full bg-purple-900/20 flex items-center justify-center mb-4 border border-purple-900/30">
               <ShoppingCart size={28} className="text-purple-500/50" />
             </div>
-            <p className="text-lg text-slate-300 font-heading font-bold tracking-widest uppercase mb-2">Loja Vazia</p>
-            <p className="text-sm text-slate-500 font-body mb-6">Defina suas próprias recompensas para continuar evoluindo.</p>
+            <p className="text-lg text-slate-300 font-heading font-bold tracking-widest uppercase mb-2">Sem Itens Personalizados</p>
+            <p className="text-sm text-slate-500 font-body mb-6">Defina suas próprias recompensas além dos itens do Sistema.</p>
           </div>
         )}
       </section>

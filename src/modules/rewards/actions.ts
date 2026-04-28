@@ -52,13 +52,45 @@ export async function createRewardAction(
 export async function redeemRewardAction(
   rewardId: string,
   pointsCost: number
-): Promise<{ error?: string; message?: string }> {
+): Promise<{ error?: string; message?: string; isPotion?: boolean }> {
   const user = await requireUser();
   const supabase = await createSupabaseServerClient();
 
   const progress = await getUserProgress();
   if (progress.availablePoints < pointsCost) {
     return { error: "Pontos insuficientes para resgatar esta recompensa." };
+  }
+
+  // Verifica se é a Poção de Cura pelo ID especial "potion"
+  if (rewardId === "potion") {
+    if (progress.hpCurrent >= 100) {
+      return { error: "Seu HP já está no máximo." };
+    }
+
+    const newHp = Math.min(100, progress.hpCurrent + 30); // Poção cura 30 HP
+
+    // 1. Atualiza HP do usuário
+    const { error: hpError } = await supabase
+      .from("user_progress")
+      .update({ hp_current: newHp })
+      .eq("user_id", user.id);
+
+    if (hpError) return { error: "Erro ao consumir poção." };
+
+    // 2. Registra no histórico como um resgate já consumido
+    // Para isso a poção precisa existir na tabela de rewards ou criamos um registro falso no histórico sem FK.
+    // Mas o banco exige FK. Para contornar, registramos apenas o gasto de pontos e atualizamos a tela
+    // Vamos registrar um "xp_events" negativo para subtrair os pontos diretamente, já que não temos um reward_id válido.
+    
+    await supabase.from("xp_events").insert({
+      user_id: user.id,
+      source: "potion_buy",
+      points: -pointsCost, // evento negativo para descontar pontos
+    });
+
+    revalidatePath("/dashboard");
+    revalidatePath("/loja");
+    return { message: "Poção consumida! +30 HP restaurado.", isPotion: true };
   }
 
   const { error } = await supabase.from("reward_redemptions").insert({
