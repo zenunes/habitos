@@ -44,14 +44,14 @@ export async function getUserRedeemedRewards(): Promise<RedeemedItem[]> {
     .select(`
       id,
       points_cost,
-      created_at,
+      redeemed_at,
       consumed_at,
       rewards (
         title
       )
     `)
     .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+    .order("redeemed_at", { ascending: false });
 
   if (error) {
     logger.error("Erro ao buscar historico de resgates", error, { userId: user.id });
@@ -62,7 +62,7 @@ export async function getUserRedeemedRewards(): Promise<RedeemedItem[]> {
     id: row.id,
     title: row.rewards?.title || "Recompensa Excluída",
     pointsCost: row.points_cost,
-    redeemedAt: row.created_at,
+    redeemedAt: row.redeemed_at,
     consumedAt: row.consumed_at || null,
   }));
 }
