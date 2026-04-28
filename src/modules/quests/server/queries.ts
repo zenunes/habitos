@@ -70,15 +70,25 @@ export async function getActiveQuests(): Promise<Quest[]> {
   }
 
   // 3. Formata para retornar o Boss do Dia
-  const qData = dailyBossQuest.quests as any;
-  const rule = qData.rule && typeof qData.rule === "object" ? qData.rule : {};
+  const questsJoined = dailyBossQuest.quests as unknown;
+  const questObj = Array.isArray(questsJoined) ? questsJoined[0] : questsJoined;
+  const qData = (questObj ?? null) as Record<string, unknown> | null;
+  if (!qData) return [];
+
+  const ruleRaw = qData.rule;
+  const rule = ruleRaw && typeof ruleRaw === "object" ? (ruleRaw as Record<string, unknown>) : {};
+  const description = typeof rule.description === "string" ? rule.description : "Enfrente esse desafio épico hoje.";
+  const code = typeof qData.code === "string" ? qData.code : undefined;
+  const xpReward = typeof qData.xp_reward === "number" ? qData.xp_reward : 0;
+  const title = typeof qData.title === "string" ? qData.title : "Missão Especial";
+  const id = typeof qData.id === "string" ? qData.id : "";
 
   return [{
-    id: qData.id,
-    code: qData.code,
-    title: qData.title,
-    description: rule.description || "Enfrente esse desafio épico hoje.",
-    xpReward: qData.xp_reward,
+    id,
+    code,
+    title,
+    description,
+    xpReward,
     completed: dailyBossQuest.status === "completed",
   }];
 }

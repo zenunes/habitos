@@ -58,11 +58,17 @@ export async function getUserRedeemedRewards(): Promise<RedeemedItem[]> {
     return [];
   }
 
-  return data.map((row: any) => ({
-    id: row.id,
-    title: row.rewards?.title || "Recompensa Excluída",
-    pointsCost: row.points_cost,
-    redeemedAt: row.redeemed_at,
-    consumedAt: row.consumed_at || null,
-  }));
+  return (data || []).map((row) => {
+    const r = row as Record<string, unknown>;
+    const rewards = (r.rewards ?? null) as Record<string, unknown> | null;
+    const title = rewards && typeof rewards.title === "string" ? rewards.title : "Recompensa Excluída";
+
+    return {
+      id: String(r.id ?? ""),
+      title,
+      pointsCost: typeof r.points_cost === "number" ? r.points_cost : Number(r.points_cost ?? 0),
+      redeemedAt: String(r.redeemed_at ?? ""),
+      consumedAt: r.consumed_at ? String(r.consumed_at) : null,
+    };
+  });
 }

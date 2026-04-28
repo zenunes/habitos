@@ -3,15 +3,21 @@ import { requireUser } from "@/modules/auth/server/session";
 import { getUserProfile } from "@/modules/profile/server/queries";
 import { getUserProgress } from "@/modules/progression/server/queries";
 import { getLevelProgress } from "@/modules/progression/domain/progression";
-import { getHabitLogsSummary } from "@/modules/habits/server/queries";
+import { getDailyCompletionCountsByRange, getHabitLogsSummary } from "@/modules/habits/server/queries";
 import { getUserBadges } from "@/modules/progression/server/badges";
 import { ProfileForm } from "./profile-form";
 import { TopNav } from "@/components/layout/top-nav";
-import { UserIcon, Shield, Star, Zap, Activity, CalendarDays, Medal } from "lucide-react";
+import { UserIcon, Shield, Star, Zap, Activity, CalendarDays, Medal, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { Heatmap } from "./heatmap";
 import { BadgesList } from "./badges-list";
+import { ProductivityChart, type ProductivityPoint } from "./productivity-chart";
+import { getTodayDateStr } from "@/lib/date-utils";
 
-export default async function PerfilPage() {
+export default async function PerfilPage({
+  searchParams,
+}: {
+  searchParams?: { month?: string };
+}) {
   const user = await requireUser();
   const profile = await getUserProfile();
   const progress = await getUserProgress();
@@ -22,6 +28,53 @@ export default async function PerfilPage() {
   
   // Buscar conquistas (badges) do usuário
   const badges = await getUserBadges();
+
+  const currentMonthStr = getTodayDateStr().slice(0, 7);
+  const monthStr =
+    searchParams?.month && /^\d{4}-\d{2}$/.test(searchParams.month)
+      ? searchParams.month
+      : currentMonthStr;
+
+  const [yearStr, monthNumStr] = monthStr.split("-");
+  const year = Number(yearStr);
+  const monthNum = Number(monthNumStr);
+  const lastDay = new Date(year, monthNum, 0).getDate();
+
+  const pad2 = (n: number) => String(n).padStart(2, "0");
+  const startDateStr = `${monthStr}-01`;
+  const endDateStr = `${monthStr}-${pad2(lastDay)}`;
+
+  const completionCounts = await getDailyCompletionCountsByRange(startDateStr, endDateStr);
+  const countsMap = new Map(completionCounts.map((r) => [r.date, r.count]));
+
+  const monthPoints: ProductivityPoint[] = Array.from({ length: lastDay }, (_, i) => {
+    const day = i + 1;
+    const date = `${monthStr}-${pad2(day)}`;
+    const count = countsMap.get(date) ?? 0;
+    return { date, day, count, score: 0 };
+  });
+
+  const maxCount = Math.max(0, ...monthPoints.map((p) => p.count));
+  const finalMonthPoints = monthPoints.map((p) => {
+    if (p.count <= 0 || maxCount <= 0) return { ...p, score: 0 };
+    const score = Math.max(1, Math.min(5, Math.ceil((p.count / maxCount) * 5)));
+    return { ...p, score };
+  });
+
+  const monthLabel = new Intl.DateTimeFormat("pt-BR", {
+    month: "long",
+    year: "numeric",
+    timeZone: "America/Sao_Paulo",
+  }).format(new Date(`${monthStr}-01T12:00:00Z`));
+
+  const prevDate = new Date(`${monthStr}-01T12:00:00Z`);
+  prevDate.setUTCMonth(prevDate.getUTCMonth() - 1);
+  const prevMonth = `${prevDate.getUTCFullYear()}-${pad2(prevDate.getUTCMonth() + 1)}`;
+
+  const nextDate = new Date(`${monthStr}-01T12:00:00Z`);
+  nextDate.setUTCMonth(nextDate.getUTCMonth() + 1);
+  const nextMonth = `${nextDate.getUTCFullYear()}-${pad2(nextDate.getUTCMonth() + 1)}`;
+  const canGoNext = monthStr < currentMonthStr;
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-10 relative z-10 pb-24 md:pb-10">
@@ -89,6 +142,42 @@ export default async function PerfilPage() {
           <CalendarDays size={24} className="text-sky-500" /> Histórico de Quests
         </h2>
         <Heatmap data={logsSummary} days={140} />
+      </section>
+
+      <section className="system-card p-6 border-sky-900/30">
+        <div className="flex items-center justify-between gap-3 mb-5">
+          <div className="flex items-center gap-3">
+            <TrendingUp size={22} className="text-theme-light" />
+            <div>
+              <h2 className="text-xl font-heading font-bold tracking-widest text-white">Gráfico de Produtividade</h2>
+              <p className="text-xs text-slate-400 mt-1">Toque e arraste para inspecionar os dias</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/perfil?month=${prevMonth}`}
+              className="h-9 w-9 rounded-lg border border-slate-800 bg-slate-900/40 flex items-center justify-center text-slate-300 hover:text-white hover:border-theme-base/50 transition-colors"
+              aria-label="Mês anterior"
+            >
+              <ChevronLeft size={18} />
+            </Link>
+            <div className="px-3 py-2 rounded-lg border border-slate-800 bg-slate-900/40 text-xs font-heading tracking-widest uppercase text-slate-300 min-w-[140px] text-center">
+              {monthLabel}
+            </div>
+            <Link
+              href={`/perfil?month=${nextMonth}`}
+              className={`h-9 w-9 rounded-lg border border-slate-800 bg-slate-900/40 flex items-center justify-center text-slate-300 transition-colors ${
+                canGoNext ? "hover:text-white hover:border-theme-base/50" : "opacity-40 pointer-events-none"
+              }`}
+              aria-label="Próximo mês"
+            >
+              <ChevronRight size={18} />
+            </Link>
+          </div>
+        </div>
+
+        <ProductivityChart points={finalMonthPoints} />
       </section>
 
       {/* CONQUISTAS / BADGES */}

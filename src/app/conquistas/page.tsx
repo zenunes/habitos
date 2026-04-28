@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { requireUser } from "@/modules/auth/server/session";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { TopNav } from "@/components/layout/top-nav";
@@ -44,7 +43,9 @@ export default async function ConquistasPage() {
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {allBadges?.map((badge) => {
           const isEarned = earnedBadgeIds.has(badge.id);
-          const criteria = badge.criteria as any;
+          const criteria = (badge.criteria ?? {}) as Record<string, unknown>;
+          const criteriaType = typeof criteria.type === "string" ? criteria.type : "";
+          const criteriaDescription = typeof criteria.description === "string" ? criteria.description : "";
           const ub = userBadges?.find((ub) => ub.badge_id === badge.id);
           const dateEarned = ub ? new Date(ub.granted_at).toLocaleDateString("pt-BR") : null;
 
@@ -66,7 +67,7 @@ export default async function ConquistasPage() {
                   isEarned ? "bg-amber-950/50 border-amber-500/30 text-amber-400" : "bg-slate-800 border-slate-700 text-slate-500"
                 }`}>
                   <span className="text-xl font-heading font-bold">
-                    {criteria.type === "level" ? "Lvl" : "🔥"}
+                    {criteriaType === "level" ? "Lvl" : "🔥"}
                   </span>
                 </div>
                 <div>
@@ -80,7 +81,7 @@ export default async function ConquistasPage() {
               </div>
               
               <p className="text-sm text-slate-400 font-body">
-                {criteria.description}
+                {criteriaDescription}
               </p>
             </div>
           );

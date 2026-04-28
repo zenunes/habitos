@@ -4,7 +4,7 @@ import { useState } from "react";
 import { CreateRewardForm } from "./create-reward-form";
 import { RewardItem } from "./reward-item";
 import { Reward } from "@/modules/rewards/domain/reward";
-import { Plus, X, ShoppingCart, Heart } from "lucide-react";
+import { Plus, X, ShoppingCart } from "lucide-react";
 
 export function StoreManager({ initialRewards, availablePoints }: { initialRewards: Reward[], availablePoints: number }) {
   const [isCreating, setIsCreating] = useState(false);
@@ -51,7 +51,7 @@ export function StoreManager({ initialRewards, availablePoints }: { initialRewar
               id: "potion",
               title: "Poção de Cura (Restaura 30 HP)",
               pointsCost: 50, // 50 Gold
-              active: true,
+              available: true,
             }}
             availablePoints={availablePoints}
             isSystemItem={true}

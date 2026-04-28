@@ -25,9 +25,11 @@ export async function completeBossQuestAction(questId: string): Promise<{ messag
     return { error: "Quest não encontrada ou já concluída." };
   }
 
-  const qData = userQuest.quests as any;
-  const xpReward = qData?.xp_reward || 100;
-  const coinsReward = Math.floor(xpReward / 2); // Moedas são metade do XP
+  const questsJoined = userQuest.quests as unknown;
+  const questObj = Array.isArray(questsJoined) ? questsJoined[0] : questsJoined;
+  const qData = (questObj ?? null) as Record<string, unknown> | null;
+  const xpReward = qData && typeof qData.xp_reward === "number" ? qData.xp_reward : 100;
+  const coinsReward = Math.floor(xpReward / 2);
 
   // 2. Atualiza a user_quest para completed
   const { error: updateError } = await supabase
