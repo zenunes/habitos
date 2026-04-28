@@ -95,3 +95,23 @@ export async function deleteRewardAction(rewardId: string) {
   revalidatePath("/dashboard");
   revalidatePath("/loja");
 }
+
+export async function consumeRewardAction(redemptionId: string): Promise<{ error?: string; message?: string }> {
+  const user = await requireUser();
+  const supabase = await createSupabaseServerClient();
+
+  const { error } = await supabase
+    .from("reward_redemptions")
+    .update({ consumed_at: new Date().toISOString() })
+    .eq("id", redemptionId)
+    .eq("user_id", user.id)
+    .is("consumed_at", null); // Garante que não será consumido duas vezes
+
+  if (error) {
+    logger.error("Erro ao consumir recompensa", error, { userId: user.id, redemptionId });
+    return { error: "Falha ao utilizar o item." };
+  }
+
+  revalidatePath("/loja");
+  return { message: "Item consumido com sucesso!" };
+}

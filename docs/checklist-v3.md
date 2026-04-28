@@ -17,7 +17,7 @@ Após uma análise completa do projeto, identifiquei diversas oportunidades de m
 - [x] **Componentização do Cabeçalho (Header Global):**
   - *Problema atual:* O cabeçalho com os links (Loja, Conquistas, Perfil, etc) está replicado idêntico em `/dashboard`, `/loja`, `/perfil`, `/conquistas` e `/habitos`.
   - *Solução:* Extrair para um componente `<SystemHeader />` reutilizável para aplicar o princípio DRY (Don't Repeat Yourself).
-- [ ] **Tratamento de Fuso Horário (Timezones):**
+- [x] **Tratamento de Fuso Horário (Timezones):**
   - *Problema atual:* A string `todayStr` usa a data ISO universal (`split("T")[0]`), o que pode gerar bugs se o usuário estiver de noite no Brasil e o servidor na Europa (já seria outro dia).
   - *Solução:* Usar uma biblioteca como `date-fns` ou garantir a conversão pelo `Intl.DateTimeFormat` local.
 
@@ -28,11 +28,11 @@ Após uma análise completa do projeto, identifiquei diversas oportunidades de m
 - [x] **Barra de Navegação Mobile (Bottom Bar):**
   - *Problema atual:* No celular, o cabeçalho tem 5 botões quadrados empilhados, o que ocupa muito espaço útil da tela.
   - *Solução:* Transformar a navegação principal em uma "Bottom Bar" (barra fixada na base do celular) para telas pequenas, deixando o layout mais limpo.
-- [ ] **Pop-up de Detalhes da Missão:**
+- [x] **Pop-up de Detalhes da Missão:**
   - *Problema atual:* A descrição longa de uma missão ocupa muito espaço no card.
   - *Solução:* Esconder a descrição e mostrá-la apenas quando o usuário clicar no card (um pop-up/modal ou collapse).
 
 ## 4) Próximas Features
 - [ ] **Quests de Longo Prazo:** (Ex: Missões semanais, mensais ou épicas que dão recompensas enormes).
-- [ ] **Inventário Avançado:** Permitir "Consumir" um item do inventário depois que ele for comprado na Loja.
+- [x] **Inventário Avançado:** Permitir "Consumir" um item do inventário depois que ele for comprado na Loja.
 - [ ] **Fluxo de Recuperação de Senha.**

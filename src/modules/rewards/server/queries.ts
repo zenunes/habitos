@@ -32,6 +32,7 @@ export type RedeemedItem = {
   title: string;
   pointsCost: number;
   redeemedAt: string;
+  consumedAt: string | null;
 };
 
 export async function getUserRedeemedRewards(): Promise<RedeemedItem[]> {
@@ -44,6 +45,7 @@ export async function getUserRedeemedRewards(): Promise<RedeemedItem[]> {
       id,
       points_cost,
       created_at,
+      consumed_at,
       rewards (
         title
       )
@@ -61,5 +63,6 @@ export async function getUserRedeemedRewards(): Promise<RedeemedItem[]> {
     title: row.rewards?.title || "Recompensa Excluída",
     pointsCost: row.points_cost,
     redeemedAt: row.created_at,
+    consumedAt: row.consumed_at || null,
   }));
 }
