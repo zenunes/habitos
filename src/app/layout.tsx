@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Rajdhani, Outfit } from "next/font/google";
 import { Toaster } from "sonner";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
@@ -25,6 +25,13 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "Solo Leveling - System",
   description: "Arise. Seu sistema pessoal de evolução.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default async function RootLayout({

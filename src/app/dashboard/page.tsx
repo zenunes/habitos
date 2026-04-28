@@ -59,24 +59,26 @@ export default async function DashboardPage() {
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span>
             <p className="text-xs uppercase tracking-[0.2em] text-theme-base font-heading font-bold">Status do Sistema</p>
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] flex items-center gap-3">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] flex items-center gap-3">
             {userName}
           </h1>
-          <p className="text-slate-400 mt-1">O sistema está registrando sua evolução diária.</p>
+          <p className="text-sm md:text-base text-slate-400 mt-1">O sistema está registrando sua evolução diária.</p>
         </div>
 
-        <TopNav />
+        <div className="hidden md:flex">
+          <TopNav />
+        </div>
       </header>
 
       {/* PAINEL DE STATUS */}
-      <section className="system-card p-6 relative overflow-hidden">
+      <section className="system-card p-4 md:p-6 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-theme-base opacity-10 rounded-full blur-[80px] pointer-events-none" />
         
-        <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
+        <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 relative z-10">
           <div className="flex flex-col items-center justify-center min-w-[120px] relative">
             <div className="absolute inset-0 bg-theme-base opacity-20 blur-2xl rounded-full"></div>
             <span className="text-sm font-heading font-bold uppercase tracking-widest text-theme-light mb-1">Level</span>
-            <span className="text-7xl font-heading font-bold text-white drop-shadow-[0_0_20px_var(--theme-glow)]">
+            <span className="text-6xl md:text-7xl font-heading font-bold text-white drop-shadow-[0_0_20px_var(--theme-glow)]">
               {progress.level}
             </span>
             <span className="mt-2 text-xs font-heading font-bold tracking-widest uppercase text-theme-light bg-slate-900/50 px-3 py-1 rounded-full border border-theme-base/30 whitespace-nowrap text-center">

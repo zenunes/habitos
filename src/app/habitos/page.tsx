@@ -19,12 +19,12 @@ export default async function HabitosPage() {
               <Target size={12} /> Registro de Missões
             </p>
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
             Painel de Quests Diárias
           </h1>
-          <p className="text-slate-400 mt-1">Gerencie as missões que guiarão sua evolução.</p>
+          <p className="text-sm md:text-base text-slate-400 mt-1">Gerencie as missões que guiarão sua evolução.</p>
         </div>
-        <div className="flex flex-col items-end gap-4">
+        <div className="hidden md:flex flex-col items-end gap-4">
           <TopNav />
         </div>
       </header>

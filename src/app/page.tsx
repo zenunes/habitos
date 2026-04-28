@@ -41,7 +41,7 @@ export default function Home() {
           </Link>
           <Link
             href="/login"
-            className="system-btn-secondary flex-1 py-4 text-sm"
+            className="system-btn-secondary flex-1 py-4 text-sm w-full text-center"
           >
             Despertar / Cadastro
           </Link>

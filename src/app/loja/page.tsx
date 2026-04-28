@@ -24,17 +24,19 @@ export default async function LojaPage() {
             <span className="h-2 w-2 rounded-full bg-purple-500 animate-pulse shadow-[0_0_8px_rgba(168,85,247,0.5)]"></span>
             <p className="text-xs uppercase tracking-[0.2em] text-purple-400 font-heading font-bold">Comércio de Habilidades</p>
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] flex items-center gap-3">
-            <ShoppingCart size={32} className="text-purple-500" /> Loja do Sistema
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] flex items-center gap-3">
+            <ShoppingCart size={32} className="text-purple-500 hidden sm:block" /> Loja do Sistema
           </h1>
-          <p className="text-slate-400 mt-1">Utilize seus pontos de evolução para adquirir recompensas.</p>
+          <p className="text-sm md:text-base text-slate-400 mt-1">Utilize seu ouro para adquirir recompensas e itens.</p>
         </div>
-        <div className="flex flex-col items-end gap-4">
-          <div className="bg-amber-900/20 border border-amber-500/30 px-4 py-2 rounded-lg flex flex-col items-end">
-            <span className="text-xs text-amber-400 font-heading uppercase tracking-widest block mb-1">Ouro (Gold)</span>
-            <span className="text-2xl font-bold text-white drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">{progress.coins} 🪙</span>
+        <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto gap-4 mt-4 md:mt-0">
+          <div className="bg-amber-900/20 border border-amber-500/30 px-4 py-2 rounded-lg flex flex-col items-start md:items-end w-full md:w-auto">
+            <span className="text-[10px] md:text-xs text-amber-400 font-heading uppercase tracking-widest block mb-1">Ouro (Gold)</span>
+            <span className="text-xl md:text-2xl font-bold text-white drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">{progress.coins} 🪙</span>
           </div>
-          <TopNav />
+          <div className="hidden md:flex">
+            <TopNav />
+          </div>
         </div>
       </header>
 
