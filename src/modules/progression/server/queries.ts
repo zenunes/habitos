@@ -1,7 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUser } from "@/modules/auth/server/session";
 import { logger } from "@/lib/logger";
-import { UserProgress, calculateLevel } from "../domain/progression";
+import { UserProgress, calculateLevel, getHunterClass } from "../domain/progression";
 
 export async function getUserProgress(): Promise<UserProgress> {
   const user = await requireUser();
@@ -42,18 +42,22 @@ export async function getUserProgress(): Promise<UserProgress> {
       lastCheckinDate: null,
       hpCurrent: 100,
       lastHpCalcDate: null,
+      className: getHunterClass(1),
     };
   }
 
   const xpTotal = progressData.xp_total;
+  const currentLevel = progressData.level || calculateLevel(xpTotal);
+  
   return {
     xpTotal,
-    level: progressData.level || calculateLevel(xpTotal),
+    level: currentLevel,
     currentStreak: progressData.current_streak,
     bestStreak: progressData.best_streak,
     availablePoints: Math.max(0, xpTotal - spentPoints - potionSpentPoints),
     lastCheckinDate: progressData.last_checkin_date,
     hpCurrent: progressData.hp_current ?? 100,
     lastHpCalcDate: progressData.last_hp_calc_date,
+    className: getHunterClass(currentLevel),
   };
 }

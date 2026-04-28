@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { checkinHabitAction } from "@/modules/habits/actions-checkin";
-import { CheckCircle2, CircleDashed, ShieldAlert, Zap } from "lucide-react";
+import { CheckCircle2, CircleDashed, ShieldAlert, Zap, Swords } from "lucide-react";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
 
@@ -19,9 +19,32 @@ export function CheckinButton({ habitId, todayDateRef }: CheckinButtonProps) {
       try {
         const result = await checkinHabitAction(habitId, todayDateRef);
         
-        if (result.message?.includes("LEVEL UP") || result.message?.includes("Sucesso")) {
+        if (result.message?.includes("LEVEL UP") || result.message?.includes("Sucesso") || result.message?.includes("CLASS UP")) {
           
-          if (result.message.includes("LEVEL UP")) {
+          if (result.message.includes("CLASS UP")) {
+            const classMatch = result.message.match(/como: (.*?)!/);
+            const className = classMatch ? classMatch[1] : "Nova Classe";
+            
+            toast.success(`MUDANÇA DE CLASSE! Você despertou como ${className}`, {
+              icon: <Swords className="text-amber-400" />,
+              style: { 
+                borderColor: "#f59e0b", 
+                color: "#fbbf24", 
+                background: "rgba(245, 158, 11, 0.15)",
+                boxShadow: "0 0 20px rgba(245, 158, 11, 0.6)"
+              },
+              duration: 8000,
+            });
+
+            // Efeito explosivo Épico (Âmbar/Dourado) de Class UP
+            confetti({
+              particleCount: 200,
+              spread: 160,
+              origin: { y: 0.5 },
+              colors: ['#f59e0b', '#fbbf24', '#fcd34d', '#ffffff'],
+              zIndex: 9999
+            });
+          } else if (result.message.includes("LEVEL UP")) {
             const levelMatch = result.message.match(/Nível (\d+)/);
             const level = levelMatch ? levelMatch[1] : "";
             

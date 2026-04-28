@@ -2,6 +2,7 @@ import Link from "next/link";
 import { logoutAction } from "@/modules/auth/actions";
 import { requireUser } from "@/modules/auth/server/session";
 import { getUserProgress } from "@/modules/progression/server/queries";
+import { getLevelProgress } from "@/modules/progression/domain/progression";
 import { evaluateDailyHP } from "@/modules/progression/server/hp-system";
 import { getUserProfile } from "@/modules/profile/server/queries";
 import { getActiveQuests } from "@/modules/quests/server/queries";
@@ -41,10 +42,8 @@ export default async function DashboardPage() {
   const pendingHabits = activeHabits.filter(h => !completedHabitIds.has(h.id));
   const completedHabits = activeHabits.filter(h => completedHabitIds.has(h.id));
 
-  // Mock progress calculation for visual effect
-  const xpForNextLevel = progress.level * 120;
-  const currentLevelXp = progress.xpTotal % 120;
-  const progressPercent = Math.min(100, Math.max(0, (currentLevelXp / xpForNextLevel) * 100));
+  // Progress calculation using the new exponential curve
+  const levelStats = getLevelProgress(progress.xpTotal, progress.level);
   
   // Health calculation
   const hpPercent = Math.max(0, Math.min(100, progress.hpCurrent || 100));
@@ -79,19 +78,22 @@ export default async function DashboardPage() {
             <span className="text-7xl font-heading font-bold text-white drop-shadow-[0_0_20px_rgba(14,165,233,0.8)]">
               {progress.level}
             </span>
+            <span className="mt-2 text-xs font-heading font-bold tracking-widest uppercase text-sky-400 bg-sky-950/50 px-3 py-1 rounded-full border border-sky-500/30 whitespace-nowrap text-center">
+              {progress.className}
+            </span>
           </div>
 
           <div className="flex-1 w-full">
             <div className="flex justify-between text-sm mb-2 font-heading tracking-wider">
               <span className="text-slate-400 flex items-center gap-2"><Zap size={14} className="text-sky-400"/> EXPERIÊNCIA (XP)</span>
-              <span className="text-sky-400 font-bold">{currentLevelXp} / {xpForNextLevel}</span>
+              <span className="text-sky-400 font-bold">{levelStats.xpIntoCurrentLevel} / {levelStats.xpNeededForNextLevel}</span>
             </div>
             
             {/* Barra de Progresso XP */}
             <div className="h-4 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 relative mb-4">
               <div 
                 className="h-full bg-sky-500 rounded-full relative shadow-[0_0_15px_var(--primary-glow)]"
-                style={{ width: `${progressPercent}%`, transition: 'width 1s ease-in-out' }}
+                style={{ width: `${levelStats.progressPercent}%`, transition: 'width 1s ease-in-out' }}
               >
                 <div className="absolute top-0 right-0 bottom-0 w-10 bg-gradient-to-r from-transparent to-white/40" />
               </div>

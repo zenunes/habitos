@@ -5,7 +5,7 @@ import { requireUser } from "@/modules/auth/server/session";
 import { logger } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
 import { evaluateBadges } from "@/modules/progression/server/badges";
-import { calculateLevel } from "@/modules/progression/domain/progression";
+import { calculateLevel, getHunterClass } from "@/modules/progression/domain/progression";
 
 const XP_PER_CHECKIN = 10;
 
@@ -103,19 +103,31 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
   const oldLevel = calculateLevel(currentXp);
   const newLevel = calculateLevel(newXp);
   const leveledUp = newLevel > oldLevel;
+  
+  const oldClass = getHunterClass(oldLevel);
+  const newClass = getHunterClass(newLevel);
+  const classChanged = newClass !== oldClass;
 
-  logger.info("Check-in concluido com sucesso", { userId: user.id, habitId, newXp, unlockedTitles, leveledUp });
+  logger.info("Check-in concluido com sucesso", { userId: user.id, habitId, newXp, unlockedTitles, leveledUp, classChanged });
   revalidatePath("/habitos");
   revalidatePath("/dashboard");
   revalidatePath("/conquistas");
   
-  if (leveledUp && unlockedTitles.length > 0) {
-    return { message: `LEVEL UP! Você alcançou o Nível ${newLevel}. Título desbloqueado: ${unlockedTitles.join(", ")}` };
+  let returnMessage = "Sucesso: Quest concluída! +10 XP";
+
+  if (classChanged) {
+    returnMessage = `CLASS UP! Você despertou como: ${newClass}!`;
   } else if (leveledUp) {
-    return { message: `LEVEL UP! Você alcançou o Nível ${newLevel}!` };
-  } else if (unlockedTitles.length > 0) {
-    return { message: `Sucesso: Quest concluída! +10 XP. Título desbloqueado: ${unlockedTitles.join(", ")}` };
+    returnMessage = `LEVEL UP! Você alcançou o Nível ${newLevel}!`;
   }
 
-  return { message: "Sucesso: Quest concluída! +10 XP" };
+  if (unlockedTitles.length > 0) {
+    if (leveledUp || classChanged) {
+      returnMessage += ` Título: ${unlockedTitles.join(", ")}`;
+    } else {
+      returnMessage = `Sucesso: Quest concluída! +10 XP. Título desbloqueado: ${unlockedTitles.join(", ")}`;
+    }
+  }
+
+  return { message: returnMessage };
 }
