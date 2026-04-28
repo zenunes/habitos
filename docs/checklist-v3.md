@@ -9,7 +9,7 @@ Após uma análise completa do projeto, identifiquei diversas oportunidades de m
 - [x] **Filtro de Dias Úteis no Servidor:**
   - *Problema atual:* Missões de "Dias Úteis" podem ser concluídas em finais de semana, e vice-versa.
   - *Solução:* O backend deve ocultar ou desabilitar missões de dias úteis quando for sábado ou domingo.
-- [ ] **Sistema de Penalidade (HP / Fadiga):**
+- [x] **Sistema de Penalidade (HP / Fadiga):**
   - *Problema atual:* Não há consequência negativa por não completar missões (apenas não se ganha XP).
   - *Solução:* Implementar uma barra de Vida (HP) ou sistema de "Fadiga" que diminui se missões obrigatórias forem ignoradas no dia anterior.
 

@@ -2,19 +2,23 @@ import Link from "next/link";
 import { logoutAction } from "@/modules/auth/actions";
 import { requireUser } from "@/modules/auth/server/session";
 import { getUserProgress } from "@/modules/progression/server/queries";
+import { evaluateDailyHP } from "@/modules/progression/server/hp-system";
 import { getUserProfile } from "@/modules/profile/server/queries";
 import { getActiveQuests } from "@/modules/quests/server/queries";
 import { getActiveHabits, getTodayHabitLogs } from "@/modules/habits/server/queries";
 import { CheckinButton } from "./checkin-button";
 import { TopNav } from "@/components/layout/top-nav";
 import { getTodayDateStr, isWeekendInTimezone } from "@/lib/date-utils";
-import { ShoppingCart, Trophy, Target, Swords, Scroll, ShieldAlert, Zap, CheckCircle2, ChevronDown } from "lucide-react";
+import { ShoppingCart, Trophy, Target, Swords, Scroll, ShieldAlert, Zap, CheckCircle2, ChevronDown, Heart } from "lucide-react";
 
 export default async function DashboardPage() {
   const user = await requireUser();
   const todayStr = getTodayDateStr(); // YYYY-MM-DD ajustado pro fuso
   const isWeekend = isWeekendInTimezone();
   
+  // Avalia o dano por missões não concluídas (se houver) antes de buscar o progresso
+  await evaluateDailyHP();
+
   const [progress, quests, allHabits, todayLogs, profile] = await Promise.all([
     getUserProgress(),
     getActiveQuests(),
@@ -41,6 +45,9 @@ export default async function DashboardPage() {
   const xpForNextLevel = progress.level * 120;
   const currentLevelXp = progress.xpTotal % 120;
   const progressPercent = Math.min(100, Math.max(0, (currentLevelXp / xpForNextLevel) * 100));
+  
+  // Health calculation
+  const hpPercent = Math.max(0, Math.min(100, progress.hpCurrent || 100));
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-10 relative z-10">
@@ -80,11 +87,26 @@ export default async function DashboardPage() {
               <span className="text-sky-400 font-bold">{currentLevelXp} / {xpForNextLevel}</span>
             </div>
             
-            {/* Barra de Progresso */}
-            <div className="h-4 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 relative">
+            {/* Barra de Progresso XP */}
+            <div className="h-4 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 relative mb-4">
               <div 
                 className="h-full bg-sky-500 rounded-full relative shadow-[0_0_15px_var(--primary-glow)]"
                 style={{ width: `${progressPercent}%`, transition: 'width 1s ease-in-out' }}
+              >
+                <div className="absolute top-0 right-0 bottom-0 w-10 bg-gradient-to-r from-transparent to-white/40" />
+              </div>
+            </div>
+
+            <div className="flex justify-between text-sm mb-2 font-heading tracking-wider">
+              <span className="text-slate-400 flex items-center gap-2"><Heart size={14} className={hpPercent > 30 ? "text-rose-500" : "text-rose-600 animate-pulse"}/> HP DO CAÇADOR</span>
+              <span className={hpPercent > 30 ? "text-rose-500 font-bold" : "text-rose-600 font-bold animate-pulse"}>{progress.hpCurrent} / 100</span>
+            </div>
+            
+            {/* Barra de Vida (HP) */}
+            <div className="h-4 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 relative">
+              <div 
+                className={`h-full rounded-full relative transition-all duration-1000 ${hpPercent > 30 ? 'bg-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.5)]' : 'bg-rose-600 shadow-[0_0_20px_rgba(225,29,72,0.8)]'}`}
+                style={{ width: `${hpPercent}%` }}
               >
                 <div className="absolute top-0 right-0 bottom-0 w-10 bg-gradient-to-r from-transparent to-white/40" />
               </div>
