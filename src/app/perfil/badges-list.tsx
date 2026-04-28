@@ -1,7 +1,7 @@
 "use client";
 
 import { BadgeInfo } from "@/modules/progression/server/badges";
-import { Droplet, Flame, Cpu, Shield, Medal, HeartPulse } from "lucide-react";
+import { Droplet, Flame, Cpu, Shield, Medal, HeartPulse, Star, Zap, Crown, Swords, Sun, Moon, Mountain, Trophy, Target, Gem } from "lucide-react";
 
 type BadgesListProps = {
   badges: BadgeInfo[];
@@ -17,6 +17,16 @@ function getIconComponent(iconName: string, colorClass: string, unlocked: boolea
     case "cpu": return <Cpu size={size} className={finalColor} />;
     case "shield": return <Shield size={size} className={finalColor} />;
     case "heart-pulse": return <HeartPulse size={size} className={finalColor} />;
+    case "star": return <Star size={size} className={finalColor} />;
+    case "zap": return <Zap size={size} className={finalColor} />;
+    case "crown": return <Crown size={size} className={finalColor} />;
+    case "swords": return <Swords size={size} className={finalColor} />;
+    case "sun": return <Sun size={size} className={finalColor} />;
+    case "moon": return <Moon size={size} className={finalColor} />;
+    case "mountain": return <Mountain size={size} className={finalColor} />;
+    case "trophy": return <Trophy size={size} className={finalColor} />;
+    case "target": return <Target size={size} className={finalColor} />;
+    case "gem": return <Gem size={size} className={finalColor} />;
     default: return <Medal size={size} className={finalColor} />;
   }
 }
