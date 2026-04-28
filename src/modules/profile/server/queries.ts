@@ -15,7 +15,7 @@ export async function getUserProfile(): Promise<UserProfile | null> {
     .from("profiles")
     .select("id, name")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   if (error) {
     logger.error("Erro ao buscar perfil do usuario", error, { userId: user.id });

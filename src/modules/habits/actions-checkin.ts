@@ -47,7 +47,7 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
     .from("user_progress")
     .select("*")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   const currentXp = progress?.xp_total || 0;
   const currentStreak = progress?.current_streak || 0;

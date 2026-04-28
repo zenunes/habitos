@@ -12,7 +12,7 @@ export async function getUserProgress(): Promise<UserProgress> {
       .from("user_progress")
       .select("*")
       .eq("user_id", user.id)
-      .single(),
+      .maybeSingle(),
     supabase
       .from("reward_redemptions")
       .select("points_cost")
@@ -22,9 +22,10 @@ export async function getUserProgress(): Promise<UserProgress> {
   const spentPoints = redemptionsData?.reduce((acc, row) => acc + row.points_cost, 0) || 0;
 
   if (progressError) {
-    if (progressError.code !== "PGRST116") { // Nao e "Row not found"
-      logger.error("Erro ao buscar progresso do usuario", progressError, { userId: user.id });
-    }
+    logger.error("Erro ao buscar progresso do usuario", progressError, { userId: user.id });
+  }
+
+  if (progressError || !progressData) {
     // Retorna progresso vazio
     return {
       xpTotal: 0,
