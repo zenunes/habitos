@@ -37,14 +37,17 @@ export async function getUserBadges(): Promise<BadgeInfo[]> {
   const userBadgeMap = new Map(userBadges?.map(ub => [ub.badge_id, ub.granted_at]) || []);
 
   return allBadges.map((badge) => {
-    const criteria = badge.criteria as any;
+    const criteria = (badge.criteria ?? {}) as Record<string, unknown>;
+    const description = typeof criteria.description === "string" ? criteria.description : "";
+    const icon = typeof criteria.icon === "string" ? criteria.icon : "medal";
+    const color = typeof criteria.color === "string" ? criteria.color : "text-slate-400";
     return {
       id: badge.id,
       code: badge.code,
       title: badge.title,
-      description: criteria.description || "",
-      icon: criteria.icon || "medal",
-      color: criteria.color || "text-slate-400",
+      description,
+      icon,
+      color,
       unlocked: userBadgeMap.has(badge.id),
       grantedAt: userBadgeMap.get(badge.id),
     };
@@ -80,14 +83,16 @@ export async function evaluateBadges(userId: string, newXpTotal: number, current
   for (const badge of allBadges) {
     if (existingBadgeIds.has(badge.id)) continue;
 
-    const criteria = badge.criteria as any;
+    const criteria = (badge.criteria ?? {}) as Record<string, unknown>;
+    const type = typeof criteria.type === "string" ? criteria.type : "";
+    const target = typeof criteria.target === "number" ? criteria.target : 0;
     let qualifies = false;
 
-    if (criteria.type === "level" && currentLevel >= criteria.target) {
+    if (type === "level" && currentLevel >= target) {
       qualifies = true;
-    } else if (criteria.type === "streak" && currentStreak >= criteria.target) {
+    } else if (type === "streak" && currentStreak >= target) {
       qualifies = true;
-    } else if (criteria.type === "checkin" && newXpTotal > 0) {
+    } else if (type === "checkin" && newXpTotal > 0) {
       qualifies = true;
     }
 

@@ -23,14 +23,13 @@ export function BossButton({ questId }: { questId: string }) {
           duration: 5000,
         });
 
-        // Efeito de confete massivo para o Boss
         const duration = 3 * 1000;
         const animationEnd = Date.now() + duration;
         const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
 
         const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
-        const interval: any = setInterval(function() {
+        const interval: ReturnType<typeof setInterval> = setInterval(() => {
           const timeLeft = animationEnd - Date.now();
 
           if (timeLeft <= 0) {

@@ -83,3 +83,42 @@ export async function getHabitLogsSummary(days: number = 120): Promise<HabitLogS
     count,
   }));
 }
+
+export type DailyCompletionCount = {
+  date: string;
+  count: number;
+};
+
+export async function getDailyCompletionCountsByRange(
+  startDateStr: string,
+  endDateStr: string,
+): Promise<DailyCompletionCount[]> {
+  const user = await requireUser();
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("habit_logs")
+    .select("data_ref")
+    .eq("user_id", user.id)
+    .eq("status", "done")
+    .gte("data_ref", startDateStr)
+    .lte("data_ref", endDateStr)
+    .order("data_ref", { ascending: true });
+
+  if (error) {
+    logger.error("Erro ao buscar histórico de conclusão por período", error, {
+      userId: user.id,
+      startDateStr,
+      endDateStr,
+    });
+    return [];
+  }
+
+  const summaryMap: Record<string, number> = {};
+  for (const row of data || []) {
+    const date = row.data_ref;
+    summaryMap[date] = (summaryMap[date] || 0) + 1;
+  }
+
+  return Object.entries(summaryMap).map(([date, count]) => ({ date, count }));
+}

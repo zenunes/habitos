@@ -1,29 +1,37 @@
-import { AuthForms } from "./auth-forms";
-import { Suspense } from "react";
+import Link from "next/link";
+import { LoginForm, SignupForm } from "@/app/login/auth-forms";
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-6 relative overflow-hidden">
-      {/* Background glow effects */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-sky-900/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-sky-500 to-transparent opacity-50" />
-
-      <main className="w-full max-w-md relative z-10">
-        <header className="mb-10 text-center">
-          <div className="inline-block mb-3 px-3 py-1 rounded-full border border-sky-500/30 bg-sky-500/10 text-sky-400 text-xs font-bold tracking-[0.2em] uppercase">
-            System Initialization
-          </div>
-          <h1 className="text-5xl font-bold tracking-tight text-white mb-2 drop-shadow-[0_0_10px_rgba(14,165,233,0.5)]">
-            SOLO LEVELING
-          </h1>
-          <p className="text-slate-400 font-body">
-            O sistema o escolheu. Faça login para continuar sua evolução.
+    <main className="mx-auto flex min-h-screen w-full max-w-5xl items-center px-6 py-10">
+      <section className="grid w-full gap-6 md:grid-cols-2">
+        <article className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <h1 className="text-2xl font-bold tracking-tight">Entrar</h1>
+          <p className="mt-2 text-sm text-zinc-600">
+            Acesse seu progresso diario de habitos.
           </p>
-        </header>
-        <Suspense fallback={<div className="h-[400px] w-full system-card animate-pulse" />}>
-          <AuthForms />
-        </Suspense>
-      </main>
-    </div>
+          <div className="mt-5">
+            <LoginForm />
+          </div>
+        </article>
+
+        <article className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <h2 className="text-2xl font-bold tracking-tight">Criar conta</h2>
+          <p className="mt-2 text-sm text-zinc-600">
+            Comece com um fluxo rapido e simples.
+          </p>
+          <div className="mt-5">
+            <SignupForm />
+          </div>
+        </article>
+      </section>
+
+      <Link
+        href="/"
+        className="fixed top-4 left-4 rounded-lg border border-zinc-300 bg-white px-3 py-1 text-sm font-medium text-zinc-700 hover:bg-zinc-100"
+      >
+        Voltar
+      </Link>
+    </main>
   );
 }
