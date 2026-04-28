@@ -6,7 +6,7 @@ Após uma análise completa do projeto, identifiquei diversas oportunidades de m
 - [x] **Lógica de Ofensiva (Streak) Real:** 
   - *Problema atual:* O sistema adiciona `+1` na ofensiva para *cada* missão completada, inflacionando o número. Além disso, não reseta quando o jogador perde um dia.
   - *Solução:* Adicionar a coluna `last_checkin_date` em `user_progress`. Se o último check-in for de hoje, a ofensiva não muda. Se for de ontem, soma `+1`. Se for mais antigo, a ofensiva reseta para `1`.
-- [ ] **Filtro de Dias Úteis no Servidor:**
+- [x] **Filtro de Dias Úteis no Servidor:**
   - *Problema atual:* Missões de "Dias Úteis" podem ser concluídas em finais de semana, e vice-versa.
   - *Solução:* O backend deve ocultar ou desabilitar missões de dias úteis quando for sábado ou domingo.
 - [ ] **Sistema de Penalidade (HP / Fadiga):**
@@ -25,7 +25,7 @@ Após uma análise completa do projeto, identifiquei diversas oportunidades de m
 - [ ] **Loading States (Skeletons):**
   - *Problema atual:* O Next.js SSR causa um "piscar" ou tela em branco durante o carregamento de dados pesados entre páginas.
   - *Solução:* Criar arquivos `loading.tsx` usando componentes de "Skeleton" (blocos que piscam simulando a interface) para navegação fluida.
-- [ ] **Barra de Navegação Mobile (Bottom Bar):**
+- [x] **Barra de Navegação Mobile (Bottom Bar):**
   - *Problema atual:* No celular, o cabeçalho tem 5 botões quadrados empilhados, o que ocupa muito espaço útil da tela.
   - *Solução:* Transformar a navegação principal em uma "Bottom Bar" (barra fixada na base do celular) para telas pequenas, deixando o layout mais limpo.
 - [ ] **Pop-up de Detalhes da Missão:**

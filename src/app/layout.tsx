@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Rajdhani, Outfit } from "next/font/google";
 import { Toaster } from "sonner";
+import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import "./globals.css";
 
 const rajdhani = Rajdhani({
@@ -30,9 +31,10 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body
-        className={`${rajdhani.variable} ${outfit.variable} font-body antialiased bg-[#030712] text-zinc-100 min-h-screen`}
+        className={`${rajdhani.variable} ${outfit.variable} font-body antialiased bg-[#030712] text-zinc-100 min-h-screen pb-20 md:pb-0`}
       >
         {children}
+        <MobileBottomNav />
         <Toaster 
           theme="dark" 
           position="bottom-center"

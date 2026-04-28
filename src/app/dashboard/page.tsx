@@ -11,6 +11,7 @@ import { ShoppingCart, Trophy, Target, LogOut, Swords, Scroll, ShieldAlert, Zap,
 export default async function DashboardPage() {
   const user = await requireUser();
   const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+  const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
   
   const [progress, quests, allHabits, todayLogs, profile] = await Promise.all([
     getUserProgress(),
@@ -25,7 +26,12 @@ export default async function DashboardPage() {
 
   // Identificar missões pendentes e concluídas
   const completedHabitIds = new Set(todayLogs.map(log => log.habit_id));
-  const activeHabits = allHabits.filter(h => h.active);
+  const activeHabits = allHabits.filter(h => {
+    if (!h.active) return false;
+    // Ocultar missões de dias úteis se for fim de semana
+    if (isWeekend && h.frequency === 'weekdays') return false;
+    return true;
+  });
   const pendingHabits = activeHabits.filter(h => !completedHabitIds.has(h.id));
   const completedHabits = activeHabits.filter(h => completedHabitIds.has(h.id));
 
@@ -50,7 +56,7 @@ export default async function DashboardPage() {
           <p className="text-slate-400 mt-1">O sistema está registrando sua evolução diária.</p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-3">
           <Link href="/loja" className="system-btn-secondary !p-3 flex items-center justify-center border-purple-500/30 text-purple-400 hover:border-purple-400 hover:text-purple-300 hover:bg-purple-500/10" title="Loja do Sistema">
             <ShoppingCart size={20} />
           </Link>
