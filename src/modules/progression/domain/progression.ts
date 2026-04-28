@@ -76,8 +76,8 @@ export function getHunterClass(level: number): string {
  * Os temas são injetados no html globalmente.
  */
 export function getThemeByLevel(level: number): string {
-  if (level < 10) return "theme-slate";     // O Adormecido: Cinza neutro
-  if (level < 20) return "theme-sky";       // O Desperto: Azul céu (padrão)
+  if (level < 10) return "theme-sky";       // O Adormecido: Azul céu (padrão)
+  if (level < 20) return "theme-cyan";      // O Desperto: Ciano (evolução do azul)
   if (level < 30) return "theme-emerald";   // Forjador de Rotinas: Verde
   if (level < 40) return "theme-amber";     // Arquiteto do Tempo: Dourado/Amarelo
   if (level < 50) return "theme-rose";      // Especialista: Vermelho rose
