@@ -2,7 +2,8 @@ import Link from "next/link";
 import { requireUser } from "@/modules/auth/server/session";
 import { getActiveHabits } from "@/modules/habits/server/queries";
 import { HabitsListManager } from "./habits-list-manager";
-import { ArrowLeft, Target } from "lucide-react";
+import { TopNav } from "@/components/layout/top-nav";
+import { Target } from "lucide-react";
 
 export default async function HabitosPage() {
   await requireUser();
@@ -23,12 +24,9 @@ export default async function HabitosPage() {
           </h1>
           <p className="text-slate-400 mt-1">Gerencie as missões que guiarão sua evolução.</p>
         </div>
-        <Link
-          href="/dashboard"
-          className="system-btn-secondary flex items-center gap-2"
-        >
-          <ArrowLeft size={16} /> Voltar ao Sistema
-        </Link>
+        <div className="flex flex-col items-end gap-4">
+          <TopNav />
+        </div>
       </header>
 
       <HabitsListManager initialHabits={habits} />

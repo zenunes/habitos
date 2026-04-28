@@ -6,7 +6,8 @@ import { getUserProfile } from "@/modules/profile/server/queries";
 import { getActiveQuests } from "@/modules/quests/server/queries";
 import { getActiveHabits, getTodayHabitLogs } from "@/modules/habits/server/queries";
 import { CheckinButton } from "./checkin-button";
-import { ShoppingCart, Trophy, Target, LogOut, Swords, Scroll, ShieldAlert, Zap, CheckCircle2, User as UserIcon } from "lucide-react";
+import { TopNav } from "@/components/layout/top-nav";
+import { ShoppingCart, Trophy, Target, Swords, Scroll, ShieldAlert, Zap, CheckCircle2 } from "lucide-react";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -56,25 +57,7 @@ export default async function DashboardPage() {
           <p className="text-slate-400 mt-1">O sistema está registrando sua evolução diária.</p>
         </div>
 
-        <div className="hidden md:flex items-center gap-3">
-          <Link href="/loja" className="system-btn-secondary !p-3 flex items-center justify-center border-purple-500/30 text-purple-400 hover:border-purple-400 hover:text-purple-300 hover:bg-purple-500/10" title="Loja do Sistema">
-            <ShoppingCart size={20} />
-          </Link>
-          <Link href="/conquistas" className="system-btn-secondary !p-3 flex items-center justify-center border-amber-500/30 text-amber-400 hover:border-amber-400 hover:text-amber-300 hover:bg-amber-500/10" title="Títulos e Conquistas">
-            <Trophy size={20} />
-          </Link>
-          <Link href="/habitos" className="system-btn-secondary !p-3 flex items-center justify-center hover:bg-slate-800" title="Gerenciar Quests">
-            <Target size={20} />
-          </Link>
-          <Link href="/perfil" className="system-btn-secondary !p-3 flex items-center justify-center border-sky-500/30 text-sky-400 hover:border-sky-400 hover:text-sky-300 hover:bg-sky-500/10" title="Perfil do Caçador">
-            <UserIcon size={20} />
-          </Link>
-          <form action={logoutAction}>
-            <button type="submit" className="system-btn-secondary !p-3 flex items-center justify-center border-red-900/50 text-red-400 hover:border-red-500 hover:text-red-300 hover:bg-red-900/20" title="Desconectar">
-              <LogOut size={20} />
-            </button>
-          </form>
-        </div>
+        <TopNav />
       </header>
 
       {/* PAINEL DE STATUS */}

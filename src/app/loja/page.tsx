@@ -3,7 +3,8 @@ import { requireUser } from "@/modules/auth/server/session";
 import { getUserRewards, getUserRedeemedRewards } from "@/modules/rewards/server/queries";
 import { getUserProgress } from "@/modules/progression/server/queries";
 import { StoreManager } from "./store-manager";
-import { ArrowLeft, ShoppingCart, History } from "lucide-react";
+import { TopNav } from "@/components/layout/top-nav";
+import { ShoppingCart, History } from "lucide-react";
 
 export default async function LojaPage() {
   await requireUser();
@@ -27,17 +28,12 @@ export default async function LojaPage() {
           </h1>
           <p className="text-slate-400 mt-1">Utilize seus pontos de evolução para adquirir recompensas.</p>
         </div>
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-col items-end gap-4">
           <div className="bg-purple-900/20 border border-purple-500/30 px-4 py-2 rounded-lg">
             <span className="text-xs text-purple-400 font-heading uppercase tracking-widest block mb-1">Pontos Disponíveis</span>
             <span className="text-2xl font-bold text-white drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]">{progress.availablePoints} pts</span>
           </div>
-          <Link
-            href="/dashboard"
-            className="system-btn-secondary flex items-center gap-2"
-          >
-            <ArrowLeft size={16} /> Voltar ao Sistema
-          </Link>
+          <TopNav />
         </div>
       </header>
 

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { requireUser } from "@/modules/auth/server/session";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { Trophy, ArrowLeft } from "lucide-react";
+import { TopNav } from "@/components/layout/top-nav";
+import { Trophy } from "lucide-react";
 
 export default async function ConquistasPage() {
   const user = await requireUser();
@@ -29,19 +30,14 @@ export default async function ConquistasPage() {
           </h1>
           <p className="text-slate-400 mt-1">Exiba seus feitos e o respeito que conquistou.</p>
         </div>
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-col items-end gap-4">
           <div className="bg-amber-900/20 border border-amber-500/30 px-4 py-2 rounded-lg">
             <span className="text-xs text-amber-400 font-heading uppercase tracking-widest block mb-1">Progresso</span>
             <span className="text-2xl font-bold text-white drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">
               {earnedCount} / {totalCount}
             </span>
           </div>
-          <Link
-            href="/dashboard"
-            className="system-btn-secondary flex items-center gap-2"
-          >
-            <ArrowLeft size={16} /> Voltar ao Sistema
-          </Link>
+          <TopNav />
         </div>
       </header>
 

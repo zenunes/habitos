@@ -9,7 +9,7 @@ import { calculateLevel } from "@/modules/progression/domain/progression";
 
 const XP_PER_CHECKIN = 10;
 
-export async function checkinHabitAction(habitId: string, dataRef: string) {
+export async function checkinHabitAction(habitId: string, dataRef: string): Promise<{ message?: string, error?: string }> {
   const user = await requireUser();
   const supabase = await createSupabaseServerClient();
 

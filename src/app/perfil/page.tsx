@@ -2,7 +2,8 @@ import Link from "next/link";
 import { requireUser } from "@/modules/auth/server/session";
 import { getUserProfile } from "@/modules/profile/server/queries";
 import { ProfileForm } from "./profile-form";
-import { UserIcon, ArrowLeft } from "lucide-react";
+import { TopNav } from "@/components/layout/top-nav";
+import { UserIcon } from "lucide-react";
 
 export default async function PerfilPage() {
   const user = await requireUser();
@@ -21,12 +22,9 @@ export default async function PerfilPage() {
           </h1>
           <p className="text-slate-400 mt-1">Gerencie suas credenciais de acesso ao sistema.</p>
         </div>
-        <Link
-          href="/dashboard"
-          className="system-btn-secondary flex items-center gap-2"
-        >
-          <ArrowLeft size={16} /> Voltar ao Sistema
-        </Link>
+        <div className="flex flex-col items-end gap-4">
+          <TopNav />
+        </div>
       </header>
 
       <section className="system-card p-6 border-sky-900/30">
