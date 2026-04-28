@@ -18,13 +18,13 @@ Sistema web de habitos com gamificacao para adultos ocupados.
 npm install
 ```
 
-3. Rode o projeto:
+1. Rode o projeto:
 
 ```bash
 npm run dev
 ```
 
-4. Abra [http://localhost:3000](http://localhost:3000).
+1. Abra <http://localhost:3000>.
 
 ## Documentacao
 
@@ -51,3 +51,5 @@ npm run dev
 - Evoluir recorrencia custom de habitos
 - Exibir historico semanal e analytics basicos
 - Integrar quests/badges/recompensas no fluxo real
+- ajuste rapido
+
