@@ -9,7 +9,7 @@ import { logger } from "@/lib/logger";
 const habitSchema = z.object({
   title: z.string().min(2, "O titulo precisa ter pelo menos 2 caracteres.").max(50, "O titulo esta muito longo."),
   description: z.string().max(200, "A descricao esta muito longa.").optional().or(z.literal("")),
-  frequency: z.enum(["daily", "weekdays", "custom"]).default("daily"),
+  frequency: z.enum(["daily", "weekdays", "custom", "once", "negative"]).default("daily"),
 });
 
 export type HabitActionState = {

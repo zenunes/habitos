@@ -1,77 +1,35 @@
-# Checklist de Melhorias - Solo Leveling (System V1)
+# Checklist de Melhorias - Solo Leveling (System V2)
 
 ## 1) Nova Arquitetura e Design System (RPG/Solo Leveling)
 - [x] Atualizar nome do projeto e meta tags para "Solo Leveling".
 - [x] Criar design system escuro e com neon azul em `globals.css` (Temática de "Sistema").
 - [x] Refatorar Layout Principal (Fontes Rajdhani/Outfit, background temático).
 - [x] Melhorar UI/UX da página de Login e Cadastro (Interface "System Initialization").
+- [x] Página inicial (Landing Page) imersiva com efeitos de brilho e botões neon.
 
-## 2) Dashboard do Jogador (Status)
+## 2) Perfil e Status do Jogador
 - [x] Refatorar o Dashboard para exibir as estatísticas do jogador como um perfil de RPG.
 - [x] Adicionar barra de progresso de XP interativa e moderna.
-- [x] Exibir o nível, classe (ou título) e streak com visual gamificado.
+- [x] Exibir o nível, XP e streak com visual gamificado.
+- [x] Página de Perfil (`/perfil`) para permitir que o usuário altere seu "Codinome".
 
 ## 3) Painel de Quests Diárias (Hábitos)
-- [x] Refatorar CRUD de Hábitos com nomenclatura "Quests Diárias".
-- [x] Melhorar UX para adicionar novas "Quests" (Design mais intuitivo e rápido).
+- [x] Refatorar CRUD de Hábitos com nomenclatura "Quests Diárias" (`/habitos`).
 - [x] Checklist interativo com botão de conclusão gamificado (Check-in).
-- [x] Listagem bonita e clara de Quests ativas e completas do dia.
+- [x] Lógica de Quests Diárias: Missões concluídas somem da lista de "pendentes" e vão para "Concluídas Hoje".
+- [ ] Implementar Quests Semanais/Mensais (Módulo de Desafios Fixos).
+- [x] Adicionar filtro de dias úteis vs finais de semana para Quests Diárias.
 
-## 4) Qualidade e Correções
-- [ ] Garantir que o sistema funcione perfeitamente com Next.js 15 (Server Actions).
-- [ ] Testar fluxo completo de criar hábito e realizar check-in.
-- [ ] Garantir responsividade e visual consistente em mobile.
+## 4) Sistema de Conquistas e Recompensas
+- [x] Loja de Recompensas (`/loja`) para cadastrar itens e comprar com XP (descontando `availablePoints`).
+- [x] Sistema de Títulos e Conquistas (`/conquistas`) baseado no Nível e Ofensiva.
+- [x] Avaliação dinâmica de conquistas no momento do check-in da quest.
+- [ ] Animações de subida de nível ("Level Up!") e pop-ups de conquistas na tela.
+- [x] Inventário de itens comprados na Loja.
 
----
-
-# Checklist de Execucao - Habitos Game (Antigo)
-
-## 1) Descoberta e definicao
-- [ ] Validar proposta de valor e diferenciais.
-- [ ] Fechar requisitos do MVP (o que entra e o que fica fora).
-- [ ] Definir metricas alvo (D1, D7, check-ins/semana).
-- [ ] Definir regras iniciais de XP, nivel e streak.
-
-## 2) Fundacao tecnica
-- [ ] Criar app Next.js com TypeScript.
-- [ ] Configurar Supabase (projeto, auth e banco).
-- [ ] Definir schema inicial e migracoes.
-- [x] Ativar RLS e politicas por usuario.
-- [x] Configurar padrao de logs e tratamento de erro.
-- [x] Criar `.env.example` com todas as variaveis.
-
-## 3) Modulo de autenticacao
-- [x] Cadastro e login (base inicial com Supabase Auth).
-- [x] Sessao persistente e logout (base inicial).
-- [ ] Recuperacao de senha.
-- [x] Guardas de rota para areas autenticadas (dashboard e habitos).
-
-## 4) Modulo de habitos
-- [x] CRUD basico de habitos (criar e alternar ativo/pausado).
-- [ ] Configurar recorrencia.
-- [x] Pausar e reativar habito.
-- [x] Listagem de habitos por dia.
-
-## 5) Check-in e progressao
-- [x] Registrar conclusao diaria com idempotencia.
-- [x] Gerar `xp_events` por check-in valido.
-- [x] Recalcular nivel e streak.
-- [x] Exibir progresso no dashboard principal.
-
-## 6) Gamificacao extra (MVP estendido)
-- [ ] Quests semanais simples.
-- [ ] Badges por consistencia.
-- [ ] Loja de recompensas pessoais com resgate.
-
-## 7) Qualidade, seguranca e operacao
-- [ ] Cobrir casos criticos com testes.
-- [ ] Revisar validacoes de entrada e permissao.
-- [ ] Revisar rate limit em rotas sensiveis.
-- [ ] Revisar seguranca de secrets e ambiente.
-- [ ] Configurar monitoracao e alertas basicos.
-
-## 8) Go-live
-- [ ] Publicar ambiente de producao.
-- [ ] Rodar checklist final de smoke test.
-- [ ] Medir primeiras metricas por 7 dias.
-- [ ] Priorizar backlog com base em dados reais.
+## 5) Qualidade e Polimento
+- [x] Corrigir bugs de cache e conflitos de pacotes (`lucide-react`, `next`, `react 19`).
+- [x] Aceitar campos vazios (descrição) ao criar missões.
+- [ ] Garantir responsividade perfeita em todas as telas de celular.
+- [x] Adicionar Toast Notifications (notificações flutuantes) em vez de mensagens estáticas nos botões.
+- [ ] Configurar recuperação de senha (fluxo de e-mail).

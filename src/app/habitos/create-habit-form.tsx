@@ -38,14 +38,16 @@ export function CreateHabitForm({ onSuccess }: { onSuccess: () => void }) {
       </label>
       
       <label className="block">
-        <span className="mb-1.5 block text-xs font-heading font-semibold tracking-widest uppercase text-slate-400">Frequência da Quest</span>
+        <span className="mb-1.5 block text-xs font-heading font-semibold tracking-widest uppercase text-slate-400">Tipo / Frequência da Quest</span>
         <select
           className="system-input"
           name="frequency"
           defaultValue="daily"
         >
-          <option value="daily" className="bg-slate-900 text-white">Missão Diária</option>
-          <option value="weekdays" className="bg-slate-900 text-white">Missão de Dias Úteis (Seg-Sex)</option>
+          <option value="daily" className="bg-slate-900 text-white">Missão Diária (+10 XP)</option>
+          <option value="weekdays" className="bg-slate-900 text-white">Missão de Dias Úteis (+10 XP)</option>
+          <option value="once" className="bg-slate-900 text-sky-300 font-bold">Tarefa Única (+10 XP) - Some ao concluir</option>
+          <option value="negative" className="bg-slate-900 text-red-400 font-bold">Inimigo / Hábito Negativo (-10 HP) - Causa Dano</option>
         </select>
       </label>
 

@@ -26,3 +26,60 @@ export async function getActiveHabits(): Promise<Habit[]> {
     active: row.active,
   }));
 }
+
+export async function getTodayHabitLogs(dateRef: string): Promise<{habit_id: string}[]> {
+  const user = await requireUser();
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("habit_logs")
+    .select("habit_id")
+    .eq("user_id", user.id)
+    .eq("data_ref", dateRef);
+
+  if (error) {
+    logger.error("Erro ao buscar logs de habitos de hoje", error, { userId: user.id, dateRef });
+    return [];
+  }
+
+  return data || [];
+}
+
+export type HabitLogSummary = {
+  date: string;
+  count: number;
+};
+
+export async function getHabitLogsSummary(days: number = 120): Promise<HabitLogSummary[]> {
+  const user = await requireUser();
+  const supabase = await createSupabaseServerClient();
+
+  // Calcula a data limite (há X dias atrás)
+  const limitDate = new Date();
+  limitDate.setDate(limitDate.getDate() - days);
+  const limitDateStr = limitDate.toISOString().split("T")[0];
+
+  const { data, error } = await supabase
+    .from("habit_logs")
+    .select("data_ref")
+    .eq("user_id", user.id)
+    .gte("data_ref", limitDateStr)
+    .order("data_ref", { ascending: true });
+
+  if (error) {
+    logger.error("Erro ao buscar histórico de logs", error, { userId: user.id });
+    return [];
+  }
+
+  // Agrupa e conta
+  const summaryMap: Record<string, number> = {};
+  for (const row of data || []) {
+    const date = row.data_ref;
+    summaryMap[date] = (summaryMap[date] || 0) + 1;
+  }
+
+  return Object.entries(summaryMap).map(([date, count]) => ({
+    date,
+    count,
+  }));
+}

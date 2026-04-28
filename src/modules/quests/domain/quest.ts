@@ -4,4 +4,5 @@ export type Quest = {
   description: string;
   xpReward: number;
   completed: boolean;
+  code?: string;
 };
