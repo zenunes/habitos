@@ -7,12 +7,13 @@ import { getActiveQuests } from "@/modules/quests/server/queries";
 import { getActiveHabits, getTodayHabitLogs } from "@/modules/habits/server/queries";
 import { CheckinButton } from "./checkin-button";
 import { TopNav } from "@/components/layout/top-nav";
-import { ShoppingCart, Trophy, Target, Swords, Scroll, ShieldAlert, Zap, CheckCircle2 } from "lucide-react";
+import { getTodayDateStr, isWeekendInTimezone } from "@/lib/date-utils";
+import { ShoppingCart, Trophy, Target, Swords, Scroll, ShieldAlert, Zap, CheckCircle2, ChevronDown } from "lucide-react";
 
 export default async function DashboardPage() {
   const user = await requireUser();
-  const todayStr = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-  const isWeekend = new Date().getDay() === 0 || new Date().getDay() === 6;
+  const todayStr = getTodayDateStr(); // YYYY-MM-DD ajustado pro fuso
+  const isWeekend = isWeekendInTimezone();
   
   const [progress, quests, allHabits, todayLogs, profile] = await Promise.all([
     getUserProgress(),
@@ -181,8 +182,17 @@ export default async function DashboardPage() {
                       <Target size={18} />
                     </div>
                     <div>
-                      <p className="text-base font-heading font-bold text-slate-100 group-hover:text-white transition-colors leading-tight">{habit.title}</p>
-                      <div className="flex flex-wrap items-center gap-2 mt-2">
+                      <div className="flex items-start gap-2 justify-between w-full">
+                        <p className="text-base font-heading font-bold text-slate-100 group-hover:text-white transition-colors leading-tight">{habit.title}</p>
+                      </div>
+                      
+                      {habit.description && (
+                        <p className="text-xs text-slate-400 mt-2 line-clamp-2 font-body group-hover:text-slate-300 transition-colors">
+                          {habit.description}
+                        </p>
+                      )}
+
+                      <div className="flex flex-wrap items-center gap-2 mt-3">
                         <span className="text-[10px] font-heading tracking-widest uppercase bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">
                           {habit.frequency === 'daily' ? 'Diária' : 'Dias Úteis'}
                         </span>

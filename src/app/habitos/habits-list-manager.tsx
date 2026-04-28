@@ -79,6 +79,7 @@ export function HabitsListManager({ initialHabits }: { initialHabits: Habit[] })
                 key={habit.id}
                 habitId={habit.id}
                 title={habit.title}
+                description={habit.description}
                 frequency={habit.frequency}
                 active={habit.active}
               />

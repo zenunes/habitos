@@ -14,7 +14,7 @@ Após uma análise completa do projeto, identifiquei diversas oportunidades de m
   - *Solução:* Implementar uma barra de Vida (HP) ou sistema de "Fadiga" que diminui se missões obrigatórias forem ignoradas no dia anterior.
 
 ## 2) Arquitetura de Código
-- [ ] **Componentização do Cabeçalho (Header Global):**
+- [x] **Componentização do Cabeçalho (Header Global):**
   - *Problema atual:* O cabeçalho com os links (Loja, Conquistas, Perfil, etc) está replicado idêntico em `/dashboard`, `/loja`, `/perfil`, `/conquistas` e `/habitos`.
   - *Solução:* Extrair para um componente `<SystemHeader />` reutilizável para aplicar o princípio DRY (Don't Repeat Yourself).
 - [ ] **Tratamento de Fuso Horário (Timezones):**
@@ -22,7 +22,7 @@ Após uma análise completa do projeto, identifiquei diversas oportunidades de m
   - *Solução:* Usar uma biblioteca como `date-fns` ou garantir a conversão pelo `Intl.DateTimeFormat` local.
 
 ## 3) Interface e UX (Experiência do Usuário)
-- [ ] **Loading States (Skeletons):**
+- [x] **Loading States (Skeletons):**
   - *Problema atual:* O Next.js SSR causa um "piscar" ou tela em branco durante o carregamento de dados pesados entre páginas.
   - *Solução:* Criar arquivos `loading.tsx` usando componentes de "Skeleton" (blocos que piscam simulando a interface) para navegação fluida.
 - [x] **Barra de Navegação Mobile (Bottom Bar):**
