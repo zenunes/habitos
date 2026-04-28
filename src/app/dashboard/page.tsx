@@ -8,6 +8,7 @@ import { getUserProfile } from "@/modules/profile/server/queries";
 import { getActiveQuests } from "@/modules/quests/server/queries";
 import { getActiveHabits, getTodayHabitLogs } from "@/modules/habits/server/queries";
 import { CheckinButton } from "./checkin-button";
+import { BossButton } from "./boss-button";
 import { TopNav } from "@/components/layout/top-nav";
 import { getTodayDateStr, isWeekendInTimezone } from "@/lib/date-utils";
 import { ShoppingCart, Trophy, Target, Swords, Scroll, ShieldAlert, Zap, CheckCircle2, ChevronDown, Heart } from "lucide-react";
@@ -166,6 +167,12 @@ export default async function DashboardPage() {
                 <span className="font-bold text-xl text-amber-400">+{mainQuest.xpReward} XP</span>
               </div>
             </div>
+
+            {!mainQuest.completed && (
+              <div className="mt-6 pt-4 border-t border-amber-900/30">
+                <BossButton questId={mainQuest.id} />
+              </div>
+            )}
           </section>
         )}
 

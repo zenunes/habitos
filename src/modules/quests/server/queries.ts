@@ -2,42 +2,83 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUser } from "@/modules/auth/server/session";
 import { logger } from "@/lib/logger";
 import { Quest } from "../domain/quest";
+import { getTodayDateStr } from "@/lib/date-utils";
 
 export async function getActiveQuests(): Promise<Quest[]> {
   const user = await requireUser();
   const supabase = await createSupabaseServerClient();
+  const todayStr = getTodayDateStr();
 
-  const { data, error } = await supabase
-    .from("quests")
+  // 1. Tenta buscar uma "user_quests" ativa (que tenha starts_at hoje)
+  const { data: userQuests, error: userQuestsError } = await supabase
+    .from("user_quests")
     .select(`
-      id,
-      title,
-      rule,
-      xp_reward,
-      active,
-      user_quests!left (
-        status
+      status,
+      quest_id,
+      starts_at,
+      quests (
+        id, title, rule, xp_reward, code
       )
     `)
-    .eq("active", true)
-    .eq("user_quests.user_id", user.id);
+    .eq("user_id", user.id)
+    .gte("starts_at", `${todayStr}T00:00:00Z`)
+    .lte("starts_at", `${todayStr}T23:59:59Z`)
+    .order("starts_at", { ascending: false })
+    .limit(1);
 
-  if (error) {
-    logger.error("Erro ao buscar quests ativas", error, { userId: user.id });
-    return [];
+  let dailyBossQuest = userQuests && userQuests.length > 0 ? userQuests[0] : null;
+
+  // 2. Se o usuário NÃO tiver um Boss para hoje, vamos sortear um e criar
+  if (!dailyBossQuest) {
+    const { data: allBosses, error: bossesError } = await supabase
+      .from("quests")
+      .select("*")
+      .eq("active", true);
+
+    if (!bossesError && allBosses && allBosses.length > 0) {
+      // Sorteia um boss
+      const randomBoss = allBosses[Math.floor(Math.random() * allBosses.length)];
+
+      // Insere na user_quests para este usuário, travando para o dia de hoje
+      const { data: newAssignedBoss, error: insertError } = await supabase
+        .from("user_quests")
+        .insert({
+          user_id: user.id,
+          quest_id: randomBoss.id,
+          status: "in_progress",
+          progress: {},
+          starts_at: new Date().toISOString()
+        })
+        .select(`
+          status,
+          quest_id,
+          starts_at,
+          quests (
+            id, title, rule, xp_reward, code
+          )
+        `)
+        .single();
+
+      if (!insertError && newAssignedBoss) {
+        dailyBossQuest = newAssignedBoss;
+      }
+    }
   }
 
-  return data.map((row: Record<string, unknown>) => {
-    const userQuest = Array.isArray(row.user_quests) ? row.user_quests[0] : row.user_quests;
-    const userQuestStatus = userQuest && typeof userQuest === "object" ? (userQuest as Record<string, unknown>).status : undefined;
-    const rule = row.rule && typeof row.rule === "object" ? (row.rule as Record<string, unknown>) : {};
+  if (!dailyBossQuest) {
+    return []; // Se por algum motivo falhar, retorna vazio
+  }
 
-    return {
-      id: row.id as string,
-      title: row.title as string,
-      description: (rule.description as string) || "Quest sem descricao",
-      xpReward: row.xp_reward as number,
-      completed: userQuestStatus === "completed",
-    };
-  });
+  // 3. Formata para retornar o Boss do Dia
+  const qData = dailyBossQuest.quests as any;
+  const rule = qData.rule && typeof qData.rule === "object" ? qData.rule : {};
+
+  return [{
+    id: qData.id,
+    code: qData.code,
+    title: qData.title,
+    description: rule.description || "Enfrente esse desafio épico hoje.",
+    xpReward: qData.xp_reward,
+    completed: dailyBossQuest.status === "completed",
+  }];
 }
