@@ -79,3 +79,6 @@ Ter itens “plug-and-play” para usuários que não querem configurar uma loja
 9. Cosmético: Moldura do Perfil (raridade) — 200 🪙
 10. Cosmético: Título dourado (raridade) — 250 🪙
 
+## Implementação inicial (Seed)
+- A seed inicial foi implementada via migration para inserir recompensas padrão em `public.rewards` no primeiro acesso do usuário.
+- Migration: `0014_seed_default_store_rewards.sql`
