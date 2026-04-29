@@ -20,6 +20,7 @@ export default async function PerfilPage({
 }) {
   const user = await requireUser();
   const profile = await getUserProfile();
+  const hasRareFrame = profile?.profile_frame === "rare";
   const progress = await getUserProgress();
   const levelData = getLevelProgress(progress.xpTotal, progress.level);
   
@@ -78,21 +79,47 @@ export default async function PerfilPage({
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-10 relative z-10 pb-24 md:pb-10">
-      <header className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-slate-800 pb-6">
-        <div>
-          <div className="inline-flex items-center gap-2 mb-2">
-            <span className="h-2 w-2 rounded-full bg-sky-500 animate-pulse shadow-[0_0_8px_rgba(14,165,233,0.5)]"></span>
-            <p className="text-xs uppercase tracking-[0.2em] text-sky-400 font-heading font-bold">Identificação</p>
+      <div
+        className={
+          hasRareFrame
+            ? "rounded-2xl p-[1px] bg-gradient-to-r from-fuchsia-500/35 via-sky-500/20 to-amber-500/20 shadow-[0_0_30px_rgba(217,70,239,0.12)]"
+            : ""
+        }
+      >
+        <header
+          className={`flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-slate-800 pb-6 ${
+            hasRareFrame ? "rounded-2xl bg-[#030712] px-4 pt-4 relative overflow-hidden" : ""
+          }`}
+        >
+          {hasRareFrame && (
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute -top-20 left-1/3 w-72 h-72 bg-fuchsia-500/10 rounded-full blur-[120px]" />
+              <div className="absolute -bottom-24 right-1/3 w-72 h-72 bg-sky-500/10 rounded-full blur-[140px]" />
+            </div>
+          )}
+
+          <div className={hasRareFrame ? "relative" : ""}>
+            <div className="inline-flex items-center gap-2 mb-2">
+              <span className="h-2 w-2 rounded-full bg-sky-500 animate-pulse shadow-[0_0_8px_rgba(14,165,233,0.5)]"></span>
+              <p className="text-xs uppercase tracking-[0.2em] text-sky-400 font-heading font-bold">
+                Identificação
+              </p>
+              {hasRareFrame && (
+                <span className="text-[10px] font-heading font-bold tracking-widest uppercase px-2 py-0.5 rounded border text-fuchsia-300 bg-fuchsia-950/30 border-fuchsia-500/30">
+                  Moldura Rara
+                </span>
+              )}
+            </div>
+            <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] flex items-center gap-3">
+              <UserIcon size={32} className="text-sky-500" /> Perfil do Caçador
+            </h1>
+            <p className="text-slate-400 mt-1">Gerencie suas credenciais e verifique seu status atual.</p>
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] flex items-center gap-3">
-            <UserIcon size={32} className="text-sky-500" /> Perfil do Caçador
-          </h1>
-          <p className="text-slate-400 mt-1">Gerencie suas credenciais e verifique seu status atual.</p>
-        </div>
-        <div className="flex flex-col items-end gap-4 hidden md:flex">
-          <TopNav />
-        </div>
-      </header>
+          <div className={`flex flex-col items-end gap-4 ${hasRareFrame ? "relative" : ""} hidden md:flex`}>
+            <TopNav />
+          </div>
+        </header>
+      </div>
 
       {/* PAINEL DE STATUS GERAL */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
