@@ -9,7 +9,7 @@ import { Plus, X, ShoppingCart } from "lucide-react";
 export function StoreManager({ initialRewards, availablePoints }: { initialRewards: Reward[], availablePoints: number }) {
   const [isCreating, setIsCreating] = useState(false);
 
-  const getMeta = (reward: Reward): { categoryLabel?: string; description?: string } => {
+  const getMeta = (reward: Reward): { categoryLabel?: string; description?: string; noteLabel?: string } => {
     const title = reward.title.toLowerCase();
 
     const descriptions: Record<string, string> = {
@@ -38,19 +38,23 @@ export function StoreManager({ initialRewards, availablePoints }: { initialRewar
     const descKey = Object.keys(descriptions).find((k) => title === k) ?? null;
     const description = descKey ? descriptions[descKey] : undefined;
 
+    if (reward.id === "potion") {
+      return { categoryLabel: "Consumível", description, noteLabel: "Efeito no sistema" };
+    }
+
     if (title.includes("poção") || title.includes("kit") || title.includes("reanima") || title.includes("selo")) {
-      return { categoryLabel: "Consumível", description };
+      return { categoryLabel: "Consumível", description, noteLabel: "Recompensa manual" };
     }
 
     if (title.includes("escudo") || title.includes("pergaminho") || title.includes("amuleto") || title.includes("bônus") || title.includes("buff")) {
-      return { categoryLabel: "Boost", description };
+      return { categoryLabel: "Boost", description, noteLabel: "Recompensa manual" };
     }
 
     if (title.includes("moldura") || title.includes("título") || title.includes("cosmético")) {
-      return { categoryLabel: "Cosmético", description };
+      return { categoryLabel: "Cosmético", description, noteLabel: "Visual/Manual" };
     }
 
-    return { categoryLabel: "Recompensa", description };
+    return { categoryLabel: "Recompensa", description, noteLabel: "Recompensa manual" };
   };
 
   const potionReward: Reward = {
@@ -103,6 +107,16 @@ export function StoreManager({ initialRewards, availablePoints }: { initialRewar
       )}
 
       <section className="system-card p-6 border-amber-900/30">
+        <div className="mb-6 rounded-xl border border-slate-800 bg-slate-900/30 p-4">
+          <p className="text-xs font-heading font-bold tracking-widest uppercase text-slate-300">
+            Itens do Sistema vs Recompensas
+          </p>
+          <p className="text-sm text-slate-400 font-body mt-2">
+            Apenas itens marcados como <span className="text-rose-300">Efeito no sistema</span> aplicam mudanças automáticas.
+            Os demais são <span className="text-slate-200">recompensas manuais</span> (use como prêmio do mundo real).
+          </p>
+        </div>
+
         {orderedCategories
           .filter((c) => (grouped[c] ?? []).length > 0)
           .map((category) => (

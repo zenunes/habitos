@@ -16,7 +16,7 @@ export function RewardItem({
   reward: Reward;
   availablePoints: number;
   isSystemItem?: boolean;
-  meta?: { categoryLabel?: string; description?: string };
+  meta?: { categoryLabel?: string; description?: string; noteLabel?: string };
 }) {
   const [isPending, startTransition] = useTransition();
   const canAfford = availablePoints >= reward.pointsCost;
@@ -90,6 +90,16 @@ export function RewardItem({
                         : 'text-amber-300 bg-amber-950/30 border-amber-500/30'
               }`}>
                 {meta.categoryLabel}
+              </span>
+            )}
+
+            {meta?.noteLabel && (
+              <span className={`text-[10px] font-heading tracking-widest font-bold uppercase inline-block px-2 py-0.5 rounded border ${
+                isSystemItem
+                  ? "text-rose-200 bg-rose-950/40 border-rose-500/20"
+                  : "text-slate-300 bg-slate-900/40 border-slate-700"
+              }`}>
+                {meta.noteLabel}
               </span>
             )}
           </div>
