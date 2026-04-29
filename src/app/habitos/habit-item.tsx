@@ -9,10 +9,11 @@ type HabitItemProps = {
   title: string;
   description?: string;
   frequency: string;
+  targetPerWeek?: number | null;
   active: boolean;
 };
 
-export function HabitItem({ habitId, title, description, frequency, active }: HabitItemProps) {
+export function HabitItem({ habitId, title, description, frequency, targetPerWeek, active }: HabitItemProps) {
   const [isPending, startTransition] = useTransition();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -52,7 +53,17 @@ export function HabitItem({ habitId, title, description, frequency, active }: Ha
             </div>
             <div className="flex items-center gap-2 mt-1.5">
               <span className="text-[10px] font-heading tracking-widest uppercase bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">
-                {frequency === 'daily' ? 'Diária' : 'Dias Úteis'}
+                {frequency === "daily"
+                  ? "Diária"
+                  : frequency === "weekdays"
+                    ? "Dias Úteis"
+                    : frequency === "weekly"
+                      ? `Semanal: ${targetPerWeek ?? 3}x`
+                      : frequency === "once"
+                        ? "Única"
+                        : frequency === "negative"
+                          ? "Inimigo"
+                          : "Custom"}
               </span>
               {!active && (
                 <span className="text-[10px] font-heading tracking-widest uppercase text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded border border-slate-800">
@@ -87,7 +98,6 @@ export function HabitItem({ habitId, title, description, frequency, active }: Ha
         </div>
       </div>
       
-      {/* Collapse Description */}
       {description && isExpanded && (
         <div className="mt-4 pt-4 border-t border-slate-800 animate-in slide-in-from-top-2 fade-in duration-200">
           <p className="text-sm text-slate-400 font-body leading-relaxed bg-slate-900/80 p-3 rounded-lg border border-slate-800">

@@ -23,6 +23,7 @@ export async function getActiveHabits(): Promise<Habit[]> {
     title: row.title,
     description: row.description || "",
     frequency: row.frequency,
+    targetPerWeek: row.target_per_week ?? null,
     active: row.active,
   }));
 }
@@ -121,4 +122,50 @@ export async function getDailyCompletionCountsByRange(
   }
 
   return Object.entries(summaryMap).map(([date, count]) => ({ date, count }));
+}
+
+export type HabitWeeklyCount = {
+  habitId: string;
+  count: number;
+};
+
+function getWeekRange(dateStr: string) {
+  const base = new Date(`${dateStr}T12:00:00Z`);
+  const day = base.getUTCDay();
+  const diffToMonday = (day + 6) % 7;
+  const start = new Date(base);
+  start.setUTCDate(base.getUTCDate() - diffToMonday);
+  const end = new Date(start);
+  end.setUTCDate(start.getUTCDate() + 6);
+  return {
+    start: start.toISOString().slice(0, 10),
+    end: end.toISOString().slice(0, 10),
+  };
+}
+
+export async function getWeeklyHabitCounts(dateRef: string): Promise<HabitWeeklyCount[]> {
+  const user = await requireUser();
+  const supabase = await createSupabaseServerClient();
+
+  const { start, end } = getWeekRange(dateRef);
+
+  const { data, error } = await supabase
+    .from("habit_logs")
+    .select("habit_id")
+    .eq("user_id", user.id)
+    .eq("status", "done")
+    .gte("data_ref", start)
+    .lte("data_ref", end);
+
+  if (error) {
+    logger.error("Erro ao buscar contagem semanal de hábitos", error, { userId: user.id, start, end });
+    return [];
+  }
+
+  const summaryMap: Record<string, number> = {};
+  for (const row of data || []) {
+    summaryMap[row.habit_id] = (summaryMap[row.habit_id] || 0) + 1;
+  }
+
+  return Object.entries(summaryMap).map(([habitId, count]) => ({ habitId, count }));
 }

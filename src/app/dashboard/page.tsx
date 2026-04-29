@@ -6,7 +6,7 @@ import { getLevelProgress } from "@/modules/progression/domain/progression";
 import { evaluateDailyHP } from "@/modules/progression/server/hp-system";
 import { getUserProfile } from "@/modules/profile/server/queries";
 import { getActiveQuests } from "@/modules/quests/server/queries";
-import { getActiveHabits, getTodayHabitLogs } from "@/modules/habits/server/queries";
+import { getActiveHabits, getTodayHabitLogs, getWeeklyHabitCounts } from "@/modules/habits/server/queries";
 import { CheckinButton } from "./checkin-button";
 import { BossButton } from "./boss-button";
 import { TopNav } from "@/components/layout/top-nav";
@@ -21,11 +21,12 @@ export default async function DashboardPage() {
   // Avalia o dano por missões não concluídas (se houver) antes de buscar o progresso
   await evaluateDailyHP();
 
-  const [progress, quests, allHabits, todayLogs, profile] = await Promise.all([
+  const [progress, quests, allHabits, todayLogs, weeklyCounts, profile] = await Promise.all([
     getUserProgress(),
     getActiveQuests(),
     getActiveHabits(),
     getTodayHabitLogs(todayStr),
+    getWeeklyHabitCounts(todayStr),
     getUserProfile()
   ]);
 
@@ -40,7 +41,23 @@ export default async function DashboardPage() {
     if (isWeekend && h.frequency === 'weekdays') return false;
     return true;
   });
-  const pendingHabits = activeHabits.filter(h => !completedHabitIds.has(h.id));
+  const weeklyCountMap = new Map(weeklyCounts.map((r) => [r.habitId, r.count]));
+  const weeklyCompletedHabits = activeHabits.filter((h) => {
+    if (h.frequency !== "weekly") return false;
+    if (completedHabitIds.has(h.id)) return false;
+    const target = h.targetPerWeek ?? 0;
+    const count = weeklyCountMap.get(h.id) ?? 0;
+    return target > 0 && count >= target;
+  });
+  const pendingHabits = activeHabits.filter(h => {
+    if (completedHabitIds.has(h.id)) return false;
+    if (h.frequency === "weekly") {
+      const target = h.targetPerWeek ?? 0;
+      const count = weeklyCountMap.get(h.id) ?? 0;
+      return target > 0 ? count < target : true;
+    }
+    return true;
+  });
   const completedHabits = activeHabits.filter(h => completedHabitIds.has(h.id));
 
   // Progress calculation using the new exponential curve
@@ -206,71 +223,143 @@ export default async function DashboardPage() {
                 <Target size={18} /> Aceitar Novas Missões
               </Link>
             </div>
-          ) : pendingHabits.length > 0 ? (
-            <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {pendingHabits.map(habit => {
-                const isEnemy = habit.frequency === 'negative';
-                const isOnce = habit.frequency === 'once';
-                
-                return (
-                  <li key={habit.id} className={`group relative flex flex-col justify-between bg-slate-900/60 border rounded-xl p-4 transition-all shadow-sm ${
-                    isEnemy ? "border-red-900/50 hover:border-red-500/60 hover:bg-red-950/20 hover:shadow-[0_0_20px_rgba(220,38,38,0.15)]" :
-                    isOnce ? "border-amber-900/50 hover:border-amber-500/60 hover:bg-amber-950/20 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)]" :
-                    "border-slate-700 hover:border-theme-base/60 hover:bg-slate-800/80 hover:shadow-[0_0_20px_var(--theme-glow)]"
-                  }`}>
-                    <div className="flex items-start gap-3 mb-4">
-                      <div className={`p-2 rounded-lg border transition-colors ${
-                        isEnemy ? "bg-red-950/50 text-red-500 border-red-900/50 group-hover:bg-red-900/40 group-hover:border-red-500/30" :
-                        isOnce ? "bg-amber-950/50 text-amber-500 border-amber-900/50 group-hover:bg-amber-900/40 group-hover:border-amber-500/30" :
-                        "bg-slate-800 text-slate-500 border-slate-700 group-hover:bg-theme-base/20 group-hover:text-theme-light group-hover:border-theme-base/30"
-                      }`}>
-                        {isEnemy ? <ShieldAlert size={18} /> : <Target size={18} />}
-                      </div>
-                      <div>
-                        <div className="flex items-start gap-2 justify-between w-full">
-                          <p className={`text-base font-heading font-bold transition-colors leading-tight ${
-                            isEnemy ? "text-red-100 group-hover:text-red-400" :
-                            isOnce ? "text-amber-100 group-hover:text-amber-400" :
-                            "text-slate-100 group-hover:text-white"
-                          }`}>{habit.title}</p>
-                        </div>
-                        
-                        {habit.description && (
-                          <p className="text-xs text-slate-400 mt-2 line-clamp-2 font-body group-hover:text-slate-300 transition-colors">
-                            {habit.description}
-                          </p>
-                        )}
-
-                        <div className="flex flex-wrap items-center gap-2 mt-3">
-                          <span className={`text-[10px] font-heading tracking-widest uppercase px-2 py-0.5 rounded border ${
-                            isEnemy ? "bg-red-950 text-red-500 border-red-900" :
-                            isOnce ? "bg-amber-950 text-amber-500 border-amber-900" :
-                            "bg-slate-800 text-slate-400 border-slate-700"
-                          }`}>
-                            {isEnemy ? 'Inimigo (Evite)' : isOnce ? 'Missão Única' : habit.frequency === 'daily' ? 'Diária' : 'Dias Úteis'}
-                          </span>
-                          
-                          <span className={`text-[10px] font-heading tracking-widest uppercase flex items-center gap-1 ${
-                            isEnemy ? "text-red-500/70" : "text-theme-light/70"
-                          }`}>
-                            {isEnemy ? <><Heart size={10} /> -10 HP</> : <><Zap size={10} /> +10 XP | +5 🪙</>}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <CheckinButton habitId={habit.id} todayDateRef={todayStr} isEnemy={isEnemy} />
-                  </li>
-                );
-              })}
-            </ul>
           ) : (
-            <div className="text-center py-12 border border-dashed border-slate-700 rounded-xl bg-slate-900/30">
-              <div className="mx-auto h-16 w-16 rounded-full bg-emerald-900/20 flex items-center justify-center mb-4 border border-emerald-900/30">
-                <CheckCircle2 size={28} className="text-emerald-500/50" />
-              </div>
-              <p className="text-lg text-emerald-400 font-heading font-bold tracking-widest uppercase mb-2 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]">Todas as Missões Concluídas!</p>
-              <p className="text-sm text-slate-500 font-body mb-6">O sistema reconhece o seu esforço hoje. Descanse para amanhã.</p>
-            </div>
+            <>
+              {pendingHabits.length > 0 ? (
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {pendingHabits.map(habit => {
+                    const isEnemy = habit.frequency === 'negative';
+                    const isOnce = habit.frequency === 'once';
+                    
+                    return (
+                      <li key={habit.id} className={`group relative flex flex-col justify-between bg-slate-900/60 border rounded-xl p-4 transition-all shadow-sm ${
+                        isEnemy ? "border-red-900/50 hover:border-red-500/60 hover:bg-red-950/20 hover:shadow-[0_0_20px_rgba(220,38,38,0.15)]" :
+                        isOnce ? "border-amber-900/50 hover:border-amber-500/60 hover:bg-amber-950/20 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)]" :
+                        habit.frequency === "weekly"
+                          ? "border-indigo-900/40 hover:border-indigo-500/60 hover:bg-indigo-950/20 hover:shadow-[0_0_20px_rgba(99,102,241,0.12)]"
+                          : "border-slate-700 hover:border-theme-base/60 hover:bg-slate-800/80 hover:shadow-[0_0_20px_var(--theme-glow)]"
+                      }`}>
+                        <div className="flex items-start gap-3 mb-4">
+                          <div className={`p-2 rounded-lg border transition-colors ${
+                            isEnemy ? "bg-red-950/50 text-red-500 border-red-900/50 group-hover:bg-red-900/40 group-hover:border-red-500/30" :
+                            isOnce ? "bg-amber-950/50 text-amber-500 border-amber-900/50 group-hover:bg-amber-900/40 group-hover:border-amber-500/30" :
+                            habit.frequency === "weekly"
+                              ? "bg-indigo-950/50 text-indigo-300 border-indigo-900/40 group-hover:bg-indigo-900/30 group-hover:border-indigo-500/30"
+                              : "bg-slate-800 text-slate-500 border-slate-700 group-hover:bg-theme-base/20 group-hover:text-theme-light group-hover:border-theme-base/30"
+                          }`}>
+                            {isEnemy ? <ShieldAlert size={18} /> : <Target size={18} />}
+                          </div>
+                          <div>
+                            <div className="flex items-start gap-2 justify-between w-full">
+                              <p className={`text-base font-heading font-bold transition-colors leading-tight ${
+                                isEnemy ? "text-red-100 group-hover:text-red-400" :
+                                isOnce ? "text-amber-100 group-hover:text-amber-400" :
+                                habit.frequency === "weekly"
+                                  ? "text-indigo-100 group-hover:text-indigo-200"
+                                  : "text-slate-100 group-hover:text-white"
+                              }`}>{habit.title}</p>
+                            </div>
+                            
+                            {habit.description && (
+                              <p className="text-xs text-slate-400 mt-2 line-clamp-2 font-body group-hover:text-slate-300 transition-colors">
+                                {habit.description}
+                              </p>
+                            )}
+
+                            <div className="flex flex-wrap items-center gap-2 mt-3">
+                              <span className={`text-[10px] font-heading tracking-widest uppercase px-2 py-0.5 rounded border ${
+                                isEnemy ? "bg-red-950 text-red-500 border-red-900" :
+                                isOnce ? "bg-amber-950 text-amber-500 border-amber-900" :
+                                habit.frequency === "weekly"
+                                  ? "bg-indigo-950 text-indigo-300 border-indigo-900/40"
+                                  : "bg-slate-800 text-slate-400 border-slate-700"
+                              }`}>
+                                {isEnemy
+                                  ? "Inimigo (Evite)"
+                                  : isOnce
+                                    ? "Missão Única"
+                                    : habit.frequency === "weekly"
+                                      ? `Semanal: ${(weeklyCountMap.get(habit.id) ?? 0)}/${habit.targetPerWeek ?? 0}`
+                                      : habit.frequency === "daily"
+                                        ? "Diária"
+                                        : "Dias Úteis"}
+                              </span>
+                              
+                              <span className={`text-[10px] font-heading tracking-widest uppercase flex items-center gap-1 ${
+                                isEnemy ? "text-red-500/70" : "text-theme-light/70"
+                              }`}>
+                                {isEnemy ? <><Heart size={10} /> -10 HP</> : <><Zap size={10} /> +10 XP | +5 🪙</>}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <CheckinButton habitId={habit.id} todayDateRef={todayStr} isEnemy={isEnemy} />
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <div className="text-center py-12 border border-dashed border-slate-700 rounded-xl bg-slate-900/30">
+                  <div className="mx-auto h-16 w-16 rounded-full bg-emerald-900/20 flex items-center justify-center mb-4 border border-emerald-900/30">
+                    <CheckCircle2 size={28} className="text-emerald-500/50" />
+                  </div>
+                  <p className="text-lg text-emerald-400 font-heading font-bold tracking-widest uppercase mb-2 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]">
+                    {weeklyCompletedHabits.length > 0 ? "Missões do Dia Concluídas!" : "Todas as Missões Concluídas!"}
+                  </p>
+                  <p className="text-sm text-slate-500 font-body mb-6">
+                    {weeklyCompletedHabits.length > 0
+                      ? "A meta semanal já foi batida. Você está livre hoje."
+                      : "O sistema reconhece o seu esforço hoje. Descanse para amanhã."}
+                  </p>
+                </div>
+              )}
+
+              {weeklyCompletedHabits.length > 0 && (
+                <div className="mt-8 pt-6 border-t border-slate-800">
+                  <h3 className="text-sm font-heading font-bold tracking-widest text-slate-500 mb-4 uppercase flex items-center gap-2">
+                    <CheckCircle2 size={16} /> Meta Batida na Semana
+                  </h3>
+
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {weeklyCompletedHabits.map((habit) => {
+                      const count = weeklyCountMap.get(habit.id) ?? 0;
+                      const target = habit.targetPerWeek ?? 0;
+
+                      return (
+                        <li
+                          key={habit.id}
+                          className="relative flex flex-col justify-between bg-indigo-950/20 border border-indigo-500/25 rounded-xl p-4 shadow-[0_0_18px_rgba(99,102,241,0.08)]"
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="p-2 rounded-lg border bg-indigo-950/40 text-indigo-300 border-indigo-900/40">
+                              <CheckCircle2 size={18} />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-base font-heading font-bold text-indigo-100 leading-tight">
+                                {habit.title}
+                              </p>
+                              {habit.description && (
+                                <p className="text-xs text-slate-400 mt-2 line-clamp-2 font-body">
+                                  {habit.description}
+                                </p>
+                              )}
+                              <div className="flex flex-wrap items-center gap-2 mt-3">
+                                <span className="text-[10px] font-heading tracking-widest uppercase px-2 py-0.5 rounded border bg-indigo-950 text-indigo-300 border-indigo-900/40">
+                                  Semanal: {count}/{target}
+                                </span>
+                                <span className="text-[10px] font-heading tracking-widest uppercase px-2 py-0.5 rounded border bg-emerald-950/30 text-emerald-300 border-emerald-900/40">
+                                  Meta batida na semana
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+            </>
           )}
           
           {/* MISSÕES CONCLUÍDAS HOJE */}

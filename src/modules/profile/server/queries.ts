@@ -5,6 +5,7 @@ import { logger } from "@/lib/logger";
 export type UserProfile = {
   id: string;
   name: string;
+  focus: string | null;
 };
 
 export async function getUserProfile(): Promise<UserProfile | null> {
@@ -13,7 +14,7 @@ export async function getUserProfile(): Promise<UserProfile | null> {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, name")
+    .select("id, name, focus")
     .eq("id", user.id)
     .maybeSingle();
 

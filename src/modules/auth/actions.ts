@@ -13,6 +13,11 @@ const authSchema = z.object({
     .trim(),
 });
 
+const signupSchema = authSchema.extend({
+  name: z.string().min(2, "Informe um nome valido.").max(30, "Nome muito longo.").trim(),
+  focus: z.string().min(2, "Informe um foco valido.").max(60, "Foco muito longo.").trim(),
+});
+
 export type AuthActionState = {
   message?: string;
   error?: string;
@@ -50,9 +55,11 @@ export async function signupAction(
   _previousState: AuthActionState,
   formData: FormData,
 ): Promise<AuthActionState> {
-  const parseResult = authSchema.safeParse({
+  const parseResult = signupSchema.safeParse({
+    name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
+    focus: formData.get("focus"),
   });
 
   if (!parseResult.success) {
@@ -65,7 +72,16 @@ export async function signupAction(
   }
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.auth.signUp(parseResult.data);
+  const { error } = await supabase.auth.signUp({
+    email: parseResult.data.email,
+    password: parseResult.data.password,
+    options: {
+      data: {
+        name: parseResult.data.name,
+        focus: parseResult.data.focus,
+      },
+    },
+  });
 
   if (error) {
     logger.error("Falha ao cadastrar usuario", error, { email: parseResult.data.email });

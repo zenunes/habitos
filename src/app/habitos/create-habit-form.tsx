@@ -1,15 +1,15 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { createHabitAction, type HabitActionState } from "@/modules/habits/actions";
 
 const initialState: HabitActionState = {};
+type FrequencyOption = "daily" | "weekdays" | "weekly" | "once" | "negative";
 
 export function CreateHabitForm({ onSuccess }: { onSuccess: () => void }) {
   const [state, formAction, pending] = useActionState(createHabitAction, initialState);
+  const [frequency, setFrequency] = useState<FrequencyOption>("daily");
 
-  // Fecha o form caso tenha sucesso, mas usando um "trick" simples via React 
-  // que escuta o estado da variavel de sucesso e fecha.
   if (state.message) {
     setTimeout(onSuccess, 500);
   }
@@ -43,13 +43,30 @@ export function CreateHabitForm({ onSuccess }: { onSuccess: () => void }) {
           className="system-input"
           name="frequency"
           defaultValue="daily"
+          onChange={(e) => setFrequency(e.target.value as FrequencyOption)}
         >
           <option value="daily" className="bg-slate-900 text-white">Missão Diária (+10 XP)</option>
           <option value="weekdays" className="bg-slate-900 text-white">Missão de Dias Úteis (+10 XP)</option>
+          <option value="weekly" className="bg-slate-900 text-white">Missão Semanal (X dias/semana) (+10 XP)</option>
           <option value="once" className="bg-slate-900 text-sky-300 font-bold">Tarefa Única (+10 XP) - Some ao concluir</option>
           <option value="negative" className="bg-slate-900 text-red-400 font-bold">Inimigo / Hábito Negativo (-10 HP) - Causa Dano</option>
         </select>
       </label>
+
+      {frequency === "weekly" && (
+        <label className="block">
+          <span className="mb-1.5 block text-xs font-heading font-semibold tracking-widest uppercase text-slate-400">
+            Meta Semanal (Dias por Semana)
+          </span>
+          <select className="system-input" name="targetPerWeek" defaultValue="3">
+            {Array.from({ length: 7 }, (_, i) => i + 1).map((n) => (
+              <option key={n} value={n} className="bg-slate-900 text-white">
+                {n} {n === 1 ? "dia" : "dias"} por semana
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
 
       {state.error && <p className="text-xs text-red-400 font-heading tracking-widest uppercase bg-red-950/30 p-2 rounded border border-red-500/30">{state.error}</p>}
       {state.message && <p className="text-xs text-emerald-400 font-heading tracking-widest uppercase bg-emerald-950/30 p-2 rounded border border-emerald-500/30">{state.message}</p>}
