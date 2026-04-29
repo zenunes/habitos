@@ -24,6 +24,15 @@ export function StoreManager({ initialRewards, availablePoints }: { initialRewar
       "livro / curso (investimento)": "Invista em longo prazo. O sistema aprova evolução real.",
       "recompensa épica (algo grande)": "Um prêmio grande para marcos importantes.",
       "poção de cura (restaura 30 hp)": "Restaura 30 HP imediatamente.",
+      "kit de primeiros socorros (50 hp)": "Recuperação maior para não quebrar a ofensiva.",
+      "reanimação (1 uso)": "Uma segunda chance para voltar ao jogo após uma queda.",
+      "selo do caçador (cancelar 1 inimigo)": "Neutralize um erro do dia sem tomar dano (uso controlado).",
+      "escudo temporal (24h)": "Proteja sua consistência por 24h (ideal para dias caóticos).",
+      "pergaminho de disciplina (24h)": "Reforço de disciplina por 24h: use para um dia decisivo.",
+      "amuleto do foco (24h)": "Aumente seu foco por 24h: um dia inteiro no modo execução.",
+      "cosmético: moldura do perfil (rara)": "Personalização do perfil. Mostre seu status no sistema.",
+      "cosmético: título dourado (raro)": "Assinatura visual para quem passou por provações.",
+      "cosmético: tema de classe (raro)": "Um visual especial para celebrar sua evolução.",
     };
 
     const descKey = Object.keys(descriptions).find((k) => title === k) ?? null;

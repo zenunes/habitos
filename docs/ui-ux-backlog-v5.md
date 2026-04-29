@@ -82,3 +82,4 @@ Ter itens “plug-and-play” para usuários que não querem configurar uma loja
 ## Implementação inicial (Seed)
 - A seed inicial foi implementada via migration para inserir recompensas padrão em `public.rewards` no primeiro acesso do usuário.
 - Migration: `0014_seed_default_store_rewards.sql`
+- Expansão do seed para cobrir categorias (Consumível/Boost/Cosmético): `0015_seed_more_store_rewards.sql`
