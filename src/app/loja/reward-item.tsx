@@ -7,7 +7,17 @@ import { Trash2, ShoppingBag, Gift, Heart } from "lucide-react";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
 
-export function RewardItem({ reward, availablePoints, isSystemItem = false }: { reward: Reward, availablePoints: number, isSystemItem?: boolean }) {
+export function RewardItem({
+  reward,
+  availablePoints,
+  isSystemItem = false,
+  meta,
+}: {
+  reward: Reward;
+  availablePoints: number;
+  isSystemItem?: boolean;
+  meta?: { categoryLabel?: string; description?: string; noteLabel?: string };
+}) {
   const [isPending, startTransition] = useTransition();
   const canAfford = availablePoints >= reward.pointsCost;
 
@@ -65,8 +75,42 @@ export function RewardItem({ reward, availablePoints, isSystemItem = false }: { 
           {isSystemItem ? <Heart size={20} /> : <ShoppingBag size={20} />}
         </div>
         <div>
-          <p className={`text-lg font-heading font-bold transition-colors ${isSystemItem ? 'text-rose-200 group-hover:text-rose-100' : 'text-slate-100 group-hover:text-white'}`}>{reward.title}</p>
-          <p className={`text-[10px] mt-1 font-heading tracking-widest font-bold uppercase inline-block px-2 py-0.5 rounded border ${isSystemItem ? 'text-rose-400 bg-rose-950/40 border-rose-500/30' : 'text-amber-400 bg-amber-950/30 border-amber-500/30'}`}>Custo: {reward.pointsCost} 🪙</p>
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className={`text-lg font-heading font-bold transition-colors ${isSystemItem ? 'text-rose-200 group-hover:text-rose-100' : 'text-slate-100 group-hover:text-white'}`}>{reward.title}</p>
+            {meta?.categoryLabel && (
+              <span className={`text-[10px] font-heading tracking-widest font-bold uppercase inline-block px-2 py-0.5 rounded border ${
+                isSystemItem
+                  ? 'text-rose-300 bg-rose-950/40 border-rose-500/30'
+                  : meta.categoryLabel === 'Consumível'
+                    ? 'text-emerald-300 bg-emerald-950/30 border-emerald-500/30'
+                    : meta.categoryLabel === 'Boost'
+                      ? 'text-indigo-300 bg-indigo-950/30 border-indigo-500/30'
+                      : meta.categoryLabel === 'Cosmético'
+                        ? 'text-fuchsia-300 bg-fuchsia-950/30 border-fuchsia-500/30'
+                        : 'text-amber-300 bg-amber-950/30 border-amber-500/30'
+              }`}>
+                {meta.categoryLabel}
+              </span>
+            )}
+
+            {meta?.noteLabel && (
+              <span className={`text-[10px] font-heading tracking-widest font-bold uppercase inline-block px-2 py-0.5 rounded border ${
+                isSystemItem
+                  ? "text-rose-200 bg-rose-950/40 border-rose-500/20"
+                  : "text-slate-300 bg-slate-900/40 border-slate-700"
+              }`}>
+                {meta.noteLabel}
+              </span>
+            )}
+          </div>
+
+          {meta?.description && (
+            <p className="text-xs text-slate-400 mt-2 font-body leading-relaxed">
+              {meta.description}
+            </p>
+          )}
+
+          <p className={`text-[10px] mt-2 font-heading tracking-widest font-bold uppercase inline-block px-2 py-0.5 rounded border ${isSystemItem ? 'text-rose-400 bg-rose-950/40 border-rose-500/30' : 'text-amber-400 bg-amber-950/30 border-amber-500/30'}`}>Custo: {reward.pointsCost} 🪙</p>
         </div>
       </div>
       <div className="flex items-center gap-2 mt-4 sm:mt-0">
