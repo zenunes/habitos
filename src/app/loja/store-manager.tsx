@@ -9,6 +9,58 @@ import { Plus, X, ShoppingCart } from "lucide-react";
 export function StoreManager({ initialRewards, availablePoints }: { initialRewards: Reward[], availablePoints: number }) {
   const [isCreating, setIsCreating] = useState(false);
 
+  const getMeta = (reward: Reward): { categoryLabel?: string; description?: string } => {
+    const title = reward.title.toLowerCase();
+
+    const descriptions: Record<string, string> = {
+      "pausa estratégica (15 min)": "Recarregue energia e volte ao sistema com foco total.",
+      "café especial": "Um ritual curto para resetar a mente e manter o ritmo.",
+      "30 min de jogo": "Recompensa controlada: diversão sem culpa, com limite.",
+      "1 episódio de série": "Descanse sem quebrar o sistema. Um episódio e volta.",
+      "sobremesa (sem culpa)": "Uma indulgência planejada como recompensa por disciplina.",
+      "cinema / encontro": "Recompensa social. Construa vida fora do grind.",
+      "day off (meio período)": "Pausa estratégica para evitar burnout e manter consistência.",
+      "compra pequena (até r$30)": "Recompensa material pequena para reforçar progresso.",
+      "livro / curso (investimento)": "Invista em longo prazo. O sistema aprova evolução real.",
+      "recompensa épica (algo grande)": "Um prêmio grande para marcos importantes.",
+      "poção de cura (restaura 30 hp)": "Restaura 30 HP imediatamente.",
+    };
+
+    const descKey = Object.keys(descriptions).find((k) => title === k) ?? null;
+    const description = descKey ? descriptions[descKey] : undefined;
+
+    if (title.includes("poção") || title.includes("kit") || title.includes("reanima") || title.includes("selo")) {
+      return { categoryLabel: "Consumível", description };
+    }
+
+    if (title.includes("escudo") || title.includes("pergaminho") || title.includes("amuleto") || title.includes("bônus") || title.includes("buff")) {
+      return { categoryLabel: "Boost", description };
+    }
+
+    if (title.includes("moldura") || title.includes("título") || title.includes("cosmético")) {
+      return { categoryLabel: "Cosmético", description };
+    }
+
+    return { categoryLabel: "Recompensa", description };
+  };
+
+  const potionReward: Reward = {
+    id: "potion",
+    title: "Poção de Cura (Restaura 30 HP)",
+    pointsCost: 50,
+    available: true,
+  };
+
+  const allRewards = [potionReward, ...initialRewards];
+  const grouped = allRewards.reduce<Record<string, Reward[]>>((acc, r) => {
+    const meta = getMeta(r);
+    const key = r.id === "potion" ? "Consumível" : meta.categoryLabel ?? "Recompensa";
+    acc[key] = acc[key] ? [...acc[key], r] : [r];
+    return acc;
+  }, {});
+
+  const orderedCategories = ["Consumível", "Boost", "Recompensa", "Cosmético"];
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 gap-4">
@@ -42,29 +94,46 @@ export function StoreManager({ initialRewards, availablePoints }: { initialRewar
       )}
 
       <section className="system-card p-6 border-amber-900/30">
-        <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          
-          {/* ITEM FIXO DO SISTEMA: POÇÃO DE CURA */}
-          <RewardItem
-            key="potion"
-            reward={{
-              id: "potion",
-              title: "Poção de Cura (Restaura 30 HP)",
-              pointsCost: 50, // 50 Gold
-              available: true,
-            }}
-            availablePoints={availablePoints}
-            isSystemItem={true}
-          />
+        {orderedCategories
+          .filter((c) => (grouped[c] ?? []).length > 0)
+          .map((category) => (
+            <div key={category} className="mb-8 last:mb-0">
+              <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                <h3 className="text-sm font-heading font-bold tracking-widest uppercase text-slate-300">
+                  {category === "Consumível"
+                    ? "Consumíveis"
+                    : category === "Boost"
+                      ? "Boosts"
+                      : category === "Cosmético"
+                        ? "Cosméticos"
+                        : "Recompensas"}
+                </h3>
+                <span className={`text-[10px] font-heading font-bold tracking-widest uppercase px-2 py-1 rounded border ${
+                  category === "Consumível"
+                    ? "text-emerald-300 bg-emerald-950/30 border-emerald-500/30"
+                    : category === "Boost"
+                      ? "text-indigo-300 bg-indigo-950/30 border-indigo-500/30"
+                      : category === "Cosmético"
+                        ? "text-fuchsia-300 bg-fuchsia-950/30 border-fuchsia-500/30"
+                        : "text-amber-300 bg-amber-950/30 border-amber-500/30"
+                }`}>
+                  {grouped[category]?.length ?? 0}
+                </span>
+              </div>
 
-          {initialRewards.map((reward) => (
-            <RewardItem
-              key={reward.id}
-              reward={reward}
-              availablePoints={availablePoints}
-            />
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {(grouped[category] ?? []).map((reward) => (
+                  <RewardItem
+                    key={reward.id}
+                    reward={reward}
+                    availablePoints={availablePoints}
+                    isSystemItem={reward.id === "potion"}
+                    meta={getMeta(reward)}
+                  />
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
 
         {initialRewards.length === 0 && (
           <div className="text-center py-10 mt-6 border border-dashed border-slate-800 rounded-xl bg-slate-900/30">
@@ -72,7 +141,7 @@ export function StoreManager({ initialRewards, availablePoints }: { initialRewar
               <ShoppingCart size={28} className="text-purple-500/50" />
             </div>
             <p className="text-lg text-slate-300 font-heading font-bold tracking-widest uppercase mb-2">Sem Itens Personalizados</p>
-            <p className="text-sm text-slate-500 font-body mb-6">Defina suas próprias recompensas além dos itens do Sistema.</p>
+            <p className="text-sm text-slate-500 font-body mb-6">Use os itens pré-prontos do Sistema ou crie suas próprias recompensas.</p>
           </div>
         )}
       </section>
