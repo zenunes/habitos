@@ -17,7 +17,7 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
   // 0. Buscar detalhes do Hábito para saber o tipo
   const { data: habitData, error: habitError } = await supabase
     .from("habits")
-    .select("frequency")
+    .select("frequency, target_per_week")
     .eq("id", habitId)
     .single();
 
@@ -28,6 +28,38 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
 
   const isNegative = habitData.frequency === "negative";
   const isOnce = habitData.frequency === "once";
+  const isWeekly = habitData.frequency === "weekly";
+
+  if (isWeekly) {
+    const base = new Date(`${dataRef}T12:00:00Z`);
+    const day = base.getUTCDay();
+    const diffToMonday = (day + 6) % 7;
+    const start = new Date(base);
+    start.setUTCDate(base.getUTCDate() - diffToMonday);
+    const end = new Date(start);
+    end.setUTCDate(start.getUTCDate() + 6);
+    const startStr = start.toISOString().slice(0, 10);
+    const endStr = end.toISOString().slice(0, 10);
+    const target = typeof habitData.target_per_week === "number" ? habitData.target_per_week : 0;
+
+    if (target > 0) {
+      const { data: weekLogs, error: weekError } = await supabase
+        .from("habit_logs")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("habit_id", habitId)
+        .eq("status", "done")
+        .gte("data_ref", startStr)
+        .lte("data_ref", endStr);
+
+      if (!weekError) {
+        const count = (weekLogs || []).length;
+        if (count >= target) {
+          return { error: "Meta semanal já atingida para esta quest." };
+        }
+      }
+    }
+  }
 
   // 1. Inserir o log com tratamento de erro (idempotencia via constraint unique)
   const { error: logError } = await supabase.from("habit_logs").insert({

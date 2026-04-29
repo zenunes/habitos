@@ -4,11 +4,11 @@ import { useState } from "react";
 import { HabitItem } from "./habit-item";
 import { CreateHabitForm } from "./create-habit-form";
 import { Habit } from "@/modules/habits/domain/habit";
-import { Plus, X, ListTodo, Filter } from "lucide-react";
+import { Plus, X, ListTodo } from "lucide-react";
 
 export function HabitsListManager({ initialHabits }: { initialHabits: Habit[] }) {
   const [isCreating, setIsCreating] = useState(false);
-  const [filter, setFilter] = useState<"all" | "daily" | "weekdays" | "once" | "negative">("all");
+  const [filter, setFilter] = useState<"all" | "daily" | "weekdays" | "weekly" | "once" | "negative">("all");
 
   const filteredHabits = initialHabits.filter(habit => {
     if (filter === "all") return true;
@@ -42,6 +42,12 @@ export function HabitsListManager({ initialHabits }: { initialHabits: Habit[] })
               className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap flex-1 sm:flex-none ${filter === "weekdays" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
             >
               Dias Úteis
+            </button>
+            <button 
+              onClick={() => setFilter("weekly")}
+              className={`px-3 py-1.5 text-xs font-heading tracking-widest uppercase rounded whitespace-nowrap flex-1 sm:flex-none ${filter === "weekly" ? "bg-sky-900/50 text-sky-400" : "text-slate-400 hover:text-slate-200"}`}
+            >
+              Semanais
             </button>
             <button 
               onClick={() => setFilter("once")}
@@ -93,6 +99,7 @@ export function HabitsListManager({ initialHabits }: { initialHabits: Habit[] })
                 title={habit.title}
                 description={habit.description}
                 frequency={habit.frequency}
+                targetPerWeek={habit.targetPerWeek ?? null}
                 active={habit.active}
               />
             ))}

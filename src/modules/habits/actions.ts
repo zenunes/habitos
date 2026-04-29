@@ -9,7 +9,8 @@ import { logger } from "@/lib/logger";
 const habitSchema = z.object({
   title: z.string().min(2, "O titulo precisa ter pelo menos 2 caracteres.").max(50, "O titulo esta muito longo."),
   description: z.string().max(200, "A descricao esta muito longa.").optional().or(z.literal("")),
-  frequency: z.enum(["daily", "weekdays", "custom", "once", "negative"]).default("daily"),
+  frequency: z.enum(["daily", "weekdays", "weekly", "custom", "once", "negative"]).default("daily"),
+  targetPerWeek: z.coerce.number().int().min(1).max(7).optional(),
 });
 
 export type HabitActionState = {
@@ -27,6 +28,7 @@ export async function createHabitAction(
     title: formData.get("title")?.toString().trim(),
     description: formData.get("description")?.toString().trim(),
     frequency: formData.get("frequency")?.toString(),
+    targetPerWeek: formData.get("targetPerWeek"),
   });
 
   if (!parseResult.success) {
@@ -37,11 +39,15 @@ export async function createHabitAction(
   }
 
   const supabase = await createSupabaseServerClient();
+  if (parseResult.data.frequency === "weekly" && !parseResult.data.targetPerWeek) {
+    return { error: "Escolha quantos dias por semana (1 a 7)." };
+  }
   const { error } = await supabase.from("habits").insert({
     user_id: user.id,
     title: parseResult.data.title,
     description: parseResult.data.description || null,
     frequency: parseResult.data.frequency,
+    target_per_week: parseResult.data.frequency === "weekly" ? parseResult.data.targetPerWeek : null,
     active: true,
   });
 

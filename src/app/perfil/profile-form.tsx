@@ -23,6 +23,20 @@ export function ProfileForm({ initialProfile }: { initialProfile: UserProfile | 
         />
       </label>
 
+      <label className="block">
+        <span className="mb-1.5 block text-xs font-heading font-semibold tracking-widest uppercase text-sky-400">
+          Foco Atual
+        </span>
+        <input
+          className="system-input focus:ring-sky-500 focus:border-sky-500"
+          name="focus"
+          type="text"
+          defaultValue={initialProfile?.focus || ""}
+          placeholder="Ex: Saúde, Disciplina, Estudo..."
+          required
+        />
+      </label>
+
       {state.error && (
         <p className="text-xs text-red-400 font-heading tracking-widest uppercase bg-red-950/30 p-3 rounded border border-red-500/30">
           {state.error}

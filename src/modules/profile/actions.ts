@@ -8,6 +8,7 @@ import { logger } from "@/lib/logger";
 
 const profileSchema = z.object({
   name: z.string().min(2, "O codinome deve ter no mínimo 2 caracteres.").max(30, "Codinome muito longo."),
+  focus: z.string().min(2, "O foco deve ter no mínimo 2 caracteres.").max(60, "Foco muito longo."),
 });
 
 export type ProfileActionState = {
@@ -21,6 +22,7 @@ export async function updateProfileAction(
 ): Promise<ProfileActionState> {
   const parseResult = profileSchema.safeParse({
     name: formData.get("name"),
+    focus: formData.get("focus"),
   });
 
   if (!parseResult.success) {
@@ -32,7 +34,10 @@ export async function updateProfileAction(
 
   const { error } = await supabase
     .from("profiles")
-    .upsert({ id: user.id, name: parseResult.data.name }, { onConflict: "id" });
+    .upsert(
+      { id: user.id, name: parseResult.data.name, focus: parseResult.data.focus },
+      { onConflict: "id" },
+    );
 
   if (error) {
     logger.error("Erro ao atualizar perfil", error, { userId: user.id });

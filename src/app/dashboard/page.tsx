@@ -6,7 +6,7 @@ import { getLevelProgress } from "@/modules/progression/domain/progression";
 import { evaluateDailyHP } from "@/modules/progression/server/hp-system";
 import { getUserProfile } from "@/modules/profile/server/queries";
 import { getActiveQuests } from "@/modules/quests/server/queries";
-import { getActiveHabits, getTodayHabitLogs } from "@/modules/habits/server/queries";
+import { getActiveHabits, getTodayHabitLogs, getWeeklyHabitCounts } from "@/modules/habits/server/queries";
 import { CheckinButton } from "./checkin-button";
 import { BossButton } from "./boss-button";
 import { TopNav } from "@/components/layout/top-nav";
@@ -21,11 +21,12 @@ export default async function DashboardPage() {
   // Avalia o dano por missões não concluídas (se houver) antes de buscar o progresso
   await evaluateDailyHP();
 
-  const [progress, quests, allHabits, todayLogs, profile] = await Promise.all([
+  const [progress, quests, allHabits, todayLogs, weeklyCounts, profile] = await Promise.all([
     getUserProgress(),
     getActiveQuests(),
     getActiveHabits(),
     getTodayHabitLogs(todayStr),
+    getWeeklyHabitCounts(todayStr),
     getUserProfile()
   ]);
 
@@ -40,7 +41,16 @@ export default async function DashboardPage() {
     if (isWeekend && h.frequency === 'weekdays') return false;
     return true;
   });
-  const pendingHabits = activeHabits.filter(h => !completedHabitIds.has(h.id));
+  const weeklyCountMap = new Map(weeklyCounts.map((r) => [r.habitId, r.count]));
+  const pendingHabits = activeHabits.filter(h => {
+    if (completedHabitIds.has(h.id)) return false;
+    if (h.frequency === "weekly") {
+      const target = h.targetPerWeek ?? 0;
+      const count = weeklyCountMap.get(h.id) ?? 0;
+      return target > 0 ? count < target : true;
+    }
+    return true;
+  });
   const completedHabits = activeHabits.filter(h => completedHabitIds.has(h.id));
 
   // Progress calculation using the new exponential curve
@@ -216,7 +226,9 @@ export default async function DashboardPage() {
                   <li key={habit.id} className={`group relative flex flex-col justify-between bg-slate-900/60 border rounded-xl p-4 transition-all shadow-sm ${
                     isEnemy ? "border-red-900/50 hover:border-red-500/60 hover:bg-red-950/20 hover:shadow-[0_0_20px_rgba(220,38,38,0.15)]" :
                     isOnce ? "border-amber-900/50 hover:border-amber-500/60 hover:bg-amber-950/20 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)]" :
-                    "border-slate-700 hover:border-theme-base/60 hover:bg-slate-800/80 hover:shadow-[0_0_20px_var(--theme-glow)]"
+                    habit.frequency === "weekly"
+                      ? "border-indigo-900/40 hover:border-indigo-500/60 hover:bg-indigo-950/20 hover:shadow-[0_0_20px_rgba(99,102,241,0.12)]"
+                      : "border-slate-700 hover:border-theme-base/60 hover:bg-slate-800/80 hover:shadow-[0_0_20px_var(--theme-glow)]"
                   }`}>
                     <div className="flex items-start gap-3 mb-4">
                       <div className={`p-2 rounded-lg border transition-colors ${
@@ -247,7 +259,15 @@ export default async function DashboardPage() {
                             isOnce ? "bg-amber-950 text-amber-500 border-amber-900" :
                             "bg-slate-800 text-slate-400 border-slate-700"
                           }`}>
-                            {isEnemy ? 'Inimigo (Evite)' : isOnce ? 'Missão Única' : habit.frequency === 'daily' ? 'Diária' : 'Dias Úteis'}
+                            {isEnemy
+                              ? "Inimigo (Evite)"
+                              : isOnce
+                                ? "Missão Única"
+                                : habit.frequency === "weekly"
+                                  ? `Semanal: ${(weeklyCountMap.get(habit.id) ?? 0)}/${habit.targetPerWeek ?? 0}`
+                                  : habit.frequency === "daily"
+                                    ? "Diária"
+                                    : "Dias Úteis"}
                           </span>
                           
                           <span className={`text-[10px] font-heading tracking-widest uppercase flex items-center gap-1 ${
