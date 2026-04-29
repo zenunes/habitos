@@ -52,7 +52,7 @@ export async function createRewardAction(
 export async function redeemRewardAction(
   rewardId: string,
   pointsCost: number
-): Promise<{ error?: string; message?: string; isPotion?: boolean }> {
+): Promise<{ error?: string; message?: string; isPotion?: boolean; isProfileFrame?: boolean }> {
   const user = await requireUser();
   const supabase = await createSupabaseServerClient();
 
@@ -83,6 +83,20 @@ export async function redeemRewardAction(
     return { message: "Poção consumida! +30 HP restaurado.", isPotion: true };
   }
 
+  const { data: rewardRow, error: rewardError } = await supabase
+    .from("rewards")
+    .select("id, title, points_cost")
+    .eq("id", rewardId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (rewardError || !rewardRow) {
+    return { error: "Item não encontrado." };
+  }
+
+  const rewardTitle = rewardRow.title;
+  const normalizedTitle = rewardTitle.toLowerCase();
+
   // Comprando item normal da loja
   const newCoins = progress.coins - pointsCost;
   
@@ -93,6 +107,26 @@ export async function redeemRewardAction(
     .eq("user_id", user.id);
 
   if (coinsError) return { error: "Erro ao descontar moedas." };
+
+  if (normalizedTitle.includes("moldura do perfil")) {
+    const { data: currentProfile, error: profileError } = await supabase
+      .from("profiles")
+      .select("profile_frame")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError) return { error: "Erro ao aplicar moldura." };
+    if (currentProfile?.profile_frame === "rare") {
+      return { error: "Você já possui esta moldura." };
+    }
+
+    const { error: frameError } = await supabase
+      .from("profiles")
+      .update({ profile_frame: "rare" })
+      .eq("id", user.id);
+
+    if (frameError) return { error: "Erro ao aplicar moldura." };
+  }
 
   const { error } = await supabase.from("reward_redemptions").insert({
     user_id: user.id,
@@ -107,6 +141,10 @@ export async function redeemRewardAction(
 
   revalidatePath("/dashboard");
   revalidatePath("/loja");
+  if (normalizedTitle.includes("moldura do perfil")) {
+    revalidatePath("/perfil");
+    return { message: "Moldura aplicada no perfil!", isProfileFrame: true };
+  }
   return { message: "Recompensa resgatada com sucesso!" };
 }
 

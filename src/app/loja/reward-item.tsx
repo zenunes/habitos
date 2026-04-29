@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { redeemRewardAction, deleteRewardAction } from "@/modules/rewards/actions";
 import { Reward } from "@/modules/rewards/domain/reward";
-import { Trash2, ShoppingBag, Gift, Heart } from "lucide-react";
+import { Trash2, ShoppingBag, Gift, Heart, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
 
@@ -41,6 +41,17 @@ export function RewardItem({
               spread: 70,
               origin: { y: 0.7 },
               colors: ['#f43f5e', '#fb7185', '#fda4af']
+            });
+          } else if (result.isProfileFrame) {
+            toast.success(result.message, {
+              icon: <Sparkles className="text-fuchsia-300" />,
+              style: { borderColor: "#d946ef", color: "#f5d0fe", background: "rgba(217, 70, 239, 0.12)" }
+            });
+            confetti({
+              particleCount: 60,
+              spread: 80,
+              origin: { y: 0.7 },
+              colors: ['#d946ef', '#c084fc', '#f0abfc']
             });
           } else {
             toast.success(`Comprado: ${reward.title}`, {

@@ -12,6 +12,14 @@ export function StoreManager({ initialRewards, availablePoints }: { initialRewar
   const getMeta = (reward: Reward): { categoryLabel?: string; description?: string; noteLabel?: string } => {
     const title = reward.title.toLowerCase();
 
+    if (title.includes("moldura do perfil")) {
+      return {
+        categoryLabel: "Cosmético",
+        description: "Moldura rara aplicada automaticamente no seu perfil.",
+        noteLabel: "Efeito no perfil",
+      };
+    }
+
     const descriptions: Record<string, string> = {
       "pausa estratégica (15 min)": "Recarregue energia e volte ao sistema com foco total.",
       "café especial": "Um ritual curto para resetar a mente e manter o ritmo.",

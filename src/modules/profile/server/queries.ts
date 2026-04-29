@@ -6,6 +6,7 @@ export type UserProfile = {
   id: string;
   name: string;
   focus: string | null;
+  profile_frame: string | null;
 };
 
 export async function getUserProfile(): Promise<UserProfile | null> {
@@ -14,7 +15,7 @@ export async function getUserProfile(): Promise<UserProfile | null> {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, name, focus")
+    .select("id, name, focus, profile_frame")
     .eq("id", user.id)
     .maybeSingle();
 
