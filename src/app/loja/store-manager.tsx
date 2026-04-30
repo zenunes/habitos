@@ -21,10 +21,13 @@ export function StoreManager({ initialRewards, availablePoints }: { initialRewar
     }
 
     if (title.includes("moldura do perfil")) {
+      const isEpic = reward.pointsCost >= 300 || title.includes("épica") || title.includes("epica");
       return {
         categoryLabel: "Cosmético",
-        description: "Moldura rara aplicada automaticamente no seu perfil.",
-        noteLabel: "Efeito no perfil",
+        description: isEpic
+          ? "Moldura épica com brilho mais intenso aplicada automaticamente no seu perfil."
+          : "Moldura rara aplicada automaticamente no seu perfil.",
+        noteLabel: isEpic ? "Efeito no perfil (Épica)" : "Efeito no perfil",
       };
     }
 

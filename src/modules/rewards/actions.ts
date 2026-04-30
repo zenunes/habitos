@@ -134,6 +134,7 @@ export async function redeemRewardAction(
   if (coinsError) return { error: "Erro ao descontar moedas." };
 
   if (normalizedTitle.includes("moldura do perfil")) {
+    const tier = pointsCost >= 300 ? "epic" : "rare";
     const { data: currentProfile, error: profileError } = await supabase
       .from("profiles")
       .select("profile_frame")
@@ -141,13 +142,13 @@ export async function redeemRewardAction(
       .maybeSingle();
 
     if (profileError) return { error: "Erro ao aplicar moldura." };
-    if (currentProfile?.profile_frame === "rare") {
+    if (currentProfile?.profile_frame === tier) {
       return { error: "Você já possui esta moldura." };
     }
 
     const { error: frameError } = await supabase
       .from("profiles")
-      .update({ profile_frame: "rare" })
+      .update({ profile_frame: tier })
       .eq("id", user.id);
 
     if (frameError) return { error: "Erro ao aplicar moldura." };
