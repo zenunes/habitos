@@ -12,6 +12,14 @@ export function StoreManager({ initialRewards, availablePoints }: { initialRewar
   const getMeta = (reward: Reward): { categoryLabel?: string; description?: string; noteLabel?: string } => {
     const title = reward.title.toLowerCase();
 
+    if (reward.id === "frame_test") {
+      return {
+        categoryLabel: "Cosmético",
+        description: "Moldura rara aplicada automaticamente no seu perfil (item de teste).",
+        noteLabel: "Teste grátis",
+      };
+    }
+
     if (title.includes("moldura do perfil")) {
       return {
         categoryLabel: "Cosmético",
@@ -72,7 +80,14 @@ export function StoreManager({ initialRewards, availablePoints }: { initialRewar
     available: true,
   };
 
-  const allRewards = [potionReward, ...initialRewards];
+  const testFrameReward: Reward = {
+    id: "frame_test",
+    title: "Moldura do Perfil (Teste Grátis)",
+    pointsCost: 0,
+    available: true,
+  };
+
+  const allRewards = [testFrameReward, potionReward, ...initialRewards];
   const grouped = allRewards.reduce<Record<string, Reward[]>>((acc, r) => {
     const meta = getMeta(r);
     const key = r.id === "potion" ? "Consumível" : meta.categoryLabel ?? "Recompensa";

@@ -57,6 +57,31 @@ export async function redeemRewardAction(
   const supabase = await createSupabaseServerClient();
 
   const progress = await getUserProgress();
+
+  if (rewardId === "frame_test") {
+    const { data: currentProfile, error: profileError } = await supabase
+      .from("profiles")
+      .select("profile_frame")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError) return { error: "Erro ao aplicar moldura." };
+    if (currentProfile?.profile_frame === "rare") {
+      return { error: "Você já possui esta moldura." };
+    }
+
+    const { error: frameError } = await supabase
+      .from("profiles")
+      .update({ profile_frame: "rare" })
+      .eq("id", user.id);
+
+    if (frameError) return { error: "Erro ao aplicar moldura." };
+
+    revalidatePath("/perfil");
+    revalidatePath("/loja");
+    return { message: "Moldura de teste aplicada no perfil!", isProfileFrame: true };
+  }
+
   if (progress.coins < pointsCost) {
     return { error: "Moedas insuficientes para comprar esta recompensa." };
   }
