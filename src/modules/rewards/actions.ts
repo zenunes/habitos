@@ -83,7 +83,7 @@ export async function redeemRewardAction(
   }
 
   if (progress.coins < pointsCost) {
-    return { error: "Moedas insuficientes para comprar esta recompensa." };
+    return { error: "Ouro insuficiente para comprar esta recompensa." };
   }
 
   // Verifica se é a Poção de Cura pelo ID especial "potion"
@@ -95,7 +95,7 @@ export async function redeemRewardAction(
     const newHp = Math.min(100, progress.hpCurrent + 30); // Poção cura 30 HP
     const newCoins = progress.coins - pointsCost;
 
-    // 1. Atualiza HP e Moedas do usuário
+    // 1. Atualiza HP e Ouro do usuário
     const { error: hpError } = await supabase
       .from("user_progress")
       .update({ hp_current: newHp, coins: newCoins })
@@ -125,13 +125,13 @@ export async function redeemRewardAction(
   // Comprando item normal da loja
   const newCoins = progress.coins - pointsCost;
   
-  // Atualiza moedas do usuário
+  // Atualiza ouro do usuário
   const { error: coinsError } = await supabase
     .from("user_progress")
     .update({ coins: newCoins })
     .eq("user_id", user.id);
 
-  if (coinsError) return { error: "Erro ao descontar moedas." };
+  if (coinsError) return { error: "Erro ao descontar ouro." };
 
   if (normalizedTitle.includes("moldura do perfil")) {
     const tier = pointsCost >= 300 ? "epic" : "rare";

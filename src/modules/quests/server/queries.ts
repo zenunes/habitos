@@ -80,7 +80,7 @@ export async function getActiveQuests(): Promise<Quest[]> {
   const description = typeof rule.description === "string" ? rule.description : "Enfrente esse desafio épico hoje.";
   const code = typeof qData.code === "string" ? qData.code : undefined;
   const xpReward = typeof qData.xp_reward === "number" ? qData.xp_reward : 0;
-  const title = typeof qData.title === "string" ? qData.title : "Missão Especial";
+  const title = typeof qData.title === "string" ? qData.title : "Quest Especial";
   const id = typeof qData.id === "string" ? qData.id : "";
 
   return [{

@@ -77,7 +77,7 @@ export function HabitsListManager({ initialHabits }: { initialHabits: Habit[] })
       {isCreating && (
         <div className="system-card p-6 border-sky-500/50 bg-sky-950/10">
           <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
-            <h3 className="font-heading text-lg font-bold text-sky-400 tracking-widest uppercase">Formular Missão</h3>
+            <h3 className="font-heading text-lg font-bold text-sky-400 tracking-widest uppercase">Formular Quest</h3>
             <button 
               onClick={() => setIsCreating(false)}
               className="text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-sm font-heading uppercase tracking-widest"
