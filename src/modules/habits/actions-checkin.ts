@@ -186,7 +186,7 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
     return { message: "Você cedeu ao inimigo. -10 HP." };
   }
 
-  let returnMessage = isOnce ? "Tarefa única concluída! +10 XP | +5 Gold" : "Sucesso: Quest concluída! +10 XP | +5 Gold";
+  let returnMessage = isOnce ? "Tarefa única concluída! +10 XP | +5 Ouro" : "Sucesso: Quest concluída! +10 XP | +5 Ouro";
 
   if (classChanged) {
     returnMessage = `CLASS UP! Você despertou como: ${newClass}!`;
@@ -198,7 +198,7 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
     if (leveledUp || classChanged) {
       returnMessage += ` Título: ${unlockedTitles.join(", ")}`;
     } else {
-      returnMessage = `Quest concluída! +10 XP | +5 Gold. Título desbloqueado: ${unlockedTitles.join(", ")}`;
+      returnMessage = `Quest concluída! +10 XP | +5 Ouro. Título desbloqueado: ${unlockedTitles.join(", ")}`;
     }
   }
 

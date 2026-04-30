@@ -16,13 +16,13 @@ export default async function HabitosPage() {
           <div className="inline-flex items-center gap-2 mb-2">
             <span className="h-2 w-2 rounded-full bg-sky-500 animate-pulse shadow-[0_0_8px_var(--primary-glow)]"></span>
             <p className="text-xs uppercase tracking-[0.2em] text-sky-400 font-heading font-bold flex items-center gap-2">
-              <Target size={12} /> Registro de Missões
+              <Target size={12} /> Registro de Quests
             </p>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
             Painel de Quests Diárias
           </h1>
-          <p className="text-sm md:text-base text-slate-400 mt-1">Gerencie as missões que guiarão sua evolução.</p>
+          <p className="text-sm md:text-base text-slate-400 mt-1">Gerencie as quests que guiarão sua evolução.</p>
         </div>
         <div className="hidden md:flex flex-col items-end gap-4">
           <TopNav />

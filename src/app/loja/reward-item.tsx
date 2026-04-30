@@ -22,7 +22,7 @@ export function RewardItem({
   const canAfford = availablePoints >= reward.pointsCost;
 
   const handleRedeem = () => {
-    if (window.confirm(`Deseja comprar "${reward.title}" por ${reward.pointsCost} moedas?`)) {
+    if (window.confirm(`Deseja comprar "${reward.title}" por ${reward.pointsCost} de Ouro?`)) {
       startTransition(async () => {
         const result = await redeemRewardAction(reward.id, reward.pointsCost);
         if (result.error) {

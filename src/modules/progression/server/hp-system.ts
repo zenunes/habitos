@@ -3,6 +3,21 @@ import { requireUser } from "@/modules/auth/server/session";
 import { logger } from "@/lib/logger";
 import { getTodayDateStr } from "@/lib/date-utils";
 
+function addDays(dateStr: string, deltaDays: number) {
+  const base = new Date(`${dateStr}T12:00:00Z`);
+  base.setUTCDate(base.getUTCDate() + deltaDays);
+  return base.toISOString().slice(0, 10);
+}
+
+function getWeekStart(dateStr: string) {
+  const base = new Date(`${dateStr}T12:00:00Z`);
+  const day = base.getUTCDay();
+  const diffToMonday = (day + 6) % 7;
+  const start = new Date(base);
+  start.setUTCDate(base.getUTCDate() - diffToMonday);
+  return start.toISOString().slice(0, 10);
+}
+
 /**
  * Calcula se o usuário perdeu HP desde o último login.
  * Se houver dias não logados/missões não cumpridas desde o last_hp_calc_date, 
@@ -39,8 +54,8 @@ export async function evaluateDailyHP() {
   }
 
   // Calcula a diferença de dias
-  const todayDate = new Date(todayStr);
-  const lastDate = new Date(lastCalcDate);
+  const todayDate = new Date(`${todayStr}T12:00:00Z`);
+  const lastDate = new Date(`${lastCalcDate}T12:00:00Z`);
   const utcToday = Date.UTC(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
   const utcLast = Date.UTC(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate());
   const diffDays = Math.floor((utcToday - utcLast) / (1000 * 60 * 60 * 24));
@@ -59,22 +74,27 @@ export async function evaluateDailyHP() {
   }
 
   // Avalia especificamente as missões perdidas ONTEM
-  const yesterdayDate = new Date(todayDate);
-  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-  const yesterdayStr = yesterdayDate.toISOString().split("T")[0]; // Formato do BD
+  const yesterdayStr = addDays(todayStr, -1);
+  const yesterdayDate = new Date(`${yesterdayStr}T12:00:00Z`);
 
   // Busca hábitos ativos e logs de ontem
   const [{ data: habits }, { data: logs }] = await Promise.all([
     supabase.from("habits").select("id, frequency").eq("user_id", user.id).eq("active", true),
-    supabase.from("habit_logs").select("habit_id").eq("user_id", user.id).eq("data_ref", yesterdayStr)
+    supabase
+      .from("habit_logs")
+      .select("habit_id")
+      .eq("user_id", user.id)
+      .eq("status", "done")
+      .eq("data_ref", yesterdayStr),
   ]);
 
   if (habits) {
     const completedIds = new Set(logs?.map(l => l.habit_id) || []);
-    const isYesterdayWeekend = yesterdayDate.getDay() === 0 || yesterdayDate.getDay() === 6;
+    const isYesterdayWeekend = yesterdayDate.getUTCDay() === 0 || yesterdayDate.getUTCDay() === 6;
 
     let uncompletedCount = 0;
     habits.forEach(h => {
+      if (h.frequency !== "daily" && h.frequency !== "weekdays") return;
       // Ignora missões de dias úteis se ontem foi fds
       if (isYesterdayWeekend && h.frequency === 'weekdays') return;
       
@@ -84,6 +104,51 @@ export async function evaluateDailyHP() {
     });
 
     hpDamage += uncompletedCount * 10; // -10 HP por missão de ontem não feita
+  }
+
+  const weekStart = getWeekStart(todayStr);
+  if (lastCalcDate < weekStart) {
+    const lastWeekStart = addDays(weekStart, -7);
+    const lastWeekEnd = addDays(weekStart, -1);
+
+    const [{ data: weeklyHabits }, { data: weeklyLogs }] = await Promise.all([
+      supabase
+        .from("habits")
+        .select("id, target_per_week")
+        .eq("user_id", user.id)
+        .eq("active", true)
+        .eq("frequency", "weekly"),
+      supabase
+        .from("habit_logs")
+        .select("habit_id")
+        .eq("user_id", user.id)
+        .eq("status", "done")
+        .gte("data_ref", lastWeekStart)
+        .lte("data_ref", lastWeekEnd),
+    ]);
+
+    const weeklyCountMap: Record<string, number> = {};
+    for (const row of weeklyLogs || []) {
+      weeklyCountMap[row.habit_id] = (weeklyCountMap[row.habit_id] || 0) + 1;
+    }
+
+    let weeklyMissingTotal = 0;
+    for (const habit of weeklyHabits || []) {
+      const target = typeof habit.target_per_week === "number" ? habit.target_per_week : null;
+      if (!target || target <= 0) continue;
+      const count = weeklyCountMap[habit.id] || 0;
+      weeklyMissingTotal += Math.max(0, target - count);
+    }
+
+    if (weeklyMissingTotal > 0) {
+      hpDamage += weeklyMissingTotal * 10;
+      logger.info("Weekly goals missed. HP damage applied.", {
+        userId: user.id,
+        weekStart: lastWeekStart,
+        weekEnd: lastWeekEnd,
+        missing: weeklyMissingTotal,
+      });
+    }
   }
 
   if (hpDamage > 0) {

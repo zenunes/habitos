@@ -45,9 +45,9 @@ export function CreateHabitForm({ onSuccess }: { onSuccess: () => void }) {
           defaultValue="daily"
           onChange={(e) => setFrequency(e.target.value as FrequencyOption)}
         >
-          <option value="daily" className="bg-slate-900 text-white">Missão Diária (+10 XP)</option>
-          <option value="weekdays" className="bg-slate-900 text-white">Missão de Dias Úteis (+10 XP)</option>
-          <option value="weekly" className="bg-slate-900 text-white">Missão Semanal (X dias/semana) (+10 XP)</option>
+          <option value="daily" className="bg-slate-900 text-white">Quest Diária (+10 XP)</option>
+          <option value="weekdays" className="bg-slate-900 text-white">Quest de Dias Úteis (+10 XP)</option>
+          <option value="weekly" className="bg-slate-900 text-white">Quest Semanal (X dias/semana) (+10 XP)</option>
           <option value="once" className="bg-slate-900 text-sky-300 font-bold">Tarefa Única (+10 XP) - Some ao concluir</option>
           <option value="negative" className="bg-slate-900 text-red-400 font-bold">Inimigo / Hábito Negativo (-10 HP) - Causa Dano</option>
         </select>
@@ -77,7 +77,7 @@ export function CreateHabitForm({ onSuccess }: { onSuccess: () => void }) {
           disabled={pending || !!state.message}
           className="system-btn-primary w-full sm:w-auto"
         >
-          {pending ? "Registrando no Sistema..." : "Aceitar Missão"}
+          {pending ? "Registrando no Sistema..." : "Aceitar Quest"}
         </button>
       </div>
     </form>

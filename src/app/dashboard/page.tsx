@@ -165,7 +165,7 @@ export default async function DashboardPage() {
                   <ShieldAlert size={24} className="text-amber-500" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-heading font-bold tracking-widest text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]">Missão Especial (Urgente)</h2>
+                  <h2 className="text-xl font-heading font-bold tracking-widest text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]">Quest Especial (Urgente)</h2>
                   <p className="text-xs text-amber-500/70 font-heading tracking-widest uppercase">Recompensa Alta</p>
                 </div>
               </div>
@@ -203,7 +203,7 @@ export default async function DashboardPage() {
                 <Scroll size={24} className="text-theme-light" />
               </div>
               <div>
-                <h2 className="text-2xl font-heading font-bold tracking-widest text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">Painel de Missões</h2>
+                <h2 className="text-2xl font-heading font-bold tracking-widest text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">Painel de Quests</h2>
                 <p className="text-xs text-theme-base/70 font-heading tracking-widest uppercase">Renovação Diária</p>
               </div>
             </div>
@@ -217,10 +217,10 @@ export default async function DashboardPage() {
               <div className="mx-auto h-16 w-16 rounded-full bg-theme-base/20 flex items-center justify-center mb-4 border border-theme-base/30">
                 <Scroll size={28} className="text-theme-base/50" />
               </div>
-              <p className="text-lg text-slate-300 font-heading font-bold tracking-widest uppercase mb-2">Nenhuma Missão Atribuída</p>
+              <p className="text-lg text-slate-300 font-heading font-bold tracking-widest uppercase mb-2">Nenhuma Quest Atribuída</p>
               <p className="text-sm text-slate-500 font-body mb-6">O sistema aguarda suas diretrizes para continuar a evolução.</p>
               <Link href="/habitos" className="system-btn-primary inline-flex items-center gap-2 w-auto px-6 py-3">
-                <Target size={18} /> Aceitar Novas Missões
+                <Target size={18} /> Aceitar Novas Quests
               </Link>
             </div>
           ) : (
@@ -277,7 +277,7 @@ export default async function DashboardPage() {
                                 {isEnemy
                                   ? "Inimigo (Evite)"
                                   : isOnce
-                                    ? "Missão Única"
+                                    ? "Quest Única"
                                     : habit.frequency === "weekly"
                                       ? `Semanal: ${(weeklyCountMap.get(habit.id) ?? 0)}/${habit.targetPerWeek ?? 0}`
                                       : habit.frequency === "daily"
@@ -304,7 +304,7 @@ export default async function DashboardPage() {
                     <CheckCircle2 size={28} className="text-emerald-500/50" />
                   </div>
                   <p className="text-lg text-emerald-400 font-heading font-bold tracking-widest uppercase mb-2 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]">
-                    {weeklyCompletedHabits.length > 0 ? "Missões do Dia Concluídas!" : "Todas as Missões Concluídas!"}
+                    {weeklyCompletedHabits.length > 0 ? "Quests do Dia Concluídas!" : "Todas as Quests Concluídas!"}
                   </p>
                   <p className="text-sm text-slate-500 font-body mb-6">
                     {weeklyCompletedHabits.length > 0

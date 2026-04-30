@@ -31,7 +31,7 @@ export default async function LojaPage() {
         </div>
         <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto gap-4 mt-4 md:mt-0">
           <div className="bg-amber-900/20 border border-amber-500/30 px-4 py-2 rounded-lg flex flex-col items-start md:items-end w-full md:w-auto">
-            <span className="text-[10px] md:text-xs text-amber-400 font-heading uppercase tracking-widest block mb-1">Ouro (Gold)</span>
+            <span className="text-[10px] md:text-xs text-amber-400 font-heading uppercase tracking-widest block mb-1">Ouro</span>
             <span className="text-xl md:text-2xl font-bold text-white drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">{progress.coins} 🪙</span>
           </div>
           <div className="hidden md:flex">
