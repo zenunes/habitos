@@ -20,7 +20,8 @@ export default async function PerfilPage({
 }) {
   const user = await requireUser();
   const profile = await getUserProfile();
-  const hasRareFrame = profile?.profile_frame === "rare";
+  const frameTier = profile?.profile_frame ?? null;
+  const hasProfileFrame = frameTier === "rare" || frameTier === "epic";
   const progress = await getUserProgress();
   const levelData = getLevelProgress(progress.xpTotal, progress.level);
   
@@ -81,32 +82,41 @@ export default async function PerfilPage({
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-10 relative z-10 pb-24 md:pb-10">
       <div
         className={
-          hasRareFrame
-            ? "rounded-2xl p-[1px] bg-gradient-to-r from-fuchsia-500/35 via-sky-500/20 to-amber-500/20 shadow-[0_0_30px_rgba(217,70,239,0.12)]"
+          hasProfileFrame
+            ? `profile-frame-shell ${frameTier === "epic" ? "profile-frame-epic" : "profile-frame-rare"}`
             : ""
         }
       >
         <header
           className={`flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-slate-800 pb-6 ${
-            hasRareFrame ? "rounded-2xl bg-[#030712] px-4 pt-4 relative overflow-hidden" : ""
+            hasProfileFrame ? "profile-frame-inner" : ""
           }`}
         >
-          {hasRareFrame && (
+          {hasProfileFrame && (
             <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute -top-20 left-1/3 w-72 h-72 bg-fuchsia-500/10 rounded-full blur-[120px]" />
-              <div className="absolute -bottom-24 right-1/3 w-72 h-72 bg-sky-500/10 rounded-full blur-[140px]" />
+              <div className={`absolute -top-24 left-1/4 w-[26rem] h-[26rem] rounded-full blur-[140px] ${
+                frameTier === "epic" ? "bg-amber-500/12" : "bg-fuchsia-500/12"
+              }`} />
+              <div className={`absolute -bottom-28 right-1/4 w-[28rem] h-[28rem] rounded-full blur-[160px] ${
+                frameTier === "epic" ? "bg-fuchsia-500/10" : "bg-sky-500/10"
+              }`} />
+              <div className={`absolute inset-0 opacity-[0.08] ${frameTier === "epic" ? "profile-frame-noise-epic" : "profile-frame-noise-rare"}`} />
             </div>
           )}
 
-          <div className={hasRareFrame ? "relative" : ""}>
+          <div className={hasProfileFrame ? "relative" : ""}>
             <div className="inline-flex items-center gap-2 mb-2">
               <span className="h-2 w-2 rounded-full bg-sky-500 animate-pulse shadow-[0_0_8px_rgba(14,165,233,0.5)]"></span>
               <p className="text-xs uppercase tracking-[0.2em] text-sky-400 font-heading font-bold">
                 Identificação
               </p>
-              {hasRareFrame && (
-                <span className="text-[10px] font-heading font-bold tracking-widest uppercase px-2 py-0.5 rounded border text-fuchsia-300 bg-fuchsia-950/30 border-fuchsia-500/30">
-                  Moldura Rara
+              {hasProfileFrame && (
+                <span className={`text-[10px] font-heading font-bold tracking-widest uppercase px-2 py-0.5 rounded border ${
+                  frameTier === "epic"
+                    ? "text-amber-300 bg-amber-950/30 border-amber-500/30"
+                    : "text-fuchsia-300 bg-fuchsia-950/30 border-fuchsia-500/30"
+                }`}>
+                  {frameTier === "epic" ? "Moldura Épica" : "Moldura Rara"}
                 </span>
               )}
             </div>
@@ -115,7 +125,7 @@ export default async function PerfilPage({
             </h1>
             <p className="text-slate-400 mt-1">Gerencie suas credenciais e verifique seu status atual.</p>
           </div>
-          <div className={`flex flex-col items-end gap-4 ${hasRareFrame ? "relative" : ""} hidden md:flex`}>
+          <div className={`flex flex-col items-end gap-4 ${hasProfileFrame ? "relative" : ""} hidden md:flex`}>
             <TopNav />
           </div>
         </header>
