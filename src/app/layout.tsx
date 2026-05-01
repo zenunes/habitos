@@ -47,8 +47,7 @@ export default async function RootLayout({
       const progress = await getUserProgress();
       theme = getThemeByLevel(progress.level);
     }
-  } catch (error) {
-    // Falha silenciosa no layout para n quebrar o app
+  } catch {
   }
 
   return (

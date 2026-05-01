@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { checkinHabitAction } from "@/modules/habits/actions-checkin";
-import { CheckCircle2, CircleDashed, ShieldAlert, Zap, Swords, Skull } from "lucide-react";
+import { CircleDashed, ShieldAlert, Zap, Swords, Skull } from "lucide-react";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
 

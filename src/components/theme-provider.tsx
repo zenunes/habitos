@@ -25,9 +25,8 @@ export function ThemeProvider({
   };
 
   useEffect(() => {
-    // Garante que o tema inicial seja injetado no client-side
     document.documentElement.setAttribute("data-theme", theme);
-  }, []);
+  }, [theme]);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>

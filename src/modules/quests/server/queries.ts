@@ -1,6 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUser } from "@/modules/auth/server/session";
-import { logger } from "@/lib/logger";
 import { Quest } from "../domain/quest";
 import { getTodayDateStr } from "@/lib/date-utils";
 
@@ -10,7 +9,7 @@ export async function getActiveQuests(): Promise<Quest[]> {
   const todayStr = getTodayDateStr();
 
   // 1. Tenta buscar uma "user_quests" ativa (que tenha starts_at hoje)
-  const { data: userQuests, error: userQuestsError } = await supabase
+  const { data: userQuests } = await supabase
     .from("user_quests")
     .select(`
       status,

@@ -72,7 +72,7 @@ export function Heatmap({ data, days = 140 }: HeatmapProps) {
         className="grid grid-rows-7 gap-1 w-max"
         style={{ gridAutoFlow: "column" }}
       >
-        {grid.map((cell, index) => (
+        {grid.map((cell) => (
           <div
             key={cell.date}
             title={`${cell.date}: ${cell.count} quests`}

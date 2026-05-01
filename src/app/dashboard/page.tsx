@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { logoutAction } from "@/modules/auth/actions";
 import { requireUser } from "@/modules/auth/server/session";
 import { getUserProgress } from "@/modules/progression/server/queries";
 import { getLevelProgress } from "@/modules/progression/domain/progression";
@@ -11,7 +10,7 @@ import { CheckinButton } from "./checkin-button";
 import { BossButton } from "./boss-button";
 import { TopNav } from "@/components/layout/top-nav";
 import { getTodayDateStr, isWeekendInTimezone } from "@/lib/date-utils";
-import { ShoppingCart, Trophy, Target, Swords, Scroll, ShieldAlert, Zap, CheckCircle2, ChevronDown, Heart } from "lucide-react";
+import { ShoppingCart, Trophy, Target, Swords, Scroll, ShieldAlert, Zap, CheckCircle2, Heart } from "lucide-react";
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -19,7 +18,7 @@ export default async function DashboardPage() {
   const isWeekend = isWeekendInTimezone();
   
   // Avalia o dano por missões não concluídas (se houver) antes de buscar o progresso
-  await evaluateDailyHP();
+  const hpReport = await evaluateDailyHP();
 
   const [progress, quests, allHabits, todayLogs, weeklyCounts, profile] = await Promise.all([
     getUserProgress(),
@@ -94,6 +93,59 @@ export default async function DashboardPage() {
           <TopNav />
         </div>
       </header>
+
+      {hpReport && (
+        <section className="system-card p-4 md:p-5 border-red-500/30 bg-red-950/10">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-heading font-bold tracking-widest uppercase text-red-300">
+                Penalidade do Sistema
+              </p>
+              <p className="text-sm text-slate-300 font-body mt-1">
+                Vitalidade reduzida em <span className="text-red-300 font-bold">{hpReport.totalDamage} HP</span>.
+              </p>
+            </div>
+            <span className="text-[10px] font-heading font-bold tracking-widest uppercase px-2 py-1 rounded border border-red-500/30 bg-red-950/30 text-red-200">
+              HP Atual: {hpReport.newHp}/100
+            </span>
+          </div>
+
+          <ul className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+            <li className="rounded border border-slate-800 bg-slate-900/30 px-3 py-2 text-slate-300">
+              <span className="font-heading font-bold tracking-widest uppercase text-slate-400 text-[10px] block">
+                Ausência
+              </span>
+              <span>
+                {hpReport.absenceDays > 0 ? `${hpReport.absenceDays} dia(s) (−${hpReport.absenceDamage} HP)` : "0 dia (−0 HP)"}
+              </span>
+            </li>
+            <li className="rounded border border-slate-800 bg-slate-900/30 px-3 py-2 text-slate-300">
+              <span className="font-heading font-bold tracking-widest uppercase text-slate-400 text-[10px] block">
+                Ontem
+              </span>
+              <span>
+                {hpReport.dailyMissedCount > 0 ? `${hpReport.dailyMissedCount} quest(s) (−${hpReport.dailyMissedDamage} HP)` : "0 quest (−0 HP)"}
+              </span>
+            </li>
+            <li className="rounded border border-slate-800 bg-slate-900/30 px-3 py-2 text-slate-300">
+              <span className="font-heading font-bold tracking-widest uppercase text-slate-400 text-[10px] block">
+                Semana
+              </span>
+              <span>
+                {hpReport.weeklyMissingTotal > 0
+                  ? `Faltaram ${hpReport.weeklyMissingTotal} (−${hpReport.weeklyMissingDamage} HP)`
+                  : "Meta batida (−0 HP)"}
+              </span>
+            </li>
+          </ul>
+
+          {hpReport.weeklyWeekStart && hpReport.weeklyWeekEnd && (
+            <p className="mt-3 text-[10px] text-slate-500 font-heading tracking-widest uppercase">
+              Semana analisada: {hpReport.weeklyWeekStart} → {hpReport.weeklyWeekEnd}
+            </p>
+          )}
+        </section>
+      )}
 
       {/* PAINEL DE STATUS */}
       <section className="system-card p-4 md:p-6 relative overflow-hidden">
@@ -216,13 +268,20 @@ export default async function DashboardPage() {
               </div>
             </div>
             {weeklyTargetTotal > 0 && (
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded border border-indigo-500/25 bg-indigo-950/10 text-[10px] font-heading font-bold tracking-widest uppercase text-indigo-200">
-                <span>Semana:</span>
-                <span className="text-indigo-300">{weeklyDoneTotal}/{weeklyTargetTotal}</span>
-                <span className="text-slate-400">•</span>
-                <span className="text-slate-300">Faltam</span>
-                <span className="text-indigo-200">{weeklyRemainingTotal}</span>
-              </div>
+              <>
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded border border-indigo-500/25 bg-indigo-950/10 text-[10px] font-heading font-bold tracking-widest uppercase text-indigo-200">
+                  <span>Semana:</span>
+                  <span className="text-indigo-300">{weeklyDoneTotal}/{weeklyTargetTotal}</span>
+                  <span className="text-slate-400">•</span>
+                  <span className="text-slate-300">Faltam</span>
+                  <span className="text-indigo-200">{weeklyRemainingTotal}</span>
+                </div>
+                <div className="flex sm:hidden items-center gap-2 px-3 py-1.5 rounded border border-indigo-500/25 bg-indigo-950/10 text-[10px] font-heading font-bold tracking-widest uppercase text-indigo-200">
+                  <span>{weeklyDoneTotal}/{weeklyTargetTotal}</span>
+                  <span className="text-slate-400">•</span>
+                  <span className="text-indigo-200">Faltam {weeklyRemainingTotal}</span>
+                </div>
+              </>
             )}
             <Link href="/habitos" className="text-xs font-heading font-bold tracking-widest uppercase text-theme-light hover:text-white transition-colors bg-slate-900/30 px-3 py-1.5 rounded border border-theme-base/50 hover:bg-theme-base/20">
               Gerenciar
