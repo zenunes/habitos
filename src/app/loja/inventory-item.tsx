@@ -10,20 +10,18 @@ export function InventoryItem({ item }: { item: RedeemedItem }) {
   const [isPending, startTransition] = useTransition();
 
   const handleConsume = () => {
-    if (window.confirm(`Deseja utilizar o item "${item.title}" agora?`)) {
-      startTransition(async () => {
-        const result = await consumeRewardAction(item.id);
-        if (result.error) {
-          toast.error(result.error, {
-            style: { borderColor: "#ef4444", color: "#f87171" }
-          });
-        } else {
-          toast.success(result.message, {
-            style: { borderColor: "#10b981", color: "#34d399", background: "rgba(16, 185, 129, 0.1)" }
-          });
-        }
-      });
-    }
+    startTransition(async () => {
+      const result = await consumeRewardAction(item.id);
+      if (result.error) {
+        toast.error(result.error, {
+          style: { borderColor: "#ef4444", color: "#f87171" }
+        });
+      } else {
+        toast.success(result.message, {
+          style: { borderColor: "#10b981", color: "#34d399", background: "rgba(16, 185, 129, 0.1)" }
+        });
+      }
+    });
   };
 
   const isConsumed = !!item.consumedAt;
@@ -52,7 +50,8 @@ export function InventoryItem({ item }: { item: RedeemedItem }) {
           <button
             onClick={handleConsume}
             disabled={isPending}
-            className="flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-heading font-bold tracking-widest uppercase transition-all bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 hover:shadow-[0_0_10px_rgba(16,185,129,0.3)] disabled:opacity-50"
+            type="button"
+            className="flex items-center justify-center gap-1.5 rounded px-4 py-2.5 min-h-[44px] text-xs font-heading font-bold tracking-widest uppercase transition-all bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 hover:shadow-[0_0_10px_rgba(16,185,129,0.3)] disabled:opacity-50 w-full sm:w-auto"
           >
             <Play size={14} /> {isPending ? "Processando..." : "Utilizar"}
           </button>

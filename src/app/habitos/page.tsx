@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { requireUser } from "@/modules/auth/server/session";
 import { getActiveHabits } from "@/modules/habits/server/queries";
 import { HabitsListManager } from "./habits-list-manager";

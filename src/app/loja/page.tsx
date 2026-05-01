@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { requireUser } from "@/modules/auth/server/session";
 import { getUserRewards, getUserRedeemedRewards } from "@/modules/rewards/server/queries";
 import { getUserProgress } from "@/modules/progression/server/queries";
@@ -17,7 +16,7 @@ export default async function LojaPage() {
   ]);
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-10 relative z-10">
+    <main className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-10 relative z-10 pb-24 md:pb-10">
       <header className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-slate-800 pb-6">
         <div>
           <div className="inline-flex items-center gap-2 mb-2">

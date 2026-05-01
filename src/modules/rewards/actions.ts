@@ -59,6 +59,9 @@ export async function redeemRewardAction(
   const progress = await getUserProgress();
 
   if (rewardId === "frame_test") {
+    if (process.env.NEXT_PUBLIC_ENABLE_TEST_ITEMS !== "true") {
+      return { error: "Item indisponível." };
+    }
     const { data: currentProfile, error: profileError } = await supabase
       .from("profiles")
       .select("profile_frame")

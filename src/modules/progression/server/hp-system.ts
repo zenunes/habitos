@@ -25,7 +25,18 @@ function getWeekStart(dateStr: string) {
  * 
  * Penalidade: -10 HP por missão ativa não concluída no dia anterior.
  */
-export async function evaluateDailyHP() {
+export async function evaluateDailyHP(): Promise<null | {
+  totalDamage: number;
+  absenceDays: number;
+  absenceDamage: number;
+  dailyMissedCount: number;
+  dailyMissedDamage: number;
+  weeklyMissingTotal: number;
+  weeklyMissingDamage: number;
+  weeklyWeekStart: string | null;
+  weeklyWeekEnd: string | null;
+  newHp: number;
+}> {
   const user = await requireUser();
   const supabase = await createSupabaseServerClient();
   const todayStr = getTodayDateStr();
@@ -36,13 +47,13 @@ export async function evaluateDailyHP() {
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!progress) return; // Nada a fazer se não há progresso ainda
+  if (!progress) return null;
 
   const currentHp = progress.hp_current ?? 100;
   const lastCalcDate = progress.last_hp_calc_date;
 
   // Se já calculou o HP de hoje, retorna
-  if (lastCalcDate === todayStr) return;
+  if (lastCalcDate === todayStr) return null;
 
   // Se nunca calculou, apenas marca como hoje (dia 1 do usuário)
   if (!lastCalcDate) {
@@ -50,7 +61,7 @@ export async function evaluateDailyHP() {
       .from("user_progress")
       .update({ last_hp_calc_date: todayStr })
       .eq("user_id", user.id);
-    return;
+    return null;
   }
 
   // Calcula a diferença de dias
@@ -60,17 +71,23 @@ export async function evaluateDailyHP() {
   const utcLast = Date.UTC(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate());
   const diffDays = Math.floor((utcToday - utcLast) / (1000 * 60 * 60 * 24));
 
-  if (diffDays <= 0) return;
+  if (diffDays <= 0) return null;
 
   // Se chegou aqui, passou 1 dia ou mais desde o último cálculo.
   // Vamos simplificar: Para cada dia perdido, verificamos as missões ativas e tiramos 10 HP por cada uma.
   // (Para não ficar muito pesado, se passou mais de 1 dia, tiramos um valor fixo de punição máxima, ex: 50 HP por dia inteiro perdido)
   
   let hpDamage = 0;
+  const absenceDays = diffDays > 1 ? diffDays - 1 : 0;
+  const absenceDamage = absenceDays * 30;
+  let dailyMissedCount = 0;
+  let weeklyMissingTotal = 0;
+  let weeklyWeekStart: string | null = null;
+  let weeklyWeekEnd: string | null = null;
   
   if (diffDays > 1) {
     // Ficou dias sem logar
-    hpDamage = (diffDays - 1) * 30; // -30 HP por dia completamente ausente
+    hpDamage = absenceDamage;
   }
 
   // Avalia especificamente as missões perdidas ONTEM
@@ -104,12 +121,15 @@ export async function evaluateDailyHP() {
     });
 
     hpDamage += uncompletedCount * 10; // -10 HP por missão de ontem não feita
+    dailyMissedCount = uncompletedCount;
   }
 
   const weekStart = getWeekStart(todayStr);
   if (lastCalcDate < weekStart) {
     const lastWeekStart = addDays(weekStart, -7);
     const lastWeekEnd = addDays(weekStart, -1);
+    weeklyWeekStart = lastWeekStart;
+    weeklyWeekEnd = lastWeekEnd;
 
     const [{ data: weeklyHabits }, { data: weeklyLogs }] = await Promise.all([
       supabase
@@ -132,7 +152,6 @@ export async function evaluateDailyHP() {
       weeklyCountMap[row.habit_id] = (weeklyCountMap[row.habit_id] || 0) + 1;
     }
 
-    let weeklyMissingTotal = 0;
     for (const habit of weeklyHabits || []) {
       const target = typeof habit.target_per_week === "number" ? habit.target_per_week : null;
       if (!target || target <= 0) continue;
@@ -172,11 +191,26 @@ export async function evaluateDailyHP() {
       .eq("user_id", user.id);
       
     logger.info("HP calculated and damage applied", { userId: user.id, damage: hpDamage, newHp });
+
+    return {
+      totalDamage: hpDamage,
+      absenceDays,
+      absenceDamage,
+      dailyMissedCount,
+      dailyMissedDamage: dailyMissedCount * 10,
+      weeklyMissingTotal,
+      weeklyMissingDamage: weeklyMissingTotal * 10,
+      weeklyWeekStart,
+      weeklyWeekEnd,
+      newHp,
+    };
   } else {
     // Não sofreu dano, apenas atualiza a data
     await supabase
       .from("user_progress")
       .update({ last_hp_calc_date: todayStr })
       .eq("user_id", user.id);
+
+    return null;
   }
 }
