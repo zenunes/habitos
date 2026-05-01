@@ -42,6 +42,14 @@ export default async function DashboardPage() {
     return true;
   });
   const weeklyCountMap = new Map(weeklyCounts.map((r) => [r.habitId, r.count]));
+  const weeklyHabits = activeHabits.filter((h) => h.frequency === "weekly" && (h.targetPerWeek ?? 0) > 0);
+  const weeklyTargetTotal = weeklyHabits.reduce((acc, h) => acc + (h.targetPerWeek ?? 0), 0);
+  const weeklyDoneTotal = weeklyHabits.reduce((acc, h) => {
+    const target = h.targetPerWeek ?? 0;
+    const count = weeklyCountMap.get(h.id) ?? 0;
+    return acc + Math.min(target, count);
+  }, 0);
+  const weeklyRemainingTotal = Math.max(0, weeklyTargetTotal - weeklyDoneTotal);
   const weeklyCompletedHabits = activeHabits.filter((h) => {
     if (h.frequency !== "weekly") return false;
     if (completedHabitIds.has(h.id)) return false;
@@ -207,6 +215,15 @@ export default async function DashboardPage() {
                 <p className="text-xs text-theme-base/70 font-heading tracking-widest uppercase">Renovação Diária</p>
               </div>
             </div>
+            {weeklyTargetTotal > 0 && (
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded border border-indigo-500/25 bg-indigo-950/10 text-[10px] font-heading font-bold tracking-widest uppercase text-indigo-200">
+                <span>Semana:</span>
+                <span className="text-indigo-300">{weeklyDoneTotal}/{weeklyTargetTotal}</span>
+                <span className="text-slate-400">•</span>
+                <span className="text-slate-300">Faltam</span>
+                <span className="text-indigo-200">{weeklyRemainingTotal}</span>
+              </div>
+            )}
             <Link href="/habitos" className="text-xs font-heading font-bold tracking-widest uppercase text-theme-light hover:text-white transition-colors bg-slate-900/30 px-3 py-1.5 rounded border border-theme-base/50 hover:bg-theme-base/20">
               Gerenciar
             </Link>
@@ -291,6 +308,29 @@ export default async function DashboardPage() {
                                 {isEnemy ? <><Heart size={10} /> -10 HP</> : <><Zap size={10} /> +10 XP | +5 🪙</>}
                               </span>
                             </div>
+
+                            {habit.frequency === "weekly" && (
+                              <div className="mt-3">
+                                <div className="flex items-center justify-between text-[10px] font-heading tracking-widest uppercase text-slate-400">
+                                  <span>Semana: {(weeklyCountMap.get(habit.id) ?? 0)}/{habit.targetPerWeek ?? 0}</span>
+                                  <span className="text-indigo-300">
+                                    Faltam {Math.max(0, (habit.targetPerWeek ?? 0) - (weeklyCountMap.get(habit.id) ?? 0))}
+                                  </span>
+                                </div>
+                                <div className="mt-1 flex gap-1">
+                                  {Array.from({ length: habit.targetPerWeek ?? 0 }, (_, i) => i).map((i) => (
+                                    <span
+                                      key={i}
+                                      className={`h-1.5 flex-1 rounded ${
+                                        i < (weeklyCountMap.get(habit.id) ?? 0)
+                                          ? "bg-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.35)]"
+                                          : "bg-slate-800 border border-slate-700"
+                                      }`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                         <CheckinButton habitId={habit.id} todayDateRef={todayStr} isEnemy={isEnemy} />
@@ -351,6 +391,23 @@ export default async function DashboardPage() {
                                   Meta batida na semana
                                 </span>
                               </div>
+
+                              {target > 0 && (
+                                <div className="mt-3">
+                                  <div className="mt-1 flex gap-1">
+                                    {Array.from({ length: target }, (_, i) => i).map((i) => (
+                                      <span
+                                        key={i}
+                                        className={`h-1.5 flex-1 rounded ${
+                                          i < count
+                                            ? "bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.25)]"
+                                            : "bg-slate-800 border border-slate-700"
+                                        }`}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </li>
