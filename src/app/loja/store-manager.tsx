@@ -8,6 +8,7 @@ import { Plus, X, ShoppingCart } from "lucide-react";
 
 export function StoreManager({ initialRewards, availablePoints }: { initialRewards: Reward[], availablePoints: number }) {
   const [isCreating, setIsCreating] = useState(false);
+  const enableTestItems = process.env.NEXT_PUBLIC_ENABLE_TEST_ITEMS === "true";
 
   const getMeta = (reward: Reward): { categoryLabel?: string; description?: string; noteLabel?: string } => {
     const title = reward.title.toLowerCase();
@@ -90,7 +91,7 @@ export function StoreManager({ initialRewards, availablePoints }: { initialRewar
     available: true,
   };
 
-  const allRewards = [testFrameReward, potionReward, ...initialRewards];
+  const allRewards = (enableTestItems ? [testFrameReward] : []).concat([potionReward, ...initialRewards]);
   const grouped = allRewards.reduce<Record<string, Reward[]>>((acc, r) => {
     const meta = getMeta(r);
     const key = r.id === "potion" ? "Consumível" : meta.categoryLabel ?? "Recompensa";
