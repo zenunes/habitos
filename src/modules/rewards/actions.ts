@@ -200,16 +200,82 @@ export async function consumeRewardAction(redemptionId: string): Promise<{ error
   const user = await requireUser();
   const supabase = await createSupabaseServerClient();
 
-  const { error } = await supabase
+  const consumedAt = new Date().toISOString();
+  const { data: redemption, error } = await supabase
     .from("reward_redemptions")
-    .update({ consumed_at: new Date().toISOString() })
+    .update({ consumed_at: consumedAt })
     .eq("id", redemptionId)
     .eq("user_id", user.id)
-    .is("consumed_at", null); // Garante que não será consumido duas vezes
+    .is("consumed_at", null)
+    .select(`
+      id,
+      rewards (
+        title
+      )
+    `)
+    .maybeSingle();
 
-  if (error) {
+  if (error || !redemption) {
     logger.error("Erro ao consumir recompensa", error, { userId: user.id, redemptionId });
     return { error: "Falha ao utilizar o item." };
+  }
+
+  const r = redemption as unknown as { id: string; rewards: { title: string } | null };
+  const title = r.rewards?.title ?? "";
+  const normalizedTitle = title.toLowerCase();
+  const healMatch = title.match(/(\d+)\s*hp/i);
+  const healAmount = healMatch && (normalizedTitle.includes("cura") || normalizedTitle.includes("primeiros socorros"))
+    ? Number(healMatch[1] ?? 0)
+    : 0;
+
+  if (healAmount > 0) {
+    const { data: progressRow, error: progressError } = await supabase
+      .from("user_progress")
+      .select("hp_current")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (progressError || !progressRow) {
+      await supabase
+        .from("reward_redemptions")
+        .update({ consumed_at: null })
+        .eq("id", redemptionId)
+        .eq("user_id", user.id)
+        .eq("consumed_at", consumedAt);
+      return { error: "Falha ao aplicar o efeito do item." };
+    }
+
+    const currentHp = typeof progressRow.hp_current === "number" ? progressRow.hp_current : 100;
+    if (currentHp >= 100) {
+      await supabase
+        .from("reward_redemptions")
+        .update({ consumed_at: null })
+        .eq("id", redemptionId)
+        .eq("user_id", user.id)
+        .eq("consumed_at", consumedAt);
+      return { error: "Seu HP já está no máximo." };
+    }
+
+    const newHp = Math.min(100, currentHp + healAmount);
+    const { error: hpError } = await supabase
+      .from("user_progress")
+      .update({ hp_current: newHp })
+      .eq("user_id", user.id);
+
+    if (hpError) {
+      await supabase
+        .from("reward_redemptions")
+        .update({ consumed_at: null })
+        .eq("id", redemptionId)
+        .eq("user_id", user.id)
+        .eq("consumed_at", consumedAt);
+      return { error: "Falha ao aplicar o efeito do item." };
+    }
+
+    revalidatePath("/dashboard");
+    revalidatePath("/perfil");
+    revalidatePath("/loja");
+    return { message: `${title} consumido! +${newHp - currentHp} HP` };
   }
 
   revalidatePath("/loja");
