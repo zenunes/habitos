@@ -85,18 +85,18 @@ export async function redeemRewardAction(
     return { message: "Moldura de teste aplicada no perfil!", isProfileFrame: true };
   }
 
-  if (progress.coins < pointsCost) {
-    return { error: "Ouro insuficiente para comprar esta recompensa." };
-  }
-
   // Verifica se é a Poção de Cura pelo ID especial "potion"
   if (rewardId === "potion") {
+    const potionCost = 50;
+    if (progress.coins < potionCost) {
+      return { error: "Ouro insuficiente para comprar esta recompensa." };
+    }
     if (progress.hpCurrent >= 100) {
       return { error: "Seu HP já está no máximo." };
     }
 
     const newHp = Math.min(100, progress.hpCurrent + 30); // Poção cura 30 HP
-    const newCoins = progress.coins - pointsCost;
+    const newCoins = progress.coins - potionCost;
 
     // 1. Atualiza HP e Ouro do usuário
     const { error: hpError } = await supabase
@@ -124,9 +124,14 @@ export async function redeemRewardAction(
 
   const rewardTitle = rewardRow.title;
   const normalizedTitle = rewardTitle.toLowerCase();
+  const actualCost = typeof rewardRow.points_cost === "number" ? rewardRow.points_cost : pointsCost;
+
+  if (progress.coins < actualCost) {
+    return { error: "Ouro insuficiente para comprar esta recompensa." };
+  }
 
   // Comprando item normal da loja
-  const newCoins = progress.coins - pointsCost;
+  const newCoins = progress.coins - actualCost;
   
   // Atualiza ouro do usuário
   const { error: coinsError } = await supabase
@@ -137,7 +142,7 @@ export async function redeemRewardAction(
   if (coinsError) return { error: "Erro ao descontar ouro." };
 
   if (normalizedTitle.includes("moldura do perfil")) {
-    const tier = pointsCost >= 300 ? "epic" : "rare";
+    const tier = actualCost >= 300 ? "epic" : "rare";
     const { data: currentProfile, error: profileError } = await supabase
       .from("profiles")
       .select("profile_frame")
@@ -160,7 +165,7 @@ export async function redeemRewardAction(
   const { error } = await supabase.from("reward_redemptions").insert({
     user_id: user.id,
     reward_id: rewardId,
-    points_cost: pointsCost,
+    points_cost: actualCost,
   });
 
   if (error) {

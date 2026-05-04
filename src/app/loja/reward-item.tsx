@@ -22,9 +22,9 @@ export function RewardItem({
   const canAfford = availablePoints >= reward.pointsCost;
 
   const handleRedeem = () => {
-    if (window.confirm(`Deseja comprar "${reward.title}" por ${reward.pointsCost} de Ouro?`)) {
+    if (window.confirm(`Deseja comprar "${reward.title}"?`)) {
       startTransition(async () => {
-        const result = await redeemRewardAction(reward.id, reward.pointsCost);
+        const result = await redeemRewardAction(reward.id, 0);
         if (result.error) {
           toast.error(result.error, {
             style: { borderColor: "#ef4444", color: "#f87171" }
