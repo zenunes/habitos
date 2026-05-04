@@ -65,12 +65,14 @@ export async function completeBossQuestAction(questId: string): Promise<{ messag
 
   const newXp = currentXp + xpReward;
   const newCoins = currentCoins + coinsReward;
+  const newLevel = calculateLevel(newXp);
 
   const { error: progressError } = await supabase
     .from("user_progress")
     .update({
       xp_total: newXp,
-      coins: newCoins
+      coins: newCoins,
+      level: newLevel,
     })
     .eq("user_id", user.id);
 
@@ -81,7 +83,6 @@ export async function completeBossQuestAction(questId: string): Promise<{ messag
   // 5. Avalia badges e classes
   const unlockedTitles = await evaluateBadges(user.id, newXp, currentStreak);
   const oldLevel = calculateLevel(currentXp);
-  const newLevel = calculateLevel(newXp);
   const leveledUp = newLevel > oldLevel;
   const oldClass = getHunterClass(oldLevel);
   const newClass = getHunterClass(newLevel);

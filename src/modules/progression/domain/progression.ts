@@ -34,9 +34,14 @@ export function getXpRequiredForLevel(level: number): number {
  */
 export function calculateLevel(xpTotal: number): number {
   if (xpTotal <= 0) return 1;
-  // A inversa de XP = L^1.5 * 100 é L = (XP / 100)^(1/1.5)
-  const exactLevel = Math.pow(xpTotal / 100, 1 / 1.5);
-  return Math.max(1, Math.floor(exactLevel));
+
+  const approx = Math.max(1, Math.floor(Math.pow(xpTotal / 100, 1 / 1.5)));
+  let level = approx;
+
+  while (getXpRequiredForLevel(level + 1) <= xpTotal) level += 1;
+  while (getXpRequiredForLevel(level) > xpTotal) level = Math.max(1, level - 1);
+
+  return level;
 }
 
 /**

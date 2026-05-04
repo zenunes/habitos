@@ -140,9 +140,13 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
     }
   }
 
+  const oldLevel = calculateLevel(currentXp);
+  const newLevel = calculateLevel(newXp);
+
   const progressPayload = {
     user_id: user.id,
     xp_total: newXp,
+    level: newLevel,
     coins: newCoins,
     current_streak: newStreak,
     best_streak: Math.max(newStreak, bestStreak),
@@ -167,8 +171,6 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
   // 6. Avaliar Conquistas / Títulos Desbloqueados
   const unlockedTitles = await evaluateBadges(user.id, newXp, newStreak);
 
-  const oldLevel = calculateLevel(currentXp);
-  const newLevel = calculateLevel(newXp);
   const leveledUp = newLevel > oldLevel;
   
   const oldClass = getHunterClass(oldLevel);

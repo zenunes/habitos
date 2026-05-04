@@ -48,7 +48,15 @@ export async function getUserProgress(): Promise<UserProgress> {
   }
 
   const xpTotal = progressData.xp_total;
-  const currentLevel = progressData.level || calculateLevel(xpTotal);
+  const calculatedLevel = calculateLevel(xpTotal);
+  const currentLevel = calculatedLevel;
+
+  if (progressData.level !== calculatedLevel) {
+    await supabase
+      .from("user_progress")
+      .update({ level: calculatedLevel })
+      .eq("user_id", user.id);
+  }
   
   return {
     xpTotal,
