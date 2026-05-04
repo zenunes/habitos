@@ -2,6 +2,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUser } from "@/modules/auth/server/session";
 import { logger } from "@/lib/logger";
 import { Habit } from "../domain/habit";
+import { addDaysToDateStr, getTodayDateStr, getWeekRangeDateStr } from "@/lib/date-utils";
 
 export async function getActiveHabits(): Promise<Habit[]> {
   const user = await requireUser();
@@ -56,9 +57,8 @@ export async function getHabitLogsSummary(days: number = 120): Promise<HabitLogS
   const supabase = await createSupabaseServerClient();
 
   // Calcula a data limite (há X dias atrás)
-  const limitDate = new Date();
-  limitDate.setDate(limitDate.getDate() - days);
-  const limitDateStr = limitDate.toISOString().split("T")[0];
+  const todayStr = getTodayDateStr();
+  const limitDateStr = addDaysToDateStr(todayStr, -days);
 
   const { data, error } = await supabase
     .from("habit_logs")
@@ -130,17 +130,7 @@ export type HabitWeeklyCount = {
 };
 
 function getWeekRange(dateStr: string) {
-  const base = new Date(`${dateStr}T12:00:00Z`);
-  const day = base.getUTCDay();
-  const diffToMonday = (day + 6) % 7;
-  const start = new Date(base);
-  start.setUTCDate(base.getUTCDate() - diffToMonday);
-  const end = new Date(start);
-  end.setUTCDate(start.getUTCDate() + 6);
-  return {
-    start: start.toISOString().slice(0, 10),
-    end: end.toISOString().slice(0, 10),
-  };
+  return getWeekRangeDateStr(dateStr);
 }
 
 export async function getWeeklyHabitCounts(dateRef: string): Promise<HabitWeeklyCount[]> {

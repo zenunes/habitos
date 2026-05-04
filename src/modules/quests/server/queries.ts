@@ -1,12 +1,13 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUser } from "@/modules/auth/server/session";
 import { Quest } from "../domain/quest";
-import { getTodayDateStr } from "@/lib/date-utils";
+import { getTodayDateStr, getUtcRangeForDateStr } from "@/lib/date-utils";
 
 export async function getActiveQuests(): Promise<Quest[]> {
   const user = await requireUser();
   const supabase = await createSupabaseServerClient();
   const todayStr = getTodayDateStr();
+  const { start, end } = getUtcRangeForDateStr(todayStr);
 
   // 1. Tenta buscar uma "user_quests" ativa (que tenha starts_at hoje)
   const { data: userQuests } = await supabase
@@ -20,8 +21,8 @@ export async function getActiveQuests(): Promise<Quest[]> {
       )
     `)
     .eq("user_id", user.id)
-    .gte("starts_at", `${todayStr}T00:00:00Z`)
-    .lte("starts_at", `${todayStr}T23:59:59Z`)
+    .gte("starts_at", start)
+    .lte("starts_at", end)
     .order("starts_at", { ascending: false })
     .limit(1);
 
