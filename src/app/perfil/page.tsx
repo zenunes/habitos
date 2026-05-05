@@ -120,8 +120,9 @@ export default async function PerfilPage({
                 </span>
               )}
             </div>
-            <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] flex items-center gap-3">
-              <UserIcon size={32} className="text-sky-500" /> Perfil do Caçador
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] flex items-center gap-3 flex-wrap">
+              <UserIcon size={32} className="text-sky-500 shrink-0" />
+              <span className="min-w-0 break-words">Perfil do Caçador</span>
             </h1>
             <p className="text-slate-400 mt-1">Gerencie suas credenciais e verifique seu status atual.</p>
           </div>
@@ -182,7 +183,7 @@ export default async function PerfilPage({
       </section>
 
       <section className="system-card p-6 border-sky-900/30">
-        <div className="flex items-center justify-between gap-3 mb-5">
+        <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
           <div className="flex items-center gap-3">
             <TrendingUp size={22} className="text-theme-light" />
             <div>
@@ -199,7 +200,7 @@ export default async function PerfilPage({
             >
               <ChevronLeft size={18} />
             </Link>
-            <div className="px-3 py-2 rounded-lg border border-slate-800 bg-slate-900/40 text-xs font-heading tracking-widest uppercase text-slate-300 min-w-[140px] text-center">
+            <div className="px-3 py-2 rounded-lg border border-slate-800 bg-slate-900/40 text-xs font-heading tracking-widest uppercase text-slate-300 min-w-[120px] max-w-[180px] text-center truncate">
               {monthLabel}
             </div>
             <Link
