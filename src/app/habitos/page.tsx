@@ -9,7 +9,7 @@ export default async function HabitosPage() {
   const habits = await getActiveHabits();
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-10 relative z-10">
+    <main className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-10 relative z-10 pb-24 md:pb-10">
       <header className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-slate-800 pb-6">
         <div>
           <div className="inline-flex items-center gap-2 mb-2">
