@@ -1,13 +1,12 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUser } from "@/modules/auth/server/session";
 import { Quest } from "../domain/quest";
-import { getTodayDateStr, getUtcRangeForDateStr } from "@/lib/date-utils";
+import { getTodayDateStr } from "@/lib/date-utils";
 
 export async function getActiveQuests(): Promise<Quest[]> {
   const user = await requireUser();
   const supabase = await createSupabaseServerClient();
   const todayStr = getTodayDateStr();
-  const { start, end } = getUtcRangeForDateStr(todayStr);
 
   // 1. Tenta buscar uma "user_quests" ativa (que tenha starts_at hoje)
   const { data: userQuests } = await supabase
@@ -21,8 +20,7 @@ export async function getActiveQuests(): Promise<Quest[]> {
       )
     `)
     .eq("user_id", user.id)
-    .gte("starts_at", start)
-    .lte("starts_at", end)
+    .eq("date_ref", todayStr)
     .order("starts_at", { ascending: false })
     .limit(1);
 
@@ -47,7 +45,8 @@ export async function getActiveQuests(): Promise<Quest[]> {
           quest_id: randomBoss.id,
           status: "in_progress",
           progress: {},
-          starts_at: new Date().toISOString()
+          starts_at: new Date().toISOString(),
+          date_ref: todayStr,
         })
         .select(`
           status,
@@ -61,6 +60,23 @@ export async function getActiveQuests(): Promise<Quest[]> {
 
       if (!insertError && newAssignedBoss) {
         dailyBossQuest = newAssignedBoss;
+      } else if (insertError) {
+        const { data: fallbackUserQuests } = await supabase
+          .from("user_quests")
+          .select(`
+            status,
+            quest_id,
+            starts_at,
+            quests (
+              id, title, rule, xp_reward, code
+            )
+          `)
+          .eq("user_id", user.id)
+          .eq("date_ref", todayStr)
+          .order("starts_at", { ascending: false })
+          .limit(1);
+
+        dailyBossQuest = fallbackUserQuests && fallbackUserQuests.length > 0 ? fallbackUserQuests[0] : null;
       }
     }
   }
