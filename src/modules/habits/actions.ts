@@ -10,7 +10,10 @@ const habitSchema = z.object({
   title: z.string().min(2, "O titulo precisa ter pelo menos 2 caracteres.").max(50, "O titulo esta muito longo."),
   description: z.string().max(200, "A descricao esta muito longa.").optional().or(z.literal("")),
   frequency: z.enum(["daily", "weekdays", "weekly", "custom", "once", "negative"]).default("daily"),
-  targetPerWeek: z.coerce.number().int().min(1).max(7).optional(),
+  targetPerWeek: z.preprocess(
+    (value) => (value === null || value === undefined || value === "" ? undefined : value),
+    z.coerce.number().int().min(1).max(7).optional(),
+  ),
 });
 
 export type HabitActionState = {
