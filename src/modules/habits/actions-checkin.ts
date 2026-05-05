@@ -6,6 +6,7 @@ import { logger } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
 import { evaluateBadges } from "@/modules/progression/server/badges";
 import { calculateLevel, getHunterClass } from "@/modules/progression/domain/progression";
+import { getWeekRangeDateStr } from "@/lib/date-utils";
 
 const XP_PER_CHECKIN = 10;
 const COINS_PER_CHECKIN = 5;
@@ -31,15 +32,7 @@ export async function checkinHabitAction(habitId: string, dataRef: string): Prom
   const isWeekly = habitData.frequency === "weekly";
 
   if (isWeekly) {
-    const base = new Date(`${dataRef}T12:00:00Z`);
-    const day = base.getUTCDay();
-    const diffToMonday = (day + 6) % 7;
-    const start = new Date(base);
-    start.setUTCDate(base.getUTCDate() - diffToMonday);
-    const end = new Date(start);
-    end.setUTCDate(start.getUTCDate() + 6);
-    const startStr = start.toISOString().slice(0, 10);
-    const endStr = end.toISOString().slice(0, 10);
+    const { start: startStr, end: endStr } = getWeekRangeDateStr(dataRef);
     const target = typeof habitData.target_per_week === "number" ? habitData.target_per_week : 0;
 
     if (target > 0) {

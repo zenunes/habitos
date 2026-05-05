@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { HabitLogSummary } from "@/modules/habits/server/queries";
-import { getTodayDateStr } from "@/lib/date-utils";
+import { formatDateStrInTimezone, getTodayDateStr, getWeekdayIndexInTimezone } from "@/lib/date-utils";
 
 type HeatmapProps = {
   data: HabitLogSummary[];
@@ -22,7 +22,7 @@ export function Heatmap({ data, days = 140 }: HeatmapProps) {
 
     // Data de hoje (final do grid)
     const todayStr = getTodayDateStr();
-    const today = new Date(`${todayStr}T12:00:00Z`); // Usa meio-dia pra evitar virada de fuso
+    const today = new Date(`${todayStr}T12:00:00-03:00`);
 
     
     // Data de início
@@ -30,7 +30,7 @@ export function Heatmap({ data, days = 140 }: HeatmapProps) {
     startDate.setDate(startDate.getDate() - days + 1);
 
     // Ajustar para começar no domingo daquela semana
-    const startDayOfWeek = startDate.getDay();
+    const startDayOfWeek = getWeekdayIndexInTimezone(startDate);
     startDate.setDate(startDate.getDate() - startDayOfWeek);
 
     const gridDates = [];
@@ -39,7 +39,7 @@ export function Heatmap({ data, days = 140 }: HeatmapProps) {
     while (current <= today || current.getDay() !== 0) { // Vai até preencher a última semana (sábado)
       if (current > today && current.getDay() === 0) break;
 
-      const dateStr = current.toISOString().split("T")[0];
+      const dateStr = formatDateStrInTimezone(current);
       const count = countsByDate.get(dateStr) || 0;
       
       gridDates.push({

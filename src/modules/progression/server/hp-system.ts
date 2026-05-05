@@ -1,22 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireUser } from "@/modules/auth/server/session";
 import { logger } from "@/lib/logger";
-import { getTodayDateStr } from "@/lib/date-utils";
-
-function addDays(dateStr: string, deltaDays: number) {
-  const base = new Date(`${dateStr}T12:00:00Z`);
-  base.setUTCDate(base.getUTCDate() + deltaDays);
-  return base.toISOString().slice(0, 10);
-}
-
-function getWeekStart(dateStr: string) {
-  const base = new Date(`${dateStr}T12:00:00Z`);
-  const day = base.getUTCDay();
-  const diffToMonday = (day + 6) % 7;
-  const start = new Date(base);
-  start.setUTCDate(base.getUTCDate() - diffToMonday);
-  return start.toISOString().slice(0, 10);
-}
+import { addDaysToDateStr, getTodayDateStr, getWeekStartDateStr, getWeekdayIndexInTimezone } from "@/lib/date-utils";
 
 /**
  * Calcula se o usuário perdeu HP desde o último login.
@@ -91,8 +76,8 @@ export async function evaluateDailyHP(): Promise<null | {
   }
 
   // Avalia especificamente as missões perdidas ONTEM
-  const yesterdayStr = addDays(todayStr, -1);
-  const yesterdayDate = new Date(`${yesterdayStr}T12:00:00Z`);
+  const yesterdayStr = addDaysToDateStr(todayStr, -1);
+  const yesterdayDate = new Date(`${yesterdayStr}T12:00:00-03:00`);
 
   // Busca hábitos ativos e logs de ontem
   const [{ data: habits }, { data: logs }] = await Promise.all([
@@ -107,7 +92,10 @@ export async function evaluateDailyHP(): Promise<null | {
 
   if (habits) {
     const completedIds = new Set(logs?.map(l => l.habit_id) || []);
-    const isYesterdayWeekend = yesterdayDate.getUTCDay() === 0 || yesterdayDate.getUTCDay() === 6;
+    const isYesterdayWeekend = (() => {
+      const d = getWeekdayIndexInTimezone(yesterdayDate);
+      return d === 0 || d === 6;
+    })();
 
     let uncompletedCount = 0;
     habits.forEach(h => {
@@ -124,10 +112,10 @@ export async function evaluateDailyHP(): Promise<null | {
     dailyMissedCount = uncompletedCount;
   }
 
-  const weekStart = getWeekStart(todayStr);
+  const weekStart = getWeekStartDateStr(todayStr);
   if (lastCalcDate < weekStart) {
-    const lastWeekStart = addDays(weekStart, -7);
-    const lastWeekEnd = addDays(weekStart, -1);
+    const lastWeekStart = addDaysToDateStr(weekStart, -7);
+    const lastWeekEnd = addDaysToDateStr(weekStart, -1);
     weeklyWeekStart = lastWeekStart;
     weeklyWeekEnd = lastWeekEnd;
 
