@@ -6,10 +6,12 @@ import { logger } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
 import { evaluateBadges } from "@/modules/progression/server/badges";
 import { calculateLevel, getHunterClass } from "@/modules/progression/domain/progression";
+import { getTodayDateStr } from "@/lib/date-utils";
 
 export async function completeBossQuestAction(questId: string): Promise<{ message?: string, error?: string }> {
   const user = await requireUser();
   const supabase = await createSupabaseServerClient();
+  const todayStr = getTodayDateStr();
 
   // 1. Busca a user_quest para garantir que ela existe e nao foi completada
   const { data: userQuest, error: uqError } = await supabase
@@ -17,8 +19,9 @@ export async function completeBossQuestAction(questId: string): Promise<{ messag
     .select("id, status, quests(xp_reward)")
     .eq("user_id", user.id)
     .eq("quest_id", questId)
+    .eq("date_ref", todayStr)
     .eq("status", "in_progress")
-    .single();
+    .maybeSingle();
 
   if (uqError || !userQuest) {
     logger.error("Erro ao buscar user_quest do boss", uqError, { userId: user.id, questId });
